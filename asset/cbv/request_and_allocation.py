@@ -24,7 +24,6 @@ from asset.filters import (
 )
 from asset.forms import AssetAllocationForm, AssetReassignForm, AssetRequestForm
 from asset.models import Asset, AssetAssignment, AssetRequest, ReturnImages
-from attendance.cbv.tab_shell import AttendanceTabContentShell
 from base.methods import filtersubordinates
 from employee.models import Employee
 from horilla.horilla_middlewares import _thread_locals
@@ -39,6 +38,7 @@ from horilla_views.generic.cbv.views import (
     HorillaFormView,
     HorillaListView,
     HorillaNavView,
+    HorillaTabContentShell,
     HorillaTabView,
     TemplateView,
 )
@@ -430,6 +430,10 @@ class AssetRequestNav(HorillaNavView):
         super().__init__(**kwargs)
         self.search_url = reverse("list-asset-request")
         self.search_swap_target = "#assetRequestListContainer"
+        self.search_in = [
+            ("requested_employee_id", _("Employee")),
+            ("asset_category_id", _("Asset Category")),
+        ]
         self.create_attrs = f"""
                             data-toggle="oh-modal-toggle"
                             data-target="#genericModal"
@@ -461,6 +465,10 @@ class AssetAllocationNav(HorillaNavView):
         super().__init__(**kwargs)
         self.search_url = reverse("list-asset-allocation")
         self.search_swap_target = "#assetAllocationListContainer"
+        self.search_in = [
+            ("assigned_to_employee_id", _("Employee")),
+            ("asset_id", _("Asset")),
+        ]
         if self.request.user.has_perm("asset.view_assetassignment"):
             self.create_attrs = f"""
                                 data-toggle="oh-modal-toggle"
@@ -478,19 +486,19 @@ class AssetAllocationNav(HorillaNavView):
             ]
 
 
-class AssetTabShell(AttendanceTabContentShell):
+class AssetTabShell(HorillaTabContentShell):
     nav_url_name = "req-alloc-asset-nav"
     container_id = "assetListContainer"
     tabs_root_id = "assetReqAllocContainer"
 
 
-class AssetRequestTabShell(AttendanceTabContentShell):
+class AssetRequestTabShell(HorillaTabContentShell):
     nav_url_name = "req-alloc-asset-request-nav"
     container_id = "assetRequestListContainer"
     tabs_root_id = "assetReqAllocContainer"
 
 
-class AssetAllocationTabShell(AttendanceTabContentShell):
+class AssetAllocationTabShell(HorillaTabContentShell):
     nav_url_name = "req-alloc-asset-allocation-nav"
     container_id = "assetAllocationListContainer"
     tabs_root_id = "assetReqAllocContainer"
