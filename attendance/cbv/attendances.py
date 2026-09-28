@@ -15,7 +15,6 @@ from django.utils.translation import gettext_lazy as _
 
 from attendance.cbv.attendance_activity import AttendanceActivityListView
 from attendance.cbv.attendance_tab import AttendanceTabView
-from attendance.cbv.tab_shell import AttendanceTabContentShell
 from attendance.filters import AttendanceFilters
 from attendance.forms import AttendanceExportForm, AttendanceForm, AttendanceUpdateForm
 from attendance.models import Attendance, AttendanceValidationCondition, strtime_seconds
@@ -43,6 +42,7 @@ from horilla_views.generic.cbv.views import (
     HorillaFormView,
     HorillaListView,
     HorillaNavView,
+    HorillaTabContentShell,
     HorillaTabView,
     TemplateView,
 )
@@ -415,21 +415,21 @@ class ValidatedAttendanceNav(_AttendanceTabNavBase):
         self.actions = _attendance_nav_common_actions(self.request)
 
 
-class ValidateAttendanceTabShell(AttendanceTabContentShell):
+class ValidateAttendanceTabShell(HorillaTabContentShell):
     nav_url_name = "validate-attendance-nav"
     container_id = "validateListContainer"
     tabs_root_id = "attendances-tab"
     selected_instances_key_id = "validateselectedInstances"
 
 
-class OTAttendanceTabShell(AttendanceTabContentShell):
+class OTAttendanceTabShell(HorillaTabContentShell):
     nav_url_name = "ot-attendance-nav"
     container_id = "otListContainer"
     tabs_root_id = "attendances-tab"
     selected_instances_key_id = "overtimeselectedInstances"
 
 
-class ValidatedAttendanceTabShell(AttendanceTabContentShell):
+class ValidatedAttendanceTabShell(HorillaTabContentShell):
     nav_url_name = "validated-attendance-nav"
     container_id = "validatedListContainer"
     tabs_root_id = "attendances-tab"

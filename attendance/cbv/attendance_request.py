@@ -12,7 +12,6 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import gettext_noop
 
-from attendance.cbv.tab_shell import AttendanceTabContentShell
 from attendance.filters import AttendanceFilters
 from attendance.forms import (
     AttendanceRequestForm,
@@ -33,6 +32,7 @@ from horilla_views.generic.cbv.views import (
     HorillaFormView,
     HorillaListView,
     HorillaNavView,
+    HorillaTabContentShell,
     HorillaTabView,
     TemplateView,
 )
@@ -439,13 +439,13 @@ class AllAttendanceRequestNav(_AttendanceRequestTabNavBase):
         self.actions = _attendance_request_common_actions(self.request)
 
 
-class RequestedAttendanceTabShell(AttendanceTabContentShell):
+class RequestedAttendanceTabShell(HorillaTabContentShell):
     nav_url_name = "requested-attendance-nav"
     container_id = "requestedAttendanceListContainer"
     tabs_root_id = "attendance-container"
 
 
-class AllAttendanceTabShell(AttendanceTabContentShell):
+class AllAttendanceTabShell(HorillaTabContentShell):
     nav_url_name = "all-attendance-request-nav"
     container_id = "allAttendanceListContainer"
     tabs_root_id = "attendance-container"
