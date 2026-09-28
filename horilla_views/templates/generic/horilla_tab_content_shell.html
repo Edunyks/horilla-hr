@@ -13,18 +13,7 @@
 </div>
 <script>
     (function () {
-        // Each Attendances tab now carries its own full Nav (its own
-        // #filterForm/#applyFilter, from the shared horilla_nav.html
-        // toolbar template) instead of one shared above all three. That
-        // template assumes exactly one live instance per page - if a
-        // second tab's Nav loads while a previously-visited tab's Nav is
-        // still sitting in the DOM, their duplicate ids collide and
-        // horilla_nav.html's own setup script (bare $("#filterForm"),
-        // $("#applyFilter")) can bind to the wrong one. Keep at most one
-        // tab's content alive at a time: whenever this tab (re)loads,
-        // clear every sibling tab's content and drop its "loaded" flag so
-        // horilla_tabs.html's own click handler re-fetches it fresh next
-        // time it's opened, rather than reusing a stale, ID-colliding copy.
+        // Keep only one tab's content live at a time to avoid duplicate-id collisions.
         var myContent = document.currentScript.closest(".oh-tabs__content");
         var contents = myContent && myContent.closest(".oh-tabs__contents");
         if (!contents) return;
