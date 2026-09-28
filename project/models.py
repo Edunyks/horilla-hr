@@ -17,8 +17,10 @@ from django.utils.formats import localize
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
+from attendance.methods.utils import validate_time_format
 from base.horilla_company_manager import HorillaCompanyManager
 from base.models import Company
+from employee.methods.duration_methods import format_time, strtime_seconds
 from employee.models import Employee
 from horilla import horilla_middlewares
 from horilla.horilla_middlewares import _thread_locals
@@ -357,6 +359,14 @@ class Task(HorillaModel):
     )
     start_date = models.DateField(null=True, blank=True, verbose_name=_("Start Date"))
     end_date = models.DateField(null=True, blank=True, verbose_name=_("End Date"))
+    allocated_hours = models.CharField(
+        null=True,
+        blank=True,
+        default="00:00",
+        max_length=10,
+        validators=[validate_time_format],
+        verbose_name=_("Allocated Hours"),
+    )
     document = models.FileField(
         upload_to=upload_path, blank=True, null=True, verbose_name=_("Task File")
     )
@@ -516,6 +526,66 @@ class Task(HorillaModel):
         return render_template(
             path="cbv/tasks/task_actions.html",
             context={"instance": self},
+        )
+
+    @property
+    def allocated_seconds(self):
+        """
+        allocated_hours (HH:MM) converted to seconds, 0 when unset/invalid.
+        """
+        if not self.allocated_hours:
+            return 0
+        try:
+            return strtime_seconds(self.allocated_hours)
+        except (ValueError, AttributeError):
+            return 0
+
+    @property
+    def timesheet_spent_seconds(self):
+        """
+        Sum of time_spent across every timesheet logged against this task.
+        """
+        total = 0
+        for time_spent in self.task_timesheet.values_list("time_spent", flat=True):
+            if not time_spent:
+                continue
+            try:
+                total += strtime_seconds(time_spent)
+            except (ValueError, AttributeError):
+                continue
+        return total
+
+    def timesheet_progress_col(self):
+        """
+        Progress bar comparing logged timesheet hours against allocated_hours,
+        rendered full-width in the task detail view.
+        """
+        allocated = self.allocated_seconds
+        spent = self.timesheet_spent_seconds
+        if not allocated:
+            return ""
+        percent = min(100, round((spent / allocated) * 100))
+        bar_color = (
+            "var(--md-red, #ef4444)"
+            if percent >= 100
+            else "var(--primary-600, #e54f38)"
+        )
+        return format_html(
+            """
+            <div class="oh-timeoff-modal__stat">
+                <span class="oh-timeoff-modal__stat-title">{label}</span>
+                <span class="oh-timeoff-modal__stat-count">{spent} / {allocated} {hrs}</span>
+            </div>
+            <div style="background:#e5e7eb;border-radius:6px;height:10px;overflow:hidden;margin-top:6px;">
+                <div style="width:{percent}%;background:{bar_color};height:100%;"></div>
+            </div>
+            """,
+            label=_("Timesheet Progress"),
+            spent=format_time(spent),
+            allocated=format_time(allocated),
+            hrs=_("hrs"),
+            percent=percent,
+            bar_color=bar_color,
         )
 
     def get_avatar(self):

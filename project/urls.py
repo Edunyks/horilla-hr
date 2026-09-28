@@ -254,6 +254,11 @@ urlpatterns = [
         name="get-tasks-of-project",
     ),
     path(
+        "time-sheet-tab-view/",
+        timesheet.TimeSheetTabView.as_view(),
+        name="time-sheet-tab-view",
+    ),
+    path(
         "time-sheet-tab-shell/",
         timesheet.TimeSheetTabShell.as_view(),
         name="time-sheet-tab-shell",

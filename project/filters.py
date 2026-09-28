@@ -117,6 +117,16 @@ class TaskFilter(FilterSet):
 
 class TaskAllFilter(HorillaFilterSet):
     search = django_filters.CharFilter(method="filter_by_task")
+    end_date = django_filters.DateFilter(
+        field_name="end_date",
+        widget=forms.HiddenInput(),
+    )
+    end_from = django_filters.DateFilter(
+        field_name="end_date",
+        lookup_expr="gte",
+        widget=forms.DateInput(attrs={"type": "date"}),
+        label=_("End Date From"),
+    )
     end_till = django_filters.DateFilter(
         field_name="end_date",
         lookup_expr="lte",

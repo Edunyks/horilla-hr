@@ -10,6 +10,7 @@ from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import resolve, reverse
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.formats import localize
 from django.utils.functional import cached_property
@@ -24,6 +25,8 @@ from horilla_views.generic.cbv.views import (
     HorillaFormView,
     HorillaListView,
     HorillaNavView,
+    HorillaTabContentShell,
+    HorillaTabView,
     TemplateView,
 )
 from project.cbv.cbv_decorators import is_projectmanager_or_member_or_perms
@@ -43,34 +46,49 @@ class TimeSheetView(TemplateView):
 
     template_name = "cbv/timesheet/timesheet.html"
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+
+@method_decorator(login_required, name="dispatch")
+class TimeSheetTabView(HorillaTabView):
+    """My Timesheets / All Timesheets tabs."""
+
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+        self.view_id = "timesheetTabContainer"
+        self.tabs = [
+            {
+                "title": _("My Timesheets"),
+                "url": reverse("my-time-sheet-tab-shell"),
+            },
+        ]
         user = self.request.user
-        context["can_view_all_timesheets"] = (
+        if (
             user.has_perm("project.view_timesheet")
             or any_project_manager(user)
             or any_task_manager(user)
             or any_task_member(user)
-        )
-        return context
+        ):
+            self.tabs.append(
+                {
+                    "title": _("All Timesheets"),
+                    "url": reverse("time-sheet-tab-shell"),
+                }
+            )
 
 
-@method_decorator(login_required, name="dispatch")
-class TimeSheetTabShell(TemplateView):
-    """
-    All Timesheets tab pane
-    """
+class TimeSheetTabShell(HorillaTabContentShell):
+    """All Timesheets tab pane."""
 
-    template_name = "cbv/timesheet/all_timesheet_tab.html"
+    nav_url_name = "time-sheet-nav"
+    container_id = "listContainer"
+    tabs_root_id = "timesheetTabContainer"
 
 
-@method_decorator(login_required, name="dispatch")
-class MyTimeSheetTabShell(TemplateView):
-    """
-    My Timesheets tab pane
-    """
+class MyTimeSheetTabShell(HorillaTabContentShell):
+    """My Timesheets tab pane."""
 
-    template_name = "cbv/timesheet/my_timesheet_tab.html"
+    nav_url_name = "my-time-sheet-nav"
+    container_id = "myListContainer"
+    tabs_root_id = "timesheetTabContainer"
 
 
 @method_decorator(login_required, name="dispatch")
@@ -85,12 +103,7 @@ class TimeSheetNavView(HorillaNavView):
     filter_form_context_name = "form"
     filter_instance = TimeSheetFilter()
     search_swap_target = "#listContainer"
-    template_name = "cbv/timesheet/timesheet_nav.html"
     filter_body_template = "cbv/timesheet/filter.html"
-    # Modern slide-over filter panel (generic/horilla_nav.html's own
-    # {% if modern_filter %} branch) -- same treatment as every other
-    # panel this session. TimeSheetFilter.ajax_fields carries the
-    # AJAX-loaded comboboxes this needs.
     modern_filter = True
     group_by_fields = [
         "employee_id",
@@ -104,9 +117,7 @@ class TimeSheetNavView(HorillaNavView):
         "employee_id__employee_work_info__company_id",
     ]
 
-    # Mirrors TimeSheetList.nested_group_by_fields below -- List and Nav
-    # are separate classes/templates (see employee/cbv/employees.py's
-    # EmployeesList/EmployeeNav for the same split).
+    # Mirrors TimeSheetList.nested_group_by_fields below
     nested_group_by_fields = [
         "employee_id",
         "project_id",
@@ -123,6 +134,11 @@ class TimeSheetNavView(HorillaNavView):
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self.search_url = reverse("time-sheet-list")
+        self.search_in = [
+            ("employee_id", _("Employee")),
+            ("project_id", _("Project")),
+            ("task_id", _("Task")),
+        ]
         self.actions = [
             {
                 "action": _("Delete"),
@@ -182,7 +198,6 @@ class MyTimeSheetNavView(HorillaNavView):
     filter_form_context_name = "form"
     filter_instance = TimeSheetFilter()
     search_swap_target = "#myListContainer"
-    template_name = "cbv/timesheet/timesheet_nav.html"
     filter_body_template = "cbv/timesheet/filter.html"
     modern_filter = True
     group_by_fields = [
@@ -214,6 +229,10 @@ class MyTimeSheetNavView(HorillaNavView):
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self.search_url = reverse("my-time-sheet-list")
+        self.search_in = [
+            ("project_id", _("Project")),
+            ("task_id", _("Task")),
+        ]
         self.actions = [
             {
                 "action": _("Delete"),
@@ -293,30 +312,85 @@ class TimeSheetList(HorillaListView):
             (get_field("date").verbose_name, "date"),
         ]
 
-    row_status_indications = [
-        (
-            "in-progress--dot",
-            _("In progress"),
-            """
-            onclick="
-                $('#applyFilter').closest('form').find('[name=status]').val('in_Progress');
-                $('#applyFilter').click();
+    @cached_property
+    def row_status_indications(self):
+        today = timezone.now().date()
+        tomorrow = today + timezone.timedelta(days=1)
+        this_week = today + timezone.timedelta(days=7)
+        yesterday = today - timezone.timedelta(days=1)
+        return [
+            (
+                "in-progress--dot",
+                _("In progress"),
+                """
+                onclick="
+                    $('#applyFilter').closest('form').find('[name=status]').val('in_Progress');
+                    $('#applyFilter').click();
 
-            "
-            """,
-        ),
-        (
-            "completed--dot",
-            _("Completed"),
-            """
-            onclick="
-                $('#applyFilter').closest('form').find('[name=status]').val('completed');
-                $('#applyFilter').click();
+                "
+                """,
+            ),
+            (
+                "completed--dot",
+                _("Completed"),
+                """
+                onclick="
+                    $('#applyFilter').closest('form').find('[name=status]').val('completed');
+                    $('#applyFilter').click();
 
-            "
-            """,
-        ),
-    ]
+                "
+                """,
+            ),
+            (
+                "filter--dot",
+                _("Yesterday"),
+                f"""
+                onclick="
+                    $('#applyFilter').closest('form').find('[name=start_from]').val('');
+                    $('#applyFilter').closest('form').find('[name=end_till]').val('');
+                    $('#applyFilter').closest('form').find('[name=date]').val('{yesterday}');
+                    $('#applyFilter').click();
+                "
+                """,
+            ),
+            (
+                "filter--dot",
+                _("Today"),
+                f"""
+                onclick="
+                    $('#applyFilter').closest('form').find('[name=start_from]').val('');
+                    $('#applyFilter').closest('form').find('[name=end_till]').val('');
+                    $('#applyFilter').closest('form').find('[name=date]').val('{today}');
+                    $('#applyFilter').click();
+                "
+                """,
+            ),
+            (
+                "filter--dot",
+                _("Tomorrow"),
+                f"""
+                onclick="
+                    $('#applyFilter').closest('form').find('[name=start_from]').val('');
+                    $('#applyFilter').closest('form').find('[name=end_till]').val('');
+                    $('#applyFilter').closest('form').find('[name=date]').val('{tomorrow}');
+                    $('#applyFilter').click();
+                "
+                """,
+            ),
+            (
+                "filter--dot",
+                _("This Week"),
+                f"""
+                onclick="
+                    $('#applyFilter').closest('form').find('[name=date]').val('');
+                    $('#applyFilter').closest('form').find('[name=start_from]').val('{today}');
+                    $('#applyFilter').closest('form').find('[name=end_till]').val('{this_week}');
+                    $('#applyFilter').click();
+                "
+                """,
+            ),
+        ]
+
     row_attrs = """
                 hx-get='{detail_view}?instance_ids={ordered_ids}'
                 hx-target="#genericModalBody"
@@ -389,30 +463,85 @@ class MyTimeSheetList(HorillaListView):
             (get_field("date").verbose_name, "date"),
         ]
 
-    row_status_indications = [
-        (
-            "in-progress--dot",
-            _("In progress"),
-            """
-            onclick="
-                $('#applyFilter').closest('form').find('[name=status]').val('in_Progress');
-                $('#applyFilter').click();
+    @cached_property
+    def row_status_indications(self):
+        today = timezone.now().date()
+        tomorrow = today + timezone.timedelta(days=1)
+        this_week = today + timezone.timedelta(days=7)
+        yesterday = today - timezone.timedelta(days=1)
+        return [
+            (
+                "in-progress--dot",
+                _("In progress"),
+                """
+                onclick="
+                    $('#applyFilter').closest('form').find('[name=status]').val('in_Progress');
+                    $('#applyFilter').click();
 
-            "
-            """,
-        ),
-        (
-            "completed--dot",
-            _("Completed"),
-            """
-            onclick="
-                $('#applyFilter').closest('form').find('[name=status]').val('completed');
-                $('#applyFilter').click();
+                "
+                """,
+            ),
+            (
+                "completed--dot",
+                _("Completed"),
+                """
+                onclick="
+                    $('#applyFilter').closest('form').find('[name=status]').val('completed');
+                    $('#applyFilter').click();
 
-            "
-            """,
-        ),
-    ]
+                "
+                """,
+            ),
+            (
+                "filter--dot",
+                _("Yesterday"),
+                f"""
+                onclick="
+                    $('#applyFilter').closest('form').find('[name=start_from]').val('');
+                    $('#applyFilter').closest('form').find('[name=end_till]').val('');
+                    $('#applyFilter').closest('form').find('[name=date]').val('{yesterday}');
+                    $('#applyFilter').click();
+                "
+                """,
+            ),
+            (
+                "filter--dot",
+                _("Today"),
+                f"""
+                onclick="
+                    $('#applyFilter').closest('form').find('[name=start_from]').val('');
+                    $('#applyFilter').closest('form').find('[name=end_till]').val('');
+                    $('#applyFilter').closest('form').find('[name=date]').val('{today}');
+                    $('#applyFilter').click();
+                "
+                """,
+            ),
+            (
+                "filter--dot",
+                _("Tomorrow"),
+                f"""
+                onclick="
+                    $('#applyFilter').closest('form').find('[name=start_from]').val('');
+                    $('#applyFilter').closest('form').find('[name=end_till]').val('');
+                    $('#applyFilter').closest('form').find('[name=date]').val('{tomorrow}');
+                    $('#applyFilter').click();
+                "
+                """,
+            ),
+            (
+                "filter--dot",
+                _("This Week"),
+                f"""
+                onclick="
+                    $('#applyFilter').closest('form').find('[name=date]').val('');
+                    $('#applyFilter').closest('form').find('[name=start_from]').val('{today}');
+                    $('#applyFilter').closest('form').find('[name=end_till]').val('{this_week}');
+                    $('#applyFilter').click();
+                "
+                """,
+            ),
+        ]
+
     row_attrs = """
                 hx-get='{detail_view}?instance_ids={ordered_ids}'
                 hx-target="#genericModalBody"
@@ -700,30 +829,84 @@ class TimeSheetCardView(HorillaCardView):
 
     card_status_class = "status-{status}"
 
-    card_status_indications = [
-        (
-            "in-progress--dot",
-            _("In progress"),
-            """
-            onclick="
-                $('#applyFilter').closest('form').find('[name=status]').val('in_Progress');
-                $('#applyFilter').click();
+    @cached_property
+    def card_status_indications(self):
+        today = timezone.now().date()
+        tomorrow = today + timezone.timedelta(days=1)
+        this_week = today + timezone.timedelta(days=7)
+        yesterday = today - timezone.timedelta(days=1)
+        return [
+            (
+                "in-progress--dot",
+                _("In progress"),
+                """
+                onclick="
+                    $('#applyFilter').closest('form').find('[name=status]').val('in_Progress');
+                    $('#applyFilter').click();
 
-            "
-            """,
-        ),
-        (
-            "completed--dot",
-            _("Completed"),
-            """
-            onclick="
-                $('#applyFilter').closest('form').find('[name=status]').val('completed');
-                $('#applyFilter').click();
+                "
+                """,
+            ),
+            (
+                "completed--dot",
+                _("Completed"),
+                """
+                onclick="
+                    $('#applyFilter').closest('form').find('[name=status]').val('completed');
+                    $('#applyFilter').click();
 
-            "
-            """,
-        ),
-    ]
+                "
+                """,
+            ),
+            (
+                "filter--dot",
+                _("Yesterday"),
+                f"""
+                onclick="
+                    $('#applyFilter').closest('form').find('[name=start_from]').val('');
+                    $('#applyFilter').closest('form').find('[name=end_till]').val('');
+                    $('#applyFilter').closest('form').find('[name=date]').val('{yesterday}');
+                    $('#applyFilter').click();
+                "
+                """,
+            ),
+            (
+                "filter--dot",
+                _("Today"),
+                f"""
+                onclick="
+                    $('#applyFilter').closest('form').find('[name=start_from]').val('');
+                    $('#applyFilter').closest('form').find('[name=end_till]').val('');
+                    $('#applyFilter').closest('form').find('[name=date]').val('{today}');
+                    $('#applyFilter').click();
+                "
+                """,
+            ),
+            (
+                "filter--dot",
+                _("Tomorrow"),
+                f"""
+                onclick="
+                    $('#applyFilter').closest('form').find('[name=start_from]').val('');
+                    $('#applyFilter').closest('form').find('[name=end_till]').val('');
+                    $('#applyFilter').closest('form').find('[name=date]').val('{tomorrow}');
+                    $('#applyFilter').click();
+                "
+                """,
+            ),
+            (
+                "filter--dot",
+                _("This Week"),
+                f"""
+                onclick="
+                    $('#applyFilter').closest('form').find('[name=date]').val('');
+                    $('#applyFilter').closest('form').find('[name=start_from]').val('{today}');
+                    $('#applyFilter').closest('form').find('[name=end_till]').val('{this_week}');
+                    $('#applyFilter').click();
+                "
+                """,
+            ),
+        ]
 
     card_attrs = """
                 hx-get='{detail_view}?instance_ids={ordered_ids}'
