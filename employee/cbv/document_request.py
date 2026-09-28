@@ -454,6 +454,23 @@ class DocumentListView(HorillaListView):
 
     action_method = "document_actions"
 
+    # One instance of this view loads per expanded document-type group on the
+    # Document Requests pipeline page (employee/templates/cbv/documents/pipeline.html),
+    # which renders ONE header shared by all of them -- see that template's
+    # comment. Row checkboxes and the per-group "Select (N)" toolbar
+    # (generic/quick_actions.html, unaffected by show_header) still work
+    # normally; only the repeated column-label row is suppressed.
+    # DocumentIndividualTabList below (the standalone Documents profile tab)
+    # restores it, since it's a normal one-off list, not one of several
+    # sharing a header.
+    show_header = False
+    header_attrs = {
+        "document_title_display": 'style="width:280px !important;"',
+        "document_status_display": 'style="width:140px !important;"',
+        "issue_date": 'style="width:140px !important;"',
+        "action": 'style="width:160px !important;"',
+    }
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["stored_filters"] = horilla_views_models.SavedFilter.objects.none()
@@ -492,6 +509,12 @@ class DocumentIndividualTabList(DocumentListView):
         (_("Document"), "title"),
         (_("Date"), "issue_date"),
     ]
+
+    # A normal standalone list (the profile's own Documents tab), not one of
+    # several sharing a header -- restore what the parent class turns off for
+    # its own embedded-in-a-pipeline-accordion use (see the comment there).
+    show_header = True
+    header_attrs = {}
 
     row_attrs = """
                 id="document{id}"
