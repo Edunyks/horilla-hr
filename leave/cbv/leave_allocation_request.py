@@ -13,7 +13,6 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import gettext_noop
 
-from attendance.cbv.tab_shell import AttendanceTabContentShell
 from base.methods import choosesubordinates, filtersubordinates, is_reportingmanager
 from employee.cbv.employee_profile import EmployeeProfileView
 from employee.models import Employee
@@ -23,6 +22,7 @@ from horilla_views.generic.cbv.views import (
     HorillaFormView,
     HorillaListView,
     HorillaNavView,
+    HorillaTabContentShell,
     HorillaTabView,
     TemplateView,
 )
@@ -345,13 +345,13 @@ class LeaveAllocationRequestsNav(_LeaveAllocationTabNavBase):
         self.search_swap_target = "#allLeaveAllocationListContainer"
 
 
-class MyLeaveAllocationTabShell(AttendanceTabContentShell):
+class MyLeaveAllocationTabShell(HorillaTabContentShell):
     nav_url_name = "my-leave-allocation-nav"
     container_id = "myLeaveAllocationListContainer"
     tabs_root_id = "leave-allocation"
 
 
-class LeaveAllocationRequestsTabShell(AttendanceTabContentShell):
+class LeaveAllocationRequestsTabShell(HorillaTabContentShell):
     nav_url_name = "leave-allocation-requests-nav"
     container_id = "allLeaveAllocationListContainer"
     tabs_root_id = "leave-allocation"
