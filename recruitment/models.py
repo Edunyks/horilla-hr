@@ -639,6 +639,17 @@ class Candidate(HorillaModel):
         ("software", _("Inside software")),
         ("other", _("Other")),
     ]
+    referral_source_choices = [
+        ("job_board", _("Job Boards")),
+        ("company_career_site", _("Company Career Site")),
+        ("social_media", _("Social Media")),
+        ("employee_referral", _("Employee Referral")),
+        ("recruiter_headhunter", _("Recruiter / Headhunter")),
+        ("search_engine", _("Search Engine")),
+        ("college_university", _("College or University")),
+        ("advertisement_event", _("Advertisement / Event")),
+        ("other", _("Other")),
+    ]
     name = models.CharField(max_length=100, null=True, verbose_name=_("Name"))
     profile = models.ImageField(upload_to=upload_path, null=True)  # 853
     portfolio = models.URLField(max_length=200, blank=True, verbose_name=_("Portfolio"))
@@ -726,6 +737,19 @@ class Candidate(HorillaModel):
         null=True,
         blank=True,
         verbose_name=_("Source"),
+    )
+    referral_source = models.CharField(
+        max_length=20,
+        choices=referral_source_choices,
+        null=True,
+        blank=True,
+        verbose_name=_("How Did You Hear About Us?"),
+    )
+    referral_source_other = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        verbose_name=_("Please Specify"),
     )
     start_onboard = models.BooleanField(
         default=False, verbose_name=_("Start Onboarding")

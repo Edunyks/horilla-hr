@@ -522,7 +522,12 @@ class ApplicationForm(RegistrationForm):
     """
 
     load = forms.CharField(widget=widgets.RecruitmentAjaxWidget, required=False)
-    active_recruitment = Recruitment.objects.filter(
+    # This form serves public, unauthenticated visitors, so a company-scoped
+    # manager (tied to the session's "selected company") is wrong here --
+    # it would reject valid recruitments from any company other than
+    # whichever one happens to be scoped, exactly like the lookup in
+    # recruitment/views/surveys.py that also uses Recruitment.default.
+    active_recruitment = Recruitment.default.filter(
         is_active=True, closed=False, is_published=True
     )
     recruitment_id = forms.ModelChoiceField(queryset=active_recruitment)
@@ -567,8 +572,16 @@ class ApplicationForm(RegistrationForm):
         self.fields["resume"].widget.attrs["accept"] = ".pdf"
         self.fields["resume"].required = False
 
+        # RegistrationForm.__init__ calls reload_queryset(), which re-scopes
+        # every ModelChoiceField to the request session's "selected company"
+        # -- meaningless for this public, unauthenticated form, and it drops
+        # the is_active/closed/is_published filters too. Re-apply the correct
+        # unscoped queryset here rather than in reload_queryset itself, since
+        # internal (staff) forms rely on that company-scoping for Recruitment.
+        self.fields["recruitment_id"].queryset = self.active_recruitment
         self.fields["recruitment_id"].widget.attrs = {"data-widget": "ajax-widget"}
         self.fields["job_position_id"].widget.attrs = {"data-widget": "ajax-widget"}
+        self.fields["referral_source"].required = True
         if request and request.user.has_perm("recruitment.add_candidate"):
             self.fields["profile"].required = False
 
@@ -580,12 +593,17 @@ class ApplicationForm(RegistrationForm):
         profile = self.cleaned_data.get("profile")
         resume = self.cleaned_data.get("resume")
         recruitment: Recruitment = self.cleaned_data.get("recruitment_id")
+        referral_source = self.cleaned_data.get("referral_source")
+        referral_source_other = self.cleaned_data.get("referral_source_other")
 
         if recruitment:
             if not resume and not recruitment.optional_resume:
                 errors["resume"] = _("This field is required")
             if not profile and not recruitment.optional_profile_image:
                 errors["profile"] = _("This field is required")
+
+        if referral_source == "other" and not referral_source_other:
+            errors["referral_source_other"] = _("This field is required")
 
         if errors:
             raise ValidationError(errors)
