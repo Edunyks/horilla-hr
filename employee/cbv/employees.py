@@ -655,6 +655,20 @@ class EmployeeNav(HorillaNavView):
                         """,
                     },
                     {
+                        "action": _("Reset Password"),
+                        "attrs": """
+                        id="resetPasswordEmployees"
+                        style="cursor: pointer;"
+                        """,
+                    },
+                    {
+                        "action": _("Send Invitation"),
+                        "attrs": """
+                        id="sendInvitationEmployees"
+                        style="cursor: pointer;"
+                        """,
+                    },
+                    {
                         "action": _("Delete"),
                         "attrs": """
                         class="oh-dropdown__link--danger"

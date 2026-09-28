@@ -10,10 +10,13 @@ from itertools import chain, groupby
 
 import pandas as pd
 from django.apps import apps
+from django.contrib.auth.hashers import make_password
 from django.db import connection, models, transaction
 from django.utils.translation import gettext as _
 
+from base.backends import ConfiguredEmailBackend
 from base.context_processors import get_initial_prefix
+from base.forms import PassWordResetForm
 from base.models import (
     Company,
     Department,
@@ -24,6 +27,7 @@ from base.models import (
     WorkType,
 )
 from employee.models import Employee, EmployeeWorkInformation
+from horilla_auth.methods import generate_random_password
 from horilla_auth.models import HorillaUser
 
 logger = logging.getLogger(__name__)
@@ -445,8 +449,12 @@ def bulk_create_user_import(success_lists):
         HorillaUser(
             username=row["Email"],
             email=row["Email"],
-            password=str(row["Phone"]).strip(),
+            # bulk_create bypasses create_user(), so the password must be
+            # hashed here directly -- passing a raw string would store it
+            # in plain text until set_initial_password() overwrites it.
+            password=make_password(generate_random_password()),
             is_superuser=False,
+            is_new_employee=True,
         )
         for row in success_lists
         if row["Email"] not in existing_usernames
@@ -514,11 +522,48 @@ def set_initial_password(employees):
     logger.info("started to set initial password")
     for employee in employees:
         try:
-            employee.employee_user_id.set_password(str(employee.phone))
+            employee.employee_user_id.set_password(generate_random_password())
             employee.employee_user_id.save()
         except Exception as e:
             logger.error(f"falied to set initial password for {employee}")
     logger.info("initial password configured")
+
+
+def send_employee_invitation(employee, host, is_secure):
+    """
+    Sends one employee a "set your password" invitation email (the same
+    token/reset-confirm flow used by "forgot password", with invitation-
+    framed copy). Shared by the individual/bulk "Send Invitation" actions
+    and by the auto-invite-on-create hooks in views.py.
+
+    Returns True if the email was sent, False if it was skipped (no linked
+    account, invalid form data, or no mail server configured) -- never
+    raises, so a failed/skipped invitation never breaks the caller's own
+    success path (e.g. employee creation).
+    """
+    user = employee.employee_user_id
+    if not user:
+        return False
+    email_backend = ConfiguredEmailBackend()
+    if not email_backend.configuration:
+        return False
+    form = PassWordResetForm(data={"email": user.username})
+    if not form.is_valid():
+        return False
+    try:
+        user.is_new_employee = True
+        user.save(update_fields=["is_new_employee"])
+        form.save(
+            domain_override=host,
+            use_https=is_secure,
+            from_email=email_backend.dynamic_from_email_with_display_name,
+            email_template_name="employee/mail_templates/invitation_email.html",
+            subject_template_name="employee/mail_templates/invitation_subject.txt",
+        )
+        return True
+    except Exception:
+        logger.error("Failed to send invitation email to %s", employee, exc_info=True)
+        return False
 
 
 def optimize_reporting_manager_lookup():

@@ -118,6 +118,7 @@ from base.forms import (
 )
 from base.methods import (
     check_chart_permission,
+    check_manager,
     choosesubordinates,
     closest_numbers,
     export_data,
@@ -926,6 +927,7 @@ class HorillaPasswordResetView(PasswordResetView):
         return redirect(reverse_lazy("reset-send-success"))
 
 
+@method_decorator(login_required, name="dispatch")
 class EmployeePasswordResetView(PasswordResetView):
     """
     Horilla View for Employee Reset Password
@@ -948,7 +950,22 @@ class EmployeePasswordResetView(PasswordResetView):
 
             username = form.cleaned_data["email"]
             user = HorillaUser.objects.filter(username=username).first()
-            if user:
+            # Previously had no server-side authorization at all -- the
+            # trigger menu item is hidden client-side via
+            # employee.cbv.accessibility.password_reset_accessibility, but
+            # that alone never stopped a direct POST for an arbitrary
+            # employee's email. Enforce the same rule server-side: only the
+            # employee themselves, someone who manages them, or a user who
+            # can add employees may trigger this.
+            target_employee = (
+                Employee.objects.filter(employee_user_id=user).first() if user else None
+            )
+            authorized = target_employee is not None and (
+                self.request.user.has_perm("employee.add_employee")
+                or check_manager(self.request.user.employee_get, target_employee)
+                or self.request.user == user
+            )
+            if user and authorized:
                 opts = {
                     "use_https": self.request.is_secure(),
                     "token_generator": self.token_generator,

@@ -214,6 +214,26 @@ urlpatterns = [
         name="employee-bulk-archive",
     ),
     path(
+        "employee-reset-password-admin/<int:emp_id>/",
+        views.employee_reset_password_admin,
+        name="employee-reset-password-admin",
+    ),
+    path(
+        "employee-bulk-reset-password-admin/",
+        views.employee_bulk_reset_password_admin,
+        name="employee-bulk-reset-password-admin",
+    ),
+    path(
+        "employee-send-invitation/<int:emp_id>/",
+        views.employee_send_invitation,
+        name="employee-send-invitation",
+    ),
+    path(
+        "employee-bulk-send-invitation/",
+        views.employee_bulk_send_invitation,
+        name="employee-bulk-send-invitation",
+    ),
+    path(
         "employee-archive/<int:obj_id>/",
         views.employee_archive,
         name="employee-archive",

@@ -2536,7 +2536,16 @@ class ResetPasswordForm(SetPasswordForm):
             request = getattr(_thread_locals, "request", None)
             if request:
                 messages.success(request, _("Password changed successfully"))
-        return super().save()
+        user = super().save()
+        # Completing a reset here is exactly as valid a way to set your own
+        # password as the change-password form (base/views.py:change_password),
+        # which already clears this flag -- without it, an employee who sets
+        # their password via an emailed reset/invitation link would still be
+        # forced through /change-password/ on their very next login.
+        if hasattr(user, "is_new_employee") and user.is_new_employee:
+            user.is_new_employee = False
+            user.save(update_fields=["is_new_employee"])
+        return user
 
     def clean_confirm_password(self):
         """

@@ -16,6 +16,8 @@ if (typeof i18nMessages === 'undefined') {
         confirmBulkReject: gettext("Do you really want to approve all the selected requests?"),
         confirmBulkApprove: gettext("Do you really want to approve all the selected requests?"),
         confirmBulkUnArchive: gettext("Do you really want to unarchive all the selected records?"),
+        confirmBulkResetPassword: gettext("Do you really want to reset the password for all selected employees? Their current password will stop working immediately."),
+        confirmBulkInvite: gettext("Do you really want to send an invitation email to all selected employees?"),
         totalVacancy: gettext("Total vacancy is %(vacancy)s."),
         candidateStageChange: gettext(
             "Are you sure to change the candidate from %(from)s stage to %(to)s stage"

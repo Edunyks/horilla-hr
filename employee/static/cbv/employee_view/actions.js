@@ -369,6 +369,98 @@ $(document).on("click", "#unArchiveEmployees", function (e) {
     }
 });
 
+$(document).on("click", "#resetPasswordEmployees", function (e) {
+    e.preventDefault();
+    ids = [];
+    ids.push($("#selectedInstances").attr("data-ids"));
+    ids = JSON.parse($("#selectedInstances").attr("data-ids"));
+    if (ids.length === 0) {
+        Swal.fire({
+            text: i18nMessages.noRowsSelected,
+            icon: "warning",
+            confirmButtonText: i18nMessages.close,
+        });
+    } else {
+        Swal.fire({
+            text: i18nMessages.confirmBulkResetPassword,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#6c757d",
+            confirmButtonText: i18nMessages.confirm,
+            cancelButtonText: i18nMessages.cancel,
+        }).then(function (result) {
+            if (result.isConfirmed) {
+                ids = [];
+                ids.push($("#selectedInstances").attr("data-ids"));
+                ids = JSON.parse($("#selectedInstances").attr("data-ids"));
+                $.ajax({
+                    type: "POST",
+                    url: "/employee/employee-bulk-reset-password-admin/",
+                    data: {
+                        csrfmiddlewaretoken: getCookie("csrftoken"),
+                        ids: JSON.stringify(ids),
+                    },
+                    success: function (response, textStatus, jqXHR) {
+                        if (jqXHR.status === 200) {
+                            $("#genericModalBody").html(response);
+                            // Same class the declarative data-toggle="oh-modal-toggle"
+                            // handler adds (ModalDialog.js openModal()) -- this is a
+                            // JS-driven open (after a Swal confirm), not a raw click
+                            // on an element carrying that attribute, so it has to be
+                            // triggered directly here instead.
+                            $("#genericModal").addClass("oh-modal--show");
+                        }
+                    },
+                });
+            }
+        });
+    }
+});
+
+$(document).on("click", "#sendInvitationEmployees", function (e) {
+    e.preventDefault();
+    ids = [];
+    ids.push($("#selectedInstances").attr("data-ids"));
+    ids = JSON.parse($("#selectedInstances").attr("data-ids"));
+    if (ids.length === 0) {
+        Swal.fire({
+            text: i18nMessages.noRowsSelected,
+            icon: "warning",
+            confirmButtonText: i18nMessages.close,
+        });
+    } else {
+        Swal.fire({
+            text: i18nMessages.confirmBulkInvite,
+            icon: "info",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#6c757d",
+            confirmButtonText: i18nMessages.confirm,
+            cancelButtonText: i18nMessages.cancel,
+        }).then(function (result) {
+            if (result.isConfirmed) {
+                ids = [];
+                ids.push($("#selectedInstances").attr("data-ids"));
+                ids = JSON.parse($("#selectedInstances").attr("data-ids"));
+                $.ajax({
+                    type: "POST",
+                    url: "/employee/employee-bulk-send-invitation/",
+                    data: {
+                        csrfmiddlewaretoken: getCookie("csrftoken"),
+                        ids: JSON.stringify(ids),
+                    },
+                    success: function (response, textStatus, jqXHR) {
+                        if (jqXHR.status === 200) {
+                            reloadEmployeeListContainer();
+                        }
+                    },
+                });
+            }
+        });
+    }
+});
+
 $(document).on("click", "#employeeBulkUpdateId", function (e) {
     ids = [];
     ids.push($("#selectedInstances").attr("data-ids"));
