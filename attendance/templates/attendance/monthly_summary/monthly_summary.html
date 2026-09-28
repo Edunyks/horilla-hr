@@ -5,21 +5,39 @@
 
 <style>
   body.dark .ms-page-header h3 { color: #dfdfdf !important; }
-  /* Active-filter chip row — same look as generic/filter_tags.html */
+  /* Active-filter chip row -- colors/sizing copied from the computed
+     styles of .oh-titlebar__tag.filter-field / .oh-titlebar__tag-close
+     (generic/filter_tags.html) so this hand-built row matches exactly
+     rather than approximating it. */
+  #ms-filter-tags { justify-content: flex-end; }
   .ms-filter-tag {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 4px 10px;
-    border-radius: 18px;
-    font-size: .78rem;
-    font-weight: 600;
-    background: rgba(229, 79, 56, .1);
-    border: 1px solid hsl(8, 77%, 56%);
-    color: hsl(8, 60%, 40%);
+    padding: 4px 12px;
+    border-radius: 25px;
+    font-size: 13.6px;
+    font-weight: 700;
+    background: #fff;
+    border: 1px solid rgb(229, 79, 56);
+    color: rgb(28, 28, 28);
   }
-  body.dark .ms-filter-tag { color: #fca5a5; }
-  .ms-filter-tag ion-icon { cursor: pointer; font-size: .95rem; }
+  body.dark .ms-filter-tag { background: transparent; color: #f1f5f9; }
+  .ms-filter-tag .ms-filter-tag-close {
+    background-color: rgb(229, 79, 56);
+    color: #fff;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    border-radius: 50%;
+    margin-left: 0.75rem;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .ms-filter-tag .ms-filter-tag-close ion-icon { font-size: 11px; }
 </style>
 
 <div class="oh-wrapper">
@@ -305,6 +323,17 @@
       </div>
     </form>
 
+    {% comment %}
+    This page builds its own filter-tag row (msRenderFilterTags below)
+    rather than including generic/filter_tags.html, so it doesn't get that
+    template's Save button or its saved-filter modal for free -- both
+    added here instead, reusing the same generic SavedFilter backend
+    (horilla_views.views.SavedFilter) everything else already saves to.
+    {% endcomment %}
+    <div class="oh-modal" id="msSavedFilterModal" role="dialog" aria-labelledby="msSavedFilterModal" aria-hidden="true">
+      <div class="oh-modal__dialog" style="max-width: 550px" id="msSavedFilterFormTarget"></div>
+    </div>
+
     <!-- Table container — loaded via HTMX -->
     <div id="summary-table-container"
          hx-get="{% url 'attendance-monthly-summary-table' %}?{{ pd }}"
@@ -389,9 +418,18 @@ function msRenderFilterTags() {
     var tag = document.createElement('span');
     tag.className = 'ms-filter-tag';
     tag.innerHTML = chip.label + ': ' + chip.value +
-      ' <ion-icon name="close-outline" data-clear-key="' + chip.key + '"></ion-icon>';
+      '<span class="ms-filter-tag-close" data-clear-key="' + chip.key + '">' +
+      '<ion-icon name="close-outline"></ion-icon></span>';
     wrap.appendChild(tag);
   });
+  var saveBtn = document.createElement('button');
+  saveBtn.type = 'button';
+  saveBtn.className = 'oh-titlebar__save';
+  saveBtn.title = "{% trans 'Save filter'|escapejs %}";
+  saveBtn.innerHTML = '<ion-icon name="bookmark-outline"></ion-icon>' + "{% trans 'Save'|escapejs %}";
+  saveBtn.onclick = msSaveCurrentFilter;
+  wrap.appendChild(saveBtn);
+
   var clearAll = document.createElement('span');
   clearAll.className = 'oh-titlebar__tag oh-titlebar__tag--custom';
   clearAll.style.cursor = 'pointer';
@@ -401,8 +439,30 @@ function msRenderFilterTags() {
   wrap.appendChild(clearAll);
 }
 
+// Reuses the same generic SavedFilter backend every other list page saves
+// to (horilla_views.views.SavedFilter) -- it only needs a path and a GET
+// querystring, neither of which is specific to the CBV filter system. The
+// querystring has to be built from the form's live field values rather
+// than location.search, same reason msRenderFilterTags does: this form
+// never pushes its state to the browser URL (hx-push-url="false").
+function msSaveCurrentFilter() {
+  var form = document.getElementById('summary-filter-form');
+  var params = new URLSearchParams(new FormData(form)).toString();
+  var path = "{% url 'attendance-monthly-summary' %}";
+  var url = "{% url 'saved-filter' %}?path=" + encodeURIComponent(path) +
+    "&referrer=" + encodeURIComponent(window.location.href) +
+    (params ? "&" + params : "");
+  htmx.ajax('GET', url, { target: '#msSavedFilterFormTarget', swap: 'innerHTML' }).then(function () {
+    document.getElementById('msSavedFilterModal').classList.add('oh-modal--show');
+  });
+}
+
 document.getElementById('ms-filter-tags').addEventListener('click', function (e) {
-  var key = e.target.getAttribute && e.target.getAttribute('data-clear-key');
+  // The close button now wraps an <ion-icon>, so a click can land on
+  // either -- closest() finds the [data-clear-key] element either way,
+  // where e.target's own attribute would miss it for icon clicks.
+  var closeEl = e.target.closest && e.target.closest('[data-clear-key]');
+  var key = closeEl && closeEl.getAttribute('data-clear-key');
   if (!key) return;
   if (key === 'search') {
     document.getElementById('ms-search-input').value = '';
