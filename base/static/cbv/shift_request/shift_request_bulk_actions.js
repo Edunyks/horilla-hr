@@ -147,10 +147,7 @@ function shiftRequestRowApprove(url, confirmText) {
 }
 
 function shiftRequestApprove() {
-
-
-
-    ids = [];
+  ids = [];
     // function addIdsTab(tabId){
     //   var dataIds = $("#"+tabId).attr("data-ids");
     //   if (dataIds){

@@ -1209,6 +1209,7 @@ class RosterFilter(HorillaFilterSet):
     # page already has). filter_search below is the same name-only
     # matching logic, just pointed at the correct field path.
     search = django_filters.CharFilter(method="filter_search")
+    search_field = django_filters.CharFilter(method="search_in")
     # Dedicated comma-separated "Name or Badge ID" search, alongside the
     # AJAX employee picker above rather than instead of it -- same
     # field/behavior as EmployeeFilter.name_or_badge/AttendanceFilters.
@@ -1253,6 +1254,8 @@ class RosterFilter(HorillaFilterSet):
         see this field's own comment above for why it can't reuse the
         shared horilla.filters.filter_by_name.
         """
+        if self.data.get("search_field"):
+            return queryset
         value = " ".join(value.split())
         queryset = queryset.annotate(
             full_name=Concat(

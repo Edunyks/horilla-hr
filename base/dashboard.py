@@ -9,7 +9,7 @@ import json
 from datetime import date, timedelta
 
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
@@ -532,17 +532,26 @@ def dashboard_kpi_data(request):
     on_leave = len(on_leave_employee_ids)
 
     present_today = 0
+    present_by_work_type = []
     try:
         from attendance.models import Attendance
 
-        present_today = (
-            Attendance.objects.filter(
-                attendance_date=real_today, employee_id__in=emp_qs
-            )
-            .values("employee_id")
-            .distinct()
-            .count()
+        present_qs = Attendance.objects.filter(
+            attendance_date=real_today, employee_id__in=emp_qs
         )
+        present_today = present_qs.values("employee_id").distinct().count()
+        present_by_work_type = list(
+            present_qs.values("work_type_id__work_type")
+            .annotate(count=Count("employee_id", distinct=True))
+            .order_by("-count")
+        )
+        present_by_work_type = [
+            {
+                "label": row["work_type_id__work_type"] or _("Unspecified"),
+                "count": row["count"],
+            }
+            for row in present_by_work_type
+        ]
     except Exception:
         pass
 
@@ -587,6 +596,7 @@ def dashboard_kpi_data(request):
         {
             "total_employees": total_employees,
             "present_today": present_today,
+            "present_by_work_type": present_by_work_type,
             "absent_today": absent_today,
             "expected_today": expected_today,
             "not_checked_in": not_checked_in,
