@@ -9,7 +9,6 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import gettext_noop
 
-from attendance.cbv.tab_shell import AttendanceTabContentShell
 from employee.cbv.employee_profile import EmployeeProfileView
 from employee.models import Employee
 from horilla.http.response import HorillaRedirect
@@ -19,6 +18,7 @@ from horilla_views.generic.cbv.views import (
     HorillaFormView,
     HorillaListView,
     HorillaNavView,
+    HorillaTabContentShell,
     HorillaTabView,
     TemplateView,
 )
@@ -359,13 +359,13 @@ class AllObjectivesNav(_ObjectivesTabNavBase):
         self.search_swap_target = "#allObjectivesListContainer"
 
 
-class MyObjectivesTabShell(AttendanceTabContentShell):
+class MyObjectivesTabShell(HorillaTabContentShell):
     nav_url_name = "my-objectives-nav"
     container_id = "myObjectivesListContainer"
     tabs_root_id = "objContainer"
 
 
-class AllObjectivesTabShell(AttendanceTabContentShell):
+class AllObjectivesTabShell(HorillaTabContentShell):
     nav_url_name = "all-objectives-nav"
     container_id = "allObjectivesListContainer"
     tabs_root_id = "objContainer"

@@ -13,7 +13,6 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import gettext_noop
 
-from attendance.cbv.tab_shell import AttendanceTabContentShell
 from base.decorators import manager_can_enter
 from base.methods import choosesubordinates, is_reportingmanager
 from employee.cbv.employee_profile import EmployeeProfileView
@@ -26,6 +25,7 @@ from horilla_views.generic.cbv.views import (
     HorillaFormView,
     HorillaListView,
     HorillaNavView,
+    HorillaTabContentShell,
     HorillaTabView,
     TemplateView,
 )
@@ -442,6 +442,11 @@ class _FeedbackTabNavBase(HorillaNavView):
 
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
+        self.search_in = [
+            ("employee_id", _("Employee")),
+            ("manager_id", _("Manager")),
+            ("employee_id__employee_work_info__department_id", _("Department")),
+        ]
         self.actions = [
             {
                 "action": _("Archive"),
@@ -560,25 +565,25 @@ class AnonymousFeedbackNav(_FeedbackTabNavBase):
         """
 
 
-class SelfFeedbackTabShell(AttendanceTabContentShell):
+class SelfFeedbackTabShell(HorillaTabContentShell):
     nav_url_name = "self-feedback-nav"
     container_id = "selfFeedbackListContainer"
     tabs_root_id = "feedbackTabs"
 
 
-class RequestedFeedbackTabShell(AttendanceTabContentShell):
+class RequestedFeedbackTabShell(HorillaTabContentShell):
     nav_url_name = "requested-feedback-nav"
     container_id = "requestedFeedbackListContainer"
     tabs_root_id = "feedbackTabs"
 
 
-class AllFeedbackTabShell(AttendanceTabContentShell):
+class AllFeedbackTabShell(HorillaTabContentShell):
     nav_url_name = "all-feedback-nav"
     container_id = "allFeedbackListContainer"
     tabs_root_id = "feedbackTabs"
 
 
-class AnonymousFeedbackTabShell(AttendanceTabContentShell):
+class AnonymousFeedbackTabShell(HorillaTabContentShell):
     nav_url_name = "anonymous-feedback-nav"
     container_id = "anonymousFeedbackListContainer"
     tabs_root_id = "feedbackTabs"
