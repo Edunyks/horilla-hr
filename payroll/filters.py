@@ -49,6 +49,7 @@ class ContractFilter(HorillaFilterSet):
     """
 
     search = django_filters.CharFilter(method="filter_by_contract")
+    search_field = django_filters.CharFilter(method="search_in")
     # Multiple-choice (not the plain single-value ChoiceFilter Meta.fields
     # would otherwise auto-generate) so the panel can default to showing
     # Active + Draft together on first load -- see __init__ below -- while
@@ -209,6 +210,8 @@ class ContractFilter(HorillaFilterSet):
         """
         Filter queryset by first name or last name.
         """
+        if self.data.get("search_field"):
+            return queryset
         # Split the search value into first name and last name
         parts = value.split()
         first_name = parts[0]
@@ -419,7 +422,8 @@ class PayslipFilter(HorillaFilterSet):
     Filter set class for payslip model.
     """
 
-    search = django_filters.CharFilter(method=filter_by_name)
+    search = django_filters.CharFilter(method="filter_by_name")
+    search_field = django_filters.CharFilter(method="search_in")
     employee_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Employee.objects.all(),
         widget=forms.SelectMultiple(),
@@ -445,6 +449,16 @@ class PayslipFilter(HorillaFilterSet):
             "placeholder": _("Search employee..."),
         },
     }
+
+    def filter_by_name(self, queryset, name, value):
+        """
+        Delegates to the shared horilla.filters.filter_by_name, except when
+        search_field is set (field-scoped search takes over instead -- see
+        HorillaFilterSet.search_in).
+        """
+        if self.data.get("search_field"):
+            return queryset
+        return filter_by_name(queryset, name, value)
 
     start_date_from = django_filters.DateFilter(
         widget=forms.DateInput(attrs={"type": "date"}),

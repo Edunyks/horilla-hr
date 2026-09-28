@@ -1818,6 +1818,22 @@ class BonusPointSetting(models.Model):
             context={"instance": self},
         )
 
+    def bonus_point_setting_detail_view(self):
+        """
+        detail view
+        """
+        url = reverse("bonus-point-setting-detail-view", kwargs={"pk": self.pk})
+        return url
+
+    def bonus_point_setting_detail_view_actions(self):
+        """
+        detail view actions
+        """
+        return render_template(
+            path="bonus/bonus_point_setting_detail_actions.html",
+            context={"instance": self},
+        )
+
     def create_employee_bonus(self, employee, field_1, field_2, instance):
         """
         For creating employee bonus

@@ -142,6 +142,42 @@ class BonusPointSettingListView(views.HorillaListView):
         "action": """ style="width:150px !important" """,
     }
 
+    row_attrs = """
+        hx-get='{bonus_point_setting_detail_view}?instance_ids={ordered_ids}'
+        data-toggle="oh-modal-toggle"
+        data-target="#genericModal"
+        hx-target="#genericModalBody"
+        """
+
+
+@method_decorator(login_required, name="dispatch")
+@method_decorator(permission_required("pms.view_bonuspointsetting"), name="dispatch")
+class BonusPointSettingDetailView(views.HorillaDetailedView):
+    """
+    BonusPointSetting detail view
+    """
+
+    model = models.BonusPointSetting
+    detail_view_url_name = "bonus-point-setting-detail-view"
+    detail_view_permission = "pms.view_bonuspointsetting"
+    title = _("Bonus Point Setting")
+    action_method = "bonus_point_setting_detail_view_actions"
+
+    header = {
+        "title": "get_model_display",
+        "subtitle": "get_bonus_for_display",
+        "avatar": "",
+    }
+
+    body = [
+        (_("Model"), "get_model_display"),
+        (_("Applicable For"), "get_applicable_for_display"),
+        (_("Bonus For"), "get_bonus_for_display"),
+        (_("Condition"), "get_condition"),
+        (_("Points"), "points"),
+        (_("Is Active"), "is_active"),
+    ]
+
 
 # ================Models for EmployeeBonusPoint==============
 

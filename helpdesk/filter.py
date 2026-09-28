@@ -70,6 +70,7 @@ class TicketFilter(HorillaFilterSet):
     """
 
     search = CharFilter(method="search_method")
+    search_field = django_filters.CharFilter(method="search_in")
     from_date = DateFilter(
         field_name="deadline",
         lookup_expr="gte",
@@ -214,6 +215,8 @@ class TicketFilter(HorillaFilterSet):
         """
         value = (value or "").strip()
         if not value:
+            return queryset
+        if self.data.get("search_field"):
             return queryset
         return (
             queryset.filter(title__icontains=value)

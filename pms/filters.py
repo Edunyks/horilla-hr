@@ -313,6 +313,7 @@ class FeedbackFilter(HorillaFilterSet):
     )
 
     search = django_filters.CharFilter(method="search_method")
+    search_field = django_filters.CharFilter(method="search_in")
     review_cycle = django_filters.CharFilter(lookup_expr="icontains")
     created_at_date_range = DateRangeFilter(
         field_name="created_at",
@@ -427,6 +428,8 @@ class FeedbackFilter(HorillaFilterSet):
         """
         Search Method
         """
+        if self.data.get("search_field"):
+            return queryset
         parts = value.split()
         first_name = parts[0]
         last_name = " ".join(parts[1:]) if len(parts) > 1 else ""

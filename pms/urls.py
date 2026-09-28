@@ -870,6 +870,11 @@ urlpatterns = [
         name="bonus-point-setting-list-view",
     ),
     path(
+        "bonus-point-setting-detail-view/<int:pk>/",
+        cbvs.BonusPointSettingDetailView.as_view(),
+        name="bonus-point-setting-detail-view",
+    ),
+    path(
         "bonus-setting-form-values/",
         views.bonus_setting_form_values,
         name="bonus-setting-form-values",

@@ -204,6 +204,14 @@ class PayslipNav(HorillaNavView):
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self.search_url = reverse("payslip-list")
+        self.search_in = [
+            ("employee_id", _("Employee")),
+            ("group_name", _("Pay Slip Batch")),
+            ("employee_id__employee_work_info__department_id", _("Department")),
+            ("employee_id__employee_work_info__job_position_id", _("Job Position")),
+            ("employee_id__employee_work_info__job_role_id", _("Job Role")),
+            ("employee_id__employee_work_info__company_id", _("Company")),
+        ]
         self.actions = []
         if self.request.user.has_perm("payroll.add_payslip"):
             # self.create_attrs = f"""

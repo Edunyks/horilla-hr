@@ -340,6 +340,7 @@ class AssetRequestFilter(CustomFilterSet):
     """
 
     search = django_filters.CharFilter(method="search_method")
+    search_field = django_filters.CharFilter(method="search_in")
     # Dedicated comma-separated "Name or Badge ID" search, alongside the
     # AJAX requested_employee_id picker below rather than instead of it --
     # same field/behavior as every other modernized panel this session;
@@ -376,6 +377,8 @@ class AssetRequestFilter(CustomFilterSet):
         """
         This method is used to search employees
         """
+        if self.data.get("search_field"):
+            return queryset
         values = value.split(" ")
         empty = queryset.model.objects.none()
         for split in values:
@@ -476,6 +479,7 @@ class AssetAllocationFilter(CustomFilterSet):
     """
 
     search = django_filters.CharFilter(method="search_method")
+    search_field = django_filters.CharFilter(method="search_in")
 
     # Meta.fields = "__all__" below only auto-generates filters for
     # AssetAssignment's own direct fields -- it doesn't reach through
@@ -523,6 +527,8 @@ class AssetAllocationFilter(CustomFilterSet):
         """
         This method is used to search employees and assets
         """
+        if self.data.get("search_field"):
+            return queryset
         values = value.split(" ")
         empty = queryset.model.objects.none()
         for split in values:

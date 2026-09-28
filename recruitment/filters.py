@@ -66,6 +66,7 @@ class CandidateFilter(HorillaFilterSet):
 
     name = django_filters.CharFilter(field_name="name", lookup_expr="icontains")
     search = django_filters.CharFilter(method="search_by_name", lookup_expr="icontains")
+    search_field = django_filters.CharFilter(method="search_in")
     has_referral = django_filters.BooleanFilter(
         method=_filter_has_referral,
         widget=django_filters.widgets.BooleanWidget(),
@@ -269,6 +270,8 @@ class CandidateFilter(HorillaFilterSet):
         """
         search by name method
         """
+        if self.data.get("search_field"):
+            return queryset
         queryset = (
             queryset.filter(name__icontains=value)
             | queryset.filter(stage_id__stage__icontains=value)
@@ -562,6 +565,7 @@ class RecruitmentFilter(HorillaFilterSet):
         widget=forms.DateInput(attrs={"type": "date"}),
     )
     search = django_filters.CharFilter(method="filter_by_name")
+    search_field = django_filters.CharFilter(method="search_in")
     is_active = django_filters.ChoiceFilter(
         choices=[
             (True, "Yes"),
@@ -620,6 +624,8 @@ class RecruitmentFilter(HorillaFilterSet):
         """
         Filter queryset by first name or last name.
         """
+        if self.data.get("search_field"):
+            return queryset
         # Split the search value into first name and last name
         parts = value.split()
         first_name = parts[0]
