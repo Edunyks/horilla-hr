@@ -122,7 +122,7 @@
         /* KPI Grid */
         .md-kpi-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(6, 1fr);
             margin-bottom: 20px;
             gap: 14px;
         }
@@ -207,6 +207,10 @@
             background: #f3e8ff;
             color: var(--md-purple);
         }
+        .md-kpi-card__icon--red {
+            background: #fee2e2;
+            color: var(--md-red, #ef4444);
+        }
         .md-kpi-card__icon--blue {
             background: #dbeafe;
             color: var(--md-blue);
@@ -223,6 +227,9 @@
         }
         .dark .md-kpi-card__icon--purple {
             background: #3b0764;
+        }
+        .dark .md-kpi-card__icon--red {
+            background: #7f1d1d;
         }
         .dark .md-kpi-card__icon--blue {
             background: #1e3a8a;
@@ -247,6 +254,26 @@
         .md-kpi-card__sub {
             font-size: 12px;
             opacity: 0.6;
+        }
+
+        .md-kpi-card__breakdown {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px 10px;
+            margin-top: 6px;
+        }
+
+        .md-kpi-card__breakdown-item {
+            font-size: 11px;
+            opacity: 0.6;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .md-kpi-card__breakdown-item b {
+            font-weight: 700;
+            opacity: 1;
         }
 
         .md-badge {
@@ -467,6 +494,9 @@
         }
         .md-kpi-card--skeleton:nth-child(4) .md-skeleton {
             animation-delay: 0.36s;
+        }
+        .md-kpi-card--skeleton:nth-child(5) .md-skeleton {
+            animation-delay: 0.48s;
         }
 
         .md-empty {
@@ -1247,6 +1277,11 @@
         }
 
         /* Responsive */
+        @media (max-width: 1440px) {
+            .md-kpi-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
         @media (max-width: 1280px) {
             .md-layout {
                 grid-template-columns: 1fr;
@@ -1434,6 +1469,12 @@
         {% endif %}
 
         <div class="md-kpi-grid" id="md-kpi-grid">
+            <div class="md-kpi-card md-kpi-card--skeleton">
+                <div class="md-skeleton md-skeleton--icon"></div>
+                <div class="md-skeleton md-skeleton--label"></div>
+                <div class="md-skeleton md-skeleton--value"></div>
+                <div class="md-skeleton md-skeleton--sub"></div>
+            </div>
             <div class="md-kpi-card md-kpi-card--skeleton">
                 <div class="md-skeleton md-skeleton--icon"></div>
                 <div class="md-skeleton md-skeleton--label"></div>
@@ -1905,11 +1946,19 @@
 
             const emptyHtml = (msg) => `<div class="md-empty"><img src="/static/images/ui/no_records.svg" alt="">${msg}</div>`;
             const hideCard  = id => document.querySelector(`[data-chart-id="${id}"]`)?.classList.add('md-chart-card--hidden');
-            const kpiCard   = (href, perm, colorClass, svg, label, value, sub) => {
+            const kpiCard   = (href, perm, colorClass, svg, label, value, sub, extra = '') => {
                 const body = `<div class="md-kpi-card__icon ${colorClass}">${svg}</div><div class="md-kpi-card__label">${label}</div><div class="md-kpi-card__value">${value}</div>`;
-                const subHtml = `<div class="md-kpi-card__sub">${sub}</div>`;
+                const subHtml = `<div class="md-kpi-card__sub">${sub}</div>${extra}`;
                 if (!perm) return `<div class="md-kpi-card">${body}${subHtml}</div>`;
                 return `<div class="md-kpi-card"><a href="${href}" class="md-kpi-card__hit">${body}</a>${subHtml}</div>`;
+            };
+            // Small "On-Office · 30  WFH · 12" row shown under Present Today,
+            // built from server-grouped work_type_id__work_type counts.
+            const escapeHtml = (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+            const kpiBreakdown = (rows) => {
+                if (!rows || !rows.length) return '';
+                const items = rows.map(r => `<span class="md-kpi-card__breakdown-item">${escapeHtml(r.label)}<b>${r.count}</b></span>`).join('');
+                return `<div class="md-kpi-card__breakdown">${items}</div>`;
             };
 
             document.getElementById('md-date').textContent = new Date().toLocaleDateString('en-US', {
@@ -2393,12 +2442,16 @@
                         const empSvg   = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
                         const attSvg   = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>';
                         const leaveSvg = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+                        const recruSvg = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>';
+                        const offlineSvg = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="18" y1="8" x2="23" y2="13"/><line x1="23" y1="8" x2="18" y2="13"/></svg>';
                         const clockSvg = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
                         document.getElementById('md-kpi-grid').innerHTML =
                             kpiCard("{% url 'employee-view' %}?is_active=True&filter_applied=on",   PERM.employee,    'md-kpi-card__icon--indigo', empSvg,   '{% trans "Total Employees"|escapejs %}',   data.total_employees,   data.new_joiners > 0 ? '<span class="md-badge md-badge--green">+' + data.new_joiners + ' {% trans "this month"|escapejs %}</span>' : '<span class="md-badge md-badge--blue">{% trans "No new joiners"|escapejs %}</span>') +
-                            kpiCard("{% url 'employee-view' %}?present_on={% now 'Y-m-d' %}&is_active=True&filter_applied=on",  PERM.employee,    'md-kpi-card__icon--green',  attSvg,   '{% trans "Present Today"|escapejs %}',     data.present_today,     '<span class="md-badge ' + (data.attendance_rate >= 80 ? 'md-badge--green' : 'md-badge--amber') + '">' + data.attendance_rate + '% {% trans "of expected"|escapejs %}</span>') +
+                            kpiCard("{% url 'employee-view' %}?present_on={% now 'Y-m-d' %}&is_active=True&filter_applied=on",  PERM.employee,    'md-kpi-card__icon--green',  attSvg,   '{% trans "Present Today"|escapejs %}',     data.present_today,     '<span class="md-badge ' + (data.attendance_rate >= 80 ? 'md-badge--green' : 'md-badge--amber') + '">' + data.attendance_rate + '% {% trans "of expected"|escapejs %}</span>', kpiBreakdown(data.present_by_work_type)) +
+                            kpiCard("{% url 'employee-view' %}?not_present_on={% now 'Y-m-d' %}&is_active=True&filter_applied=on", PERM.employee, 'md-kpi-card__icon--red', offlineSvg, '{% trans "Offline"|escapejs %}', data.not_checked_in, data.not_checked_in > 0 ? '<span class="md-badge md-badge--amber">{% trans "Yet to check in"|escapejs %}</span>' : '<span class="md-badge md-badge--green">{% trans "Everyone checked in"|escapejs %}</span>') +
                             kpiCard(`{% url 'request-view' %}?status=approved&today_leave=true&filter_applied=on`,     PERM.leave,       'md-kpi-card__icon--amber',  leaveSvg, '{% trans "On Leave"|escapejs %}',           data.on_leave,          (data.pending_leaves > 0 ? '<a href="{% url "request-view" %}?status=requested&filter_applied=on" class="md-badge md-badge--amber">' + data.pending_leaves + ' {% trans "pending"|escapejs %}</a>' : '<span class="md-badge md-badge--green">{% trans "No pending"|escapejs %}</span>') + (data.half_day_today > 0 ? ' <span class="md-badge md-badge--amber">' + data.half_day_today + ' {% trans "half day"|escapejs %}</span>' : '')) +
-                            kpiCard(`{% url 'employee-view' %}?expected_to_check_in={% now 'Y-m-d' %}&is_active=True&filter_applied=on`,     PERM.employee,    'md-kpi-card__icon--blue', clockSvg, '{% trans "Expected to Check In"|escapejs %}', data.expected_to_check_in, '<span class="md-badge md-badge--amber">{% trans "Not present, not on leave"|escapejs %}</span>');
+                            kpiCard(`{% url 'employee-view' %}?expected_to_check_in={% now 'Y-m-d' %}&is_active=True&filter_applied=on`,     PERM.employee,    'md-kpi-card__icon--blue', clockSvg, '{% trans "Expected to Check In"|escapejs %}', data.expected_to_check_in, '<span class="md-badge md-badge--amber">{% trans "Not present, not on leave"|escapejs %}</span>') +
+                            (PERM.recruitment ? kpiCard("{% url 'recruitment-view' %}?closed=false&filter_applied=on", true, 'md-kpi-card__icon--purple', recruSvg, '{% trans "Open Recruitments"|escapejs %}', data.open_recruitments, '<span class="md-badge md-badge--blue">{% trans "Active hiring"|escapejs %}</span>') : '');
                     });
             }
             loadKpiCards();

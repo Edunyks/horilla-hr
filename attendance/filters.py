@@ -1312,6 +1312,14 @@ def get_present_on(queryset, _name, value):
     return queryset.filter(employee_attendances__attendance_date=value).distinct()
 
 
+def get_not_present_on(queryset, _name, value):
+    """
+    Inverse of get_present_on -- active employees with no attendance record
+    for ``value``. Backs the dashboard's "Offline" KPI card drill-down.
+    """
+    return queryset.exclude(employee_attendances__attendance_date=value).distinct()
+
+
 def get_expected_to_check_in(queryset, _name, value):
     """
     Employees still expected to check in on ``value`` -- i.e. those with no
@@ -1407,6 +1415,13 @@ def online_init(self, *args, **kwargs):
     )
     self.filters["present_on"] = present_field
     self.form.fields["present_on"] = present_field.field
+    not_present_field = django_filters.DateFilter(
+        label=_("Not Present On"),
+        method=get_not_present_on,
+        widget=forms.DateInput(attrs={"type": "date", "class": "oh-input w-100"}),
+    )
+    self.filters["not_present_on"] = not_present_field
+    self.form.fields["not_present_on"] = not_present_field.field
     expected_check_in_field = django_filters.DateFilter(
         label=_("Expected to Check In"),
         method=get_expected_to_check_in,
