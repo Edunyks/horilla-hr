@@ -2,6 +2,7 @@
 Accessiblility
 """
 
+from django.apps import apps
 from django.contrib.auth.context_processors import PermWrapper
 
 from base.methods import check_manager
@@ -196,6 +197,68 @@ def history_accessibility(
         "employee.view_historicalemployeeworkinformation"
     ) or check_manager(request.user.employee_get, instance):
         return True
+    return False
+
+
+def allocation_accessibility(
+    request, instance: object = None, user_perms: PermWrapper = [], *args, **kwargs
+) -> bool:
+    """
+    Allocations page: visible to the instance's reporting manager, the
+    recruitment manager or onboarding stage/task manager of the candidate
+    behind it (if any), or users with explicit permission.
+
+    ``instance`` may be an Employee or (pre-conversion) a recruitment
+    Candidate, matching what AllocationView resolves before this runs.
+    """
+    if not instance or not request.user.is_authenticated:
+        return False
+    if request.user.has_perm("recruitment.view_recruitment"):
+        return True
+
+    employee = getattr(request.user, "employee_get", None)
+    if not employee:
+        return False
+
+    Candidate = (
+        apps.get_model("recruitment", "Candidate")
+        if apps.is_installed("recruitment")
+        else None
+    )
+
+    if Candidate and isinstance(instance, Candidate):
+        candidate = instance
+    elif isinstance(instance, Employee):
+        if check_manager(employee, instance):
+            return True
+        candidate = instance.candidate_get.first() if Candidate else None
+    else:
+        return False
+
+    if not candidate:
+        return False
+
+    recruitment = candidate.recruitment_id
+    if recruitment and recruitment.recruitment_managers.filter(pk=employee.pk).exists():
+        return True
+
+    if apps.is_installed("onboarding"):
+        CandidateStage = apps.get_model("onboarding", "CandidateStage")
+        stage_link = CandidateStage.objects.filter(candidate_id=candidate).first()
+        if (
+            stage_link
+            and stage_link.onboarding_stage_id.employee_id.filter(
+                pk=employee.pk
+            ).exists()
+        ):
+            return True
+
+        OnboardingTask = apps.get_model("onboarding", "OnboardingTask")
+        if OnboardingTask.objects.filter(
+            candidatetask__candidate_id=candidate, employee_id=employee
+        ).exists():
+            return True
+
     return False
 
 

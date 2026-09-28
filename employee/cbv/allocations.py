@@ -25,11 +25,14 @@ from base.forms import AddToUserGroupForm, ModelForm, forms
 from base.methods import paginator_qry
 from base.templatetags.horillafilters import app_installed
 from base.views import get_models_in_app
+from employee.cbv.accessibility import allocation_accessibility
 from employee.models import Employee, EmployeeBankDetails, EmployeeWorkInformation
 from employee.models import models as django_models
 from horilla.horilla_middlewares import _thread_locals
 from horilla.http import HorillaRedirect
+from horilla.methods import handle_no_permission
 from horilla_views.cbv_methods import (
+    allocation_manager_can_enter,
     hx_request_required,
     login_required,
     render_template,
@@ -44,14 +47,9 @@ from horilla_views.generic.cbv.views import (
 if app_installed("asset"):
     from asset.cbv.request_and_allocation import Asset
     from asset.filters import AssetFilter
+    from asset.forms import AssetReturnForm
     from asset.models import AssetAssignment, AssetCategory, AssetRequest
     from asset.views import asset_allocate_return
-    from asset.forms import AssetReturnForm
-
-from onboarding.cbv_decorators import (
-    all_manager_can_enter,
-    recruitment_manager_can_enter,
-)
 
 if app_installed("leave"):
     from leave.cbv.leave_types import AvailableLeave, LeaveType, LeaveTypeListView
@@ -64,9 +62,6 @@ logger = logging.getLogger(__name__)
 
 
 @method_decorator(login_required, name="dispatch")
-@method_decorator(
-    all_manager_can_enter(perm="recruitment.view_recruitment"), name="dispatch"
-)
 class AllocationView(HorillaDetailedView):
     """
     AllocationView
@@ -90,6 +85,8 @@ class AllocationView(HorillaDetailedView):
             if not candidate:
                 messages.error(request, _("Record not found."))
                 return HorillaFormView.HttpResponse()
+            if not allocation_accessibility(request, candidate):
+                return handle_no_permission(request)
             # set candidate to request for accessing inside work info signal
             request.employee_candidate = candidate
             instance = candidate.converted_employee_id
@@ -124,6 +121,8 @@ class AllocationView(HorillaDetailedView):
             if not instance:
                 messages.error(request, _("Employee not found."))
                 return HorillaFormView.HttpResponse()
+            if not allocation_accessibility(request, instance):
+                return handle_no_permission(request)
 
         self.instance = instance
 
@@ -276,9 +275,6 @@ class BankInfo(ModelForm):
 
 
 @method_decorator(login_required, name="dispatch")
-@method_decorator(
-    all_manager_can_enter(perm="recruitment.view_recruitment"), name="dispatch"
-)
 class PersonalFormView(HorillaFormView):
     """
     PersonalFormView
@@ -304,10 +300,16 @@ class PersonalFormView(HorillaFormView):
 
     def post(self, request, *args, pk=None, **kwargs):
         self.instance = request.POST.get("instance_id")
+        target = Employee.objects.filter(pk=self.instance).first()
+        if not allocation_accessibility(request, target):
+            return handle_no_permission(request)
         return super().post(request, *args, pk=pk, **kwargs)
 
     def get(self, request, *args, pk=None, **kwargs):
         self.instance = request.GET.get("instance_id")
+        target = Employee.objects.filter(pk=self.instance).first()
+        if not allocation_accessibility(request, target):
+            return handle_no_permission(request)
         return super().post(request, *args, pk=pk, **kwargs)
 
     def form_valid(self, form: PersonalForm):
@@ -325,9 +327,7 @@ class PersonalFormView(HorillaFormView):
 
 
 @method_decorator(login_required, name="dispatch")
-@method_decorator(
-    all_manager_can_enter(perm="recruitment.view_recruitment"), name="dispatch"
-)
+@method_decorator(allocation_manager_can_enter(), name="dispatch")
 class WorkFormView(HorillaFormView):
     """
     WorkFormView
@@ -373,9 +373,7 @@ class WorkFormView(HorillaFormView):
 
 
 @method_decorator(login_required, name="dispatch")
-@method_decorator(
-    all_manager_can_enter(perm="recruitment.view_recruitment"), name="dispatch"
-)
+@method_decorator(allocation_manager_can_enter(), name="dispatch")
 @receiver(post_save, sender=EmployeeWorkInformation)
 def work_info_post_save(sender, instance, created, **kwargs):
     """
@@ -395,9 +393,7 @@ def work_info_post_save(sender, instance, created, **kwargs):
 
 
 @method_decorator(login_required, name="dispatch")
-@method_decorator(
-    all_manager_can_enter(perm="recruitment.view_recruitment"), name="dispatch"
-)
+@method_decorator(allocation_manager_can_enter(), name="dispatch")
 class BankFormView(HorillaFormView):
     """
     WorkFormView
@@ -443,9 +439,7 @@ class BankFormView(HorillaFormView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(hx_request_required, name="dispatch")
-@method_decorator(
-    all_manager_can_enter(perm="recruitment.view_recruitment"), name="dispatch"
-)
+@method_decorator(allocation_manager_can_enter(), name="dispatch")
 class EmployeeForms(TemplateView):
     """
     EmployeeForms
@@ -469,9 +463,7 @@ if app_installed("leave"):
 
     @method_decorator(login_required, name="dispatch")
     @method_decorator(hx_request_required, name="dispatch")
-    @method_decorator(
-        all_manager_can_enter(perm="recruitment.view_recruitment"), name="dispatch"
-    )
+    @method_decorator(allocation_manager_can_enter(), name="dispatch")
     class LeaveTypeView(TemplateView):
         """
         EmployeeForms
@@ -504,9 +496,7 @@ if app_installed("leave"):
 
     @method_decorator(login_required, name="dispatch")
     @method_decorator(hx_request_required, name="dispatch")
-    @method_decorator(
-        all_manager_can_enter(perm="recruitment.view_recruitment"), name="dispatch"
-    )
+    @method_decorator(allocation_manager_can_enter(), name="dispatch")
     class LeaveTypeAllocationList(LeaveTypeListView):
         """
         LeaveTypeAllocationList
@@ -622,9 +612,7 @@ if app_installed("asset"):
 
     @method_decorator(login_required, name="dispatch")
     @method_decorator(hx_request_required, name="dispatch")
-    @method_decorator(
-        all_manager_can_enter(perm="recruitment.view_recruitment"), name="dispatch"
-    )
+    @method_decorator(allocation_manager_can_enter(), name="dispatch")
     class Assets(TemplateView):
         """
         Assets
@@ -658,9 +646,7 @@ if app_installed("asset"):
     Asset.asset_allocation_status = asset_allocation_status
 
     @method_decorator(login_required, name="dispatch")
-    @method_decorator(
-        all_manager_can_enter(perm="recruitment.view_recruitment"), name="dispatch"
-    )
+    @method_decorator(allocation_manager_can_enter(), name="dispatch")
     class AssetAllocationList(HorillaListView):
         """
         AssetAllocationLists
@@ -825,9 +811,7 @@ if app_installed("asset"):
     AssetCategory.category_allocation_metod = category_allocation_metod
 
     @method_decorator(login_required, name="dispatch")
-    @method_decorator(
-        all_manager_can_enter(perm="recruitment.view_recruitment"), name="dispatch"
-    )
+    @method_decorator(allocation_manager_can_enter(), name="dispatch")
     class AssetCategoryAllocationList(HorillaListView):
         """
         Lists asset categories for the employee and lets managers raise an
@@ -957,9 +941,7 @@ if app_installed("asset"):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(hx_request_required, name="dispatch")
-@method_decorator(
-    all_manager_can_enter(perm="recruitment.view_recruitment"), name="dispatch"
-)
+@method_decorator(allocation_manager_can_enter(), name="dispatch")
 class GroupsView(TemplateView):
     """
     GroupsView
@@ -970,9 +952,7 @@ class GroupsView(TemplateView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(hx_request_required, name="dispatch")
-@method_decorator(
-    all_manager_can_enter(perm="recruitment.view_recruitment"), name="dispatch"
-)
+@method_decorator(allocation_manager_can_enter(), name="dispatch")
 class Groups(TemplateView):
     """
     Groups
@@ -1014,9 +994,7 @@ class Groups(TemplateView):
 
 
 @method_decorator(login_required, name="dispatch")
-@method_decorator(
-    recruitment_manager_can_enter(perm="recruitment.view_recruitment"), name="dispatch"
-)
+@method_decorator(allocation_manager_can_enter(), name="dispatch")
 class GroupAssignView(TemplateView):
     """
     View to assign multiple groups to a single employee
@@ -1106,9 +1084,7 @@ if app_installed("payroll"):
 
     @method_decorator(login_required, name="dispatch")
     @method_decorator(hx_request_required, name="dispatch")
-    @method_decorator(
-        all_manager_can_enter(perm="recruitment.view_recruitment"), name="dispatch"
-    )
+    @method_decorator(allocation_manager_can_enter(), name="dispatch")
     class AllowanceView(TemplateView):
         """
         AllowanceView
@@ -1225,9 +1201,7 @@ if app_installed("payroll"):
 
     @method_decorator(login_required, name="dispatch")
     @method_decorator(hx_request_required, name="dispatch")
-    @method_decorator(
-        all_manager_can_enter(perm="recruitment.view_recruitment"), name="dispatch"
-    )
+    @method_decorator(allocation_manager_can_enter(), name="dispatch")
     class DeductionView(TemplateView):
         """
         AllowanceView
@@ -1236,9 +1210,7 @@ if app_installed("payroll"):
         template_name = "cbv/allocations/payroll/deduction/deduction_view.html"
 
     @method_decorator(login_required, name="dispatch")
-    @method_decorator(
-        all_manager_can_enter(perm="recruitment.view_recruitment"), name="dispatch"
-    )
+    @method_decorator(allocation_manager_can_enter(), name="dispatch")
     class DeductionList(DeductionListView):
         """
         AllowanceList
@@ -1347,9 +1319,7 @@ def completion_percentage(self):
 
 
 @method_decorator(login_required, name="dispatch")
-@method_decorator(
-    all_manager_can_enter(perm="recruitment.view_recruitment"), name="dispatch"
-)
+@method_decorator(allocation_manager_can_enter(), name="dispatch")
 class Summary(TemplateView):
     """
     Summary
@@ -1461,9 +1431,7 @@ class Summary(TemplateView):
 
 
 @method_decorator(login_required, name="dispatch")
-@method_decorator(
-    all_manager_can_enter(perm="recruitment.view_recruitment"), name="dispatch"
-)
+@method_decorator(allocation_manager_can_enter(), name="dispatch")
 class ToggleDashboardAccess(View):
     """
     ToggleDashboardAccess

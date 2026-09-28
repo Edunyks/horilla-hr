@@ -278,6 +278,26 @@ def owner_can_enter(
 
 
 @decorator_with_arguments
+def allocation_manager_can_enter(function):
+    """
+    Decorator for allocation manager accessibility
+    """
+    from employee.cbv.accessibility import allocation_accessibility
+    from employee.models import Employee
+
+    def _function(request, *args, **kwargs):
+        instance_id = request.GET.get("instance_id") or request.POST.get("instance_id")
+        employee = (
+            Employee.objects.filter(pk=instance_id).first() if instance_id else None
+        )
+        if not allocation_accessibility(request, employee):
+            return handle_no_permission(request)
+        return function(request, *args, **kwargs)
+
+    return _function
+
+
+@decorator_with_arguments
 def check_feature_enabled(function, feature_name, model_class: models.Model):
     """
     Decorator for check feature enabled in singlton model
