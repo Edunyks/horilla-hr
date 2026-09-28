@@ -239,6 +239,9 @@ class AssetCategoryListView(HorillaListView):
     quick_export = True
     action_method = "action_column"
     accordian_action = "cbv/asset_category/accordion_actions.html"
+    # Only this page's grouped view changes -- the shared generic/group_by_table.html
+    # stays untouched for every other page that uses the app-wide "Group By" feature.
+    group_by_template_name = "cbv/asset_category/asset_category_group_by.html"
     header_attrs = {
         "asset_name": "style='width:200px !important;'",
         "action": "style='width:130px !important;'",
