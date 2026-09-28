@@ -4,7 +4,6 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 
-from attendance.cbv.tab_shell import AttendanceTabContentShell
 from base.methods import filtersubordinates, is_reportingmanager
 from helpdesk.filter import TicketFilter
 from helpdesk.models import Ticket
@@ -13,6 +12,7 @@ from horilla_views.generic.cbv.kanban import HorillaKanbanView
 from horilla_views.generic.cbv.views import (
     HorillaListView,
     HorillaNavView,
+    HorillaTabContentShell,
     HorillaTabView,
     TemplateView,
 )
@@ -51,6 +51,12 @@ class _TicketTabNavBase(HorillaNavView):
         ("priority", _("Priority")),
         ("tags", _("Tags")),
         ("assigned_to", _("Assigner")),
+        ("employee_id__employee_work_info__company_id", _("Company")),
+    ]
+
+    search_in = [
+        ("employee_id", _("Owner")),
+        ("ticket_type", _("Ticket Type")),
         ("employee_id__employee_work_info__company_id", _("Company")),
     ]
 
@@ -173,19 +179,19 @@ class AllTicketsNav(_TicketTabNavBase):
         ]
 
 
-class MyTicketsTabShell(AttendanceTabContentShell):
+class MyTicketsTabShell(HorillaTabContentShell):
     nav_url_name = "my-tickets-nav"
     container_id = "myTicketsListContainer"
     tabs_root_id = "ticketPipelineContainer"
 
 
-class SuggestedTicketsTabShell(AttendanceTabContentShell):
+class SuggestedTicketsTabShell(HorillaTabContentShell):
     nav_url_name = "suggested-tickets-nav"
     container_id = "suggestedTicketsListContainer"
     tabs_root_id = "ticketPipelineContainer"
 
 
-class AllTicketsTabShell(AttendanceTabContentShell):
+class AllTicketsTabShell(HorillaTabContentShell):
     nav_url_name = "all-tickets-nav"
     container_id = "allTicketsListContainer"
     tabs_root_id = "ticketPipelineContainer"
