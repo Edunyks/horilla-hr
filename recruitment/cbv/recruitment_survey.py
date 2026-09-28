@@ -12,7 +12,6 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 
-from attendance.cbv.tab_shell import AttendanceTabContentShell
 from horilla.decorators import hx_request_required
 from horilla.http.response import HorillaRedirect
 from horilla_views.cbv_methods import login_required, permission_required
@@ -21,6 +20,7 @@ from horilla_views.generic.cbv.views import (
     HorillaFormView,
     HorillaListView,
     HorillaNavView,
+    HorillaTabContentShell,
     HorillaTabView,
     TemplateView,
 )
@@ -383,13 +383,13 @@ class SurveyQuestionList(HorillaListView):
         return queryset
 
 
-class SurveyTemplateTabShell(AttendanceTabContentShell):
+class SurveyTemplateTabShell(HorillaTabContentShell):
     nav_url_name = "survey-template-nav"
     container_id = "surveyTemplatesListContainer"
     tabs_root_id = "survey-templates"
 
 
-class SurveyQuestionTabShell(AttendanceTabContentShell):
+class SurveyQuestionTabShell(HorillaTabContentShell):
     nav_url_name = "survey-question-nav"
     container_id = "surveyQuestionsListContainer"
     tabs_root_id = "survey-templates"
