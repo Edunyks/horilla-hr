@@ -2,6 +2,15 @@
 
 <div class="flex items-center justify-center gap-1" onclick="event.stopPropagation()">
     {% include "cbv/candidates/option.html" %}
+    {% if perms.recruitment.view_candidate %}
+        <a
+            class="oh-btn oh-btn--light-bkg oh-btn--sq-sm"
+            title="{% trans 'View' %}"
+            href="{% url 'candidate-view-individual' instance.id %}"
+        >
+            <ion-icon name="eye-outline"></ion-icon>
+        </a>
+    {% endif %}
     {% if perms.recruitment.change_candidate %}
         <a
             class="oh-btn oh-btn--light-bkg oh-btn--sq-sm"
@@ -13,15 +22,6 @@
             hx-push-url="true"
         >
             <ion-icon name="create-outline"></ion-icon>
-        </a>
-    {% endif %}
-    {% if perms.recruitment.view_candidate %}
-        <a
-            class="oh-btn oh-btn--light-bkg oh-btn--sq-sm"
-            title="{% trans 'View' %}"
-            href="{% url 'candidate-view-individual' instance.id %}"
-        >
-            <ion-icon name="eye-outline"></ion-icon>
         </a>
     {% endif %}
     {% if perms.recruitment.delete_candidate %}

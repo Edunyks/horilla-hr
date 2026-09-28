@@ -37,7 +37,7 @@
 
 <div id="{{ feed_id }}" class="px-3 pb-6{% if compact %} eah-compact{% endif %}">
     {% if show_header %}
-        <div class="oh-btn-group p-0 mb-4 d-flex flex-col {% if not compact %}lg:flex-row lg:items-end lg:justify-between{% endif %} gap-3">
+        <div class="p-0 mb-4 d-flex flex-col {% if not compact %}lg:flex-row lg:items-end lg:justify-between{% endif %} gap-3">
             <div>
                 <span class="text-md font-semibold text-dark-500 block">{{ title }}</span>
                 {% if subtitle %}
@@ -126,6 +126,7 @@
                                                 <span class="text-sm text-dark-100">{{ history.action_phrase }}</span>
                                                 {% if history.history_date %}
                                                     <span class="text-xs text-dark-100 sm:ml-auto whitespace-nowrap">
+                                                        <span class="dateformat_changer">{{ history.history_date|date }}</span>,
                                                         <span class="timeformat_changer">{{ history.history_date|time }}</span>
                                                     </span>
                                                 {% endif %}

@@ -120,6 +120,26 @@
                     <i
                         class="fas fa-search absolute left-3 top-[1px] bottom-0 m-auto flex items-center opacity-50 text-xs"
                     ></i>
+                    {% if search_in %}
+                    <input type="text" hidden name="search_field">
+                    <div
+                        class="search-field-dropdown absolute z-30 bg-white rounded-lg [box-shadow:0px_0px_20px_0px_rgb(0_0_0_/_8%)] min-w-[220px] py-1 left-0 mt-1 hidden"
+                    >
+                        <ul>
+                            {% for option in search_in %}
+                            <li>
+                                <a href="#"
+                                    class="search-field-option block px-3 py-2 text-xs text-color-600 hover:bg-gray-50"
+                                    onmousedown="event.preventDefault(); $('[name=search_field]').val('{{option.0}}'); $(this).closest('.search-field-dropdown').addClass('hidden'); $(this).closest('form')[0].requestSubmit();"
+                                >
+                                    {% trans "Search" %} <b>{{option.1}}</b> {% trans "for:" %}
+                                    <b class="search-field-text"></b>
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
                 </div>
 
                 {% if view_types %}
@@ -536,10 +556,35 @@
         let debounceTimer;
         $inlineNavForm.find('input[name="search"]').on('keyup', function () {
             clearTimeout(debounceTimer);
+            const value = this.value;
+
+            {% if search_in %}
+            const dropdown = $(this).closest('.relative').find('.search-field-dropdown');
+            if (value) {
+                dropdown.find('.search-field-text').text(value);
+                dropdown.removeClass('hidden');
+            } else {
+                $inlineNavForm.find('[name=search_field]').val('');
+                dropdown.addClass('hidden');
+            }
+            {% endif %}
+
             debounceTimer = setTimeout(() => {
                 this.form.requestSubmit();
             }, 500);
         });
+
+        {% if search_in %}
+        $inlineNavForm.find('input[name="search"]').on('focus', function () {
+            if (this.value) {
+                $(this).closest('.relative').find('.search-field-dropdown').removeClass('hidden');
+            }
+        });
+        $inlineNavForm.find('input[name="search"]').on('blur', function () {
+            const dropdown = $(this).closest('.relative').find('.search-field-dropdown');
+            setTimeout(() => dropdown.addClass('hidden'), 200);
+        });
+        {% endif %}
 
         $inlineNavForm.find(".nav-view-btn").click(function (e) {
             e.preventDefault();

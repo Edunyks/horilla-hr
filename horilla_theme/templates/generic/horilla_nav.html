@@ -162,22 +162,26 @@
                     <i
                         class="fas fa-search absolute left-3 top-[1px] bottom-0 m-auto flex items-center opacity-50 text-xs"
                     ></i>
-                    {% comment %} {% if search_in %}
+                    {% if search_in %}
                     <input type="text" hidden name="search_field">
-                    <div class="custom-dropdown" id="dropdown" style="z-index: 1000 !important;">
-                        <ul class="search_content">
+                    <div
+                        class="search-field-dropdown absolute z-30 bg-white rounded-lg [box-shadow:0px_0px_20px_0px_rgb(0_0_0_/_8%)] min-w-[220px] py-1 left-0 mt-1 hidden"
+                    >
+                        <ul>
                             {% for option in search_in %}
                             <li>
                                 <a href="#"
-                                    onclick="$('[name=search_field]').val('{{option.0}}'); $(this).closest('form').find('#applyFilter').click()">
+                                    class="search-field-option block px-3 py-2 text-xs text-color-600 hover:bg-gray-50"
+                                    onmousedown="event.preventDefault(); $('[name=search_field]').val('{{option.0}}'); $(this).closest('.search-field-dropdown').addClass('hidden'); $(this).closest('form')[0].requestSubmit();"
+                                >
                                     {% trans "Search" %} <b>{{option.1}}</b> {% trans "for:" %}
-                                    <b class="search_text"></b>
+                                    <b class="search-field-text"></b>
                                 </a>
                             </li>
                             {% endfor %}
                         </ul>
                     </div>
-                    {% endif %} {% endcomment %}
+                    {% endif %}
                 </div>
                 <div class="flex gap-1 text-[#000]">
                     {% if view_types %}
@@ -614,11 +618,35 @@
 
         $('#filterForm input[name="search"]').on('keyup', function () {
             clearTimeout(debounceTimer);
+            const value = this.value;
+
+            {% if search_in %}
+            const dropdown = $(this).closest('.relative').find('.search-field-dropdown');
+            if (value) {
+                dropdown.find('.search-field-text').text(value);
+                dropdown.removeClass('hidden');
+            } else {
+                $('[name=search_field]').val('');
+                dropdown.addClass('hidden');
+            }
+            {% endif %}
 
             debounceTimer = setTimeout(() => {
             this.form.requestSubmit(); // Triggers HTMX handling via form's hx-get, etc.
             }, 500);
         });
+
+        {% if search_in %}
+        $('#filterForm input[name="search"]').on('focus', function () {
+            if (this.value) {
+                $(this).closest('.relative').find('.search-field-dropdown').removeClass('hidden');
+            }
+        });
+        $('#filterForm input[name="search"]').on('blur', function () {
+            const dropdown = $(this).closest('.relative').find('.search-field-dropdown');
+            setTimeout(() => dropdown.addClass('hidden'), 200);
+        });
+        {% endif %}
         });
 
         $(".nav-view-btn").click(function (e) {
