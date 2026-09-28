@@ -203,6 +203,13 @@ class HorillaListView(ListView):
 
     header_attrs: dict = {}
 
+    # Overrides the template used when the user groups this list by a field
+    # (generic/group_by_table.html by default -- the same shared template
+    # behind the "Group By" dropdown on most list pages). Leave "" to keep
+    # the shared one; set only on a page that needs its own grouped layout
+    # without affecting every other page using the generic Group By feature.
+    group_by_template_name: str = ""
+
     @classmethod
     def as_view(cls, **initkwargs):
         def view(request, *args, **kwargs):
@@ -501,7 +508,9 @@ class HorillaListView(ListView):
         if self.request.session.get(session_key) != ordered_ids:
             self.request.session[session_key] = ordered_ids
 
-        nested_fields = [f for f in self._saved_filters.getlist("nested_fields") if f]
+        nested_fields = list(
+            dict.fromkeys(f for f in self._saved_filters.getlist("nested_fields") if f)
+        )
         group_field = self._saved_filters.get("field")
         if isinstance(queryset, list) and (nested_fields or group_field):
             # sortby() returns a plain sorted list, but group-by needs a real QuerySet; rebuild one preserving this row order via Case/When.
@@ -545,7 +554,9 @@ class HorillaListView(ListView):
                 )
         elif request and group_field:
             field = group_field
-            self.template_name = "generic/group_by_table.html"
+            self.template_name = (
+                self.group_by_template_name or "generic/group_by_table.html"
+            )
             # group_by paginates groupers itself; keep a tiny queryset so bulk-select chrome (`queryset|length`) still works.
             context["queryset"] = queryset[:1]
             try:
@@ -1779,6 +1790,28 @@ class HorillaTabView(TemplateView):
 
         # CACHE.get(self.request.session.session_key + "cbv")[HorillaTabView] = context
 
+        return context
+
+
+@method_decorator(login_required, name="dispatch")
+@method_decorator(hx_request_required, name="dispatch")
+class HorillaTabContentShell(TemplateView):
+    """
+    Per-tab shell: each tab gets its own Nav plus list container.
+    """
+
+    template_name = "generic/horilla_tab_content_shell.html"
+    nav_url_name = ""
+    container_id = ""
+    tabs_root_id = ""
+    selected_instances_key_id = "selectedInstances"
+
+    def get_context_data(self, **kwargs: Any):
+        context = super().get_context_data(**kwargs)
+        context["nav_url_name"] = self.nav_url_name
+        context["container_id"] = self.container_id
+        context["tabs_root_id"] = self.tabs_root_id
+        context["selected_instances_key_id"] = self.selected_instances_key_id
         return context
 
 
