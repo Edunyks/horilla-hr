@@ -2,6 +2,8 @@
 This page handles the cbv methods of employee individual view
 """
 
+from datetime import date
+
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
@@ -9,6 +11,7 @@ from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views import View
+from django.views.generic import TemplateView
 
 from base import views as base_views
 from base.cbv.mail_log_tab import MailLogTabList
@@ -18,6 +21,7 @@ from base.forms import AddToUserGroupForm
 from employee import views
 from employee.cbv.document_request import DocumentIndividualTabList
 from employee.filters import EmployeeFilter
+from employee.history import get_employee_history_models, get_employee_model_history
 from employee.models import Employee
 from horilla import settings
 from horilla.http.response import HorillaRedirect
@@ -165,6 +169,60 @@ class EmployeeRelatedDetailView(HorillaDetailedView):
         return context
 
 
+@method_decorator(login_required, name="dispatch")
+class EmployeeHistoryTabView(TemplateView):
+    """
+    Lets the viewer pick which of the employee's linked models to show
+    history for, filtered and sorted by date.
+    """
+
+    template_name = "tabs/history.html"
+    default_model = "employee.employeeworkinformation"
+
+    def _parse_date(self, value):
+        try:
+            return date.fromisoformat(value) if value else None
+        except ValueError:
+            return None
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        employee = Employee.objects.get(id=self.kwargs.get("pk"))
+        model_options = get_employee_history_models()
+
+        selected_model = self.request.GET.get("model") or self.default_model
+        if selected_model not in {m["key"] for m in model_options}:
+            selected_model = self.default_model
+
+        date_from = self._parse_date(self.request.GET.get("date_from"))
+        date_to = self._parse_date(self.request.GET.get("date_to"))
+        sort = self.request.GET.get("sort") or "-date"
+        if sort not in {"date", "-date"}:
+            sort = "-date"
+
+        entries, tracking_status = get_employee_model_history(
+            employee,
+            selected_model,
+            date_from=date_from,
+            date_to=date_to,
+            sort=sort,
+        )
+
+        context.update(
+            {
+                "employee": employee,
+                "model_options": model_options,
+                "selected_model": selected_model,
+                "date_from": date_from,
+                "date_to": date_to,
+                "sort": sort,
+                "entries": entries,
+                "tracking_status": tracking_status,
+            }
+        )
+        return context
+
+
 EmployeeProfileView.add_tab(
     tabs=[
         {
@@ -199,7 +257,7 @@ EmployeeProfileView.add_tab(
         },
         {
             "title": _("History"),
-            "view": views.history_tab,
+            "view": EmployeeHistoryTabView.as_view(),
             "accessibility": "employee.cbv.accessibility.history_accessibility",
         },
     ]
