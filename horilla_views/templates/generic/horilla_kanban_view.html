@@ -30,6 +30,19 @@
 
     {% if show_filter_tags %} {% include "generic/filter_tags.html" %} {% endif %}
 
+    {% if card_status_indications %}
+        <div class="flex flex-wrap gap-2 items-center justify-end mb-2">
+            {% for indication in card_status_indications %}
+                <button
+                    class="oh-row-status-indication px-4 py-2 bg-[white] border border-primary-500 hover:border-primary-600 rounded-md text-xs flex gap-2 items-center flex-shrink-0 whitespace-nowrap transition duration-300"
+                    {{ indication.2|safe }}
+                >
+                    <span class="h-3 w-3 rounded-full flex {{ indication.0 }}"></span>{{ indication.1 }}
+                </button>
+            {% endfor %}
+        </div>
+    {% endif %}
+
     <div
         id="helperContainer"
         class="hidden"
