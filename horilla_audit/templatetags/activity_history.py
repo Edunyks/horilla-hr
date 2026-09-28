@@ -17,6 +17,7 @@ def activity_history_feed(
     context,
     tracking=None,
     log_entries=None,
+    entries=None,
     show_header=True,
     show_search=True,
     title=None,
@@ -43,7 +44,9 @@ def activity_history_feed(
             return value
         return str(value).lower() in {"1", "true", "yes", "on"}
 
-    feed = build_activity_history_feed(tracking=tracking, log_entries=log_entries)
+    feed = build_activity_history_feed(
+        tracking=tracking, log_entries=log_entries, entries=entries
+    )
     return {
         **feed,
         "show_header": _as_bool(show_header, True),

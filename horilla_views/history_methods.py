@@ -77,6 +77,49 @@ def filter_history(histories, track_fields):
     return filtered_histories
 
 
+# Pure bookkeeping fields, never useful in a "record created" field list.
+_CREATION_EXCLUDED_FIELDS = {
+    "id",
+    "created_at",
+    "updated_at",
+    "created_by_id",
+    "modified_by_id",
+    "is_active",
+}
+
+
+def _creation_diffs(create_history, instance):
+    """Field list for a "created" entry, read directly off the first snapshot."""
+    class_name = create_history.instance.__class__
+    diffs = []
+    for field in instance._meta.get_fields():
+        if (
+            not getattr(field, "concrete", False)
+            or field.many_to_many
+            or field.auto_created
+            or field.name in _CREATION_EXCLUDED_FIELDS
+        ):
+            continue
+        try:
+            new = getattr(create_history, field.name)
+        except Exception:
+            continue
+        if new in (None, ""):
+            continue
+        if isinstance(field, models.fields.CharField) and field.choices:
+            new = dict(field.choices).get(new, new)
+        diffs.append(
+            {
+                "field": get_field_label(class_name, field.name),
+                "field_name": field.name,
+                "is_fk": False,
+                "old": None,
+                "new": new,
+            }
+        )
+    return diffs
+
+
 class _SyntheticHistorySnapshot:
     """Stand-in when a live record has no simple-history rows yet."""
 
@@ -162,6 +205,7 @@ def get_diff(instance, history_related_name):
             {
                 "type": f"{create_history.instance.__class__._meta.verbose_name.capitalize()} created",
                 "pair": (create_history, create_history),
+                "changes": _creation_diffs(create_history, instance),
                 "updated_by": updated_by,
             }
         )
