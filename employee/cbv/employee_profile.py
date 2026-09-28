@@ -102,7 +102,7 @@ class EmployeeProfileView(HorillaProfileView):
                     "variant": "success",
                 },
             ]
-        elif employee.pk == kwargs.get("pk") and enable_profile_edit(request).get(
+        elif employee.pk == kwargs.get("pk") and not enable_profile_edit(request).get(
             "profile_edit_enabled"
         ):
             self.actions = [
