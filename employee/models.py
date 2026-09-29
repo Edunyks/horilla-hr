@@ -234,7 +234,7 @@ class Employee(models.Model):
                 and self.employee_work_info.reporting_manager_id
                 == request.user.employee_get
             ):
-                return 'style="color: inherit; text-decoration: none; background-color: hsl(38.08deg 100% 50% / 8%);"'
+                return 'style="color: inherit; text-decoration: none; background-color: rgba(255, 166, 0, 0.158);"'
             else:
                 return ""
         else:
@@ -661,7 +661,7 @@ class Employee(models.Model):
             ("view_ownprofile", "View Own Profile"),
         )
         ordering = [
-            "employee_first_name",
+            "id",
         ]
         constraints = [
             models.UniqueConstraint(
