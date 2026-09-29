@@ -4,6 +4,7 @@ Modern asset dashboard views — KPI summary + ApexCharts.
 Accessible at /asset/dashboard/modern/ alongside the existing dashboard.
 """
 
+import calendar
 from datetime import timedelta
 
 from django.db.models import Count, DecimalField, Q, Sum
@@ -17,27 +18,18 @@ from horilla.decorators import login_required, permission_required
 
 
 def _parse_period(request):
-    """Parse from_date and to_date from GET params. Defaults to current month."""
+    """Return the current calendar month's bounds (first day to last day).
+
+    The dashboard always shows the current month; GET params are ignored.
+    """
     today = timezone.now().date()
-    from_str = request.GET.get("from_date")
-    to_str = request.GET.get("to_date")
-    try:
-        from_date = (
-            timezone.datetime.fromisoformat(from_str).date()
-            if from_str
-            else today.replace(day=1)
-        )
-    except (ValueError, TypeError):
-        from_date = today.replace(day=1)
-    try:
-        to_date = timezone.datetime.fromisoformat(to_str).date() if to_str else today
-    except (ValueError, TypeError):
-        to_date = today
+    from_date = today.replace(day=1)
+    to_date = today.replace(day=calendar.monthrange(today.year, today.month)[1])
     return from_date, to_date
 
 
 def _assets_in_period(request):
-    """Return Asset queryset filtered to assets purchased in the picker range."""
+    """Return Asset queryset filtered to assets purchased in the current month."""
     from asset.models import Asset
 
     from_date, to_date = _parse_period(request)
@@ -58,32 +50,35 @@ def asset_dashboard_view(request):
 def asset_kpi_data(request):
     """Return asset KPI summary data as JSON.
 
-    Assets purchased / total value reflect the picker range. Current-state KPIs
-    (in-use / available counts, return requests, expiring soon) ignore the picker.
+    Assets purchased / total value / pending requests reflect the current
+    month. Pure inventory-state KPIs (total / in-use / available counts,
+    return requests, expiring soon) are live snapshots, independent of month.
     """
-    from asset.models import Asset, AssetAssignment, AssetRequest
+    from asset.models import Asset, AssetRequest, AssetServiceRequest
 
     from_date, to_date = _parse_period(request)
     period_assets = _assets_in_period(request)
 
-    # Total assets reflects the full inventory, not the picker range
+    # Total assets reflects the full inventory, not the current-month filter
     total_assets = Asset.objects.count()
     in_use = Asset.objects.filter(asset_status="In use").count()
     available = Asset.objects.filter(asset_status="Available").count()
     not_available = Asset.objects.filter(asset_status="Not-Available").count()
 
-    # Pending requests is a current-state KPI — count all unresolved requests
-    # regardless of when they were raised, not just those in the picker range
+    # Pending requests raised this month, via asset_request_date (the actual
+    # request date), not created_at
     pending_requests = AssetRequest.objects.filter(
         asset_request_status="Requested",
         requested_employee_id__is_active=True,
+        asset_request_date__gte=from_date,
+        asset_request_date__lte=to_date,
     ).count()
 
     total_value = period_assets.aggregate(
         total=Coalesce(Sum("asset_purchase_cost"), 0, output_field=DecimalField())
     )["total"]
 
-    # Expiring soon (next 30 days) — forward-looking, independent of picker
+    # Expiring soon (next 30 days) — forward-looking, independent of month
     today = timezone.now().date()
     expiring_soon_from_date = today
     expiring_soon_to_date = today + timedelta(days=30)
@@ -92,10 +87,8 @@ def asset_kpi_data(request):
         expiry_date__lte=expiring_soon_to_date,
     ).count()
 
-    # Return requests pending — current state
-    return_requests = AssetAssignment.objects.filter(
-        return_request=True,
-        return_status__isnull=True,
+    service_requests = AssetServiceRequest.objects.filter(
+        status__in=["Requested", "In Progress"],
     ).count()
 
     return JsonResponse(
@@ -107,7 +100,7 @@ def asset_kpi_data(request):
             "pending_requests": pending_requests,
             "total_value": float(total_value),
             "expiring_soon": expiring_soon,
-            "return_requests": return_requests,
+            "service_requests": service_requests,
             # Echoed back so the "Total Value" card's click-through can
             # filter to the exact same purchase-date range the sum above
             # was computed from, instead of showing every asset.
@@ -115,8 +108,8 @@ def asset_kpi_data(request):
             "period_to_date": to_date.isoformat(),
             # Echoed back so the "Expiring Soon" card's click-through uses
             # the exact same forward-looking window expiring_soon was
-            # counted from -- this is independent of the picker range above,
-            # so period_from_date/period_to_date would be the wrong bounds.
+            # counted from -- this is independent of the current-month bounds
+            # above, so period_from_date/period_to_date would be the wrong bounds.
             "expiring_soon_from_date": expiring_soon_from_date.isoformat(),
             "expiring_soon_to_date": expiring_soon_to_date.isoformat(),
         }
@@ -151,7 +144,7 @@ def asset_status_distribution(request):
 
 @login_required
 def asset_by_category(request):
-    """Asset count by category with in-use breakdown, for assets purchased in the picker range."""
+    """Asset count by category with in-use breakdown, for assets purchased in the current month."""
     categories = []
     from_date, to_date = _parse_period(request)
 
@@ -197,19 +190,19 @@ def asset_by_category(request):
 
 @login_required
 def asset_request_status(request):
-    """Asset request status breakdown, for the current overall request pool.
+    """Asset request status breakdown for the current month.
 
-    Like asset_department_distribution / asset_age_distribution below, this is
-    a snapshot of where every request currently stands, not "requests raised
-    this period" activity. Scoping it to created_at within the picker range
-    (which defaults to the current month) hid every request from earlier
-    months, so e.g. long-pending "Requested" rows disappeared from the chart
-    even though the KPI tile's "Pending Requests" count (unscoped) still
-    included them -- the two numbers disagreed on-screen.
+    Scoped by asset_request_date (the actual request date, not created_at)
+    so this agrees with the KPI tile's "Pending Requests" count, which is
+    scoped to the same month/field.
     """
     from asset.models import AssetRequest
 
-    requests_qs = AssetRequest.objects.all()
+    from_date, to_date = _parse_period(request)
+    requests_qs = AssetRequest.objects.filter(
+        asset_request_date__gte=from_date,
+        asset_request_date__lte=to_date,
+    )
     statuses = [
         {
             "status": "Requested",
@@ -233,7 +226,7 @@ def asset_request_status(request):
 
 @login_required
 def asset_value_by_category(request):
-    """Total asset value by category, for assets purchased in the picker range."""
+    """Total asset value by category, for assets purchased in the current month."""
     categories = []
     from_date, to_date = _parse_period(request)
 
@@ -275,13 +268,13 @@ def asset_value_by_category(request):
 
 @login_required
 def asset_expiring_soon(request):
-    """Assets expiring in the next 30 days -- forward-looking, independent of picker.
+    """Assets expiring in the next 30 days -- forward-looking, independent of month.
 
     Same reasoning as the KPI tile's expiring_soon count above: expiry dates
-    are inherently ahead of today, so the picker's [month-start, today]
-    default (built for backward-looking "purchased this period" widgets)
-    could show already-expired assets as "expiring soon" or hide genuinely
-    upcoming expiries, depending on what range happened to be selected.
+    are inherently ahead of today, so the current month's [1st, last day]
+    bounds (built for backward-looking "purchased this month" widgets) could
+    show already-expired assets as "expiring soon" or hide genuinely upcoming
+    expiries depending on where in the month today falls.
     """
     from asset.models import Asset
 
@@ -324,7 +317,7 @@ def asset_expiring_soon(request):
 
 @login_required
 def asset_recent_allocations(request):
-    """Recently allocated assets within the picker range."""
+    """Recently allocated assets within the current month."""
     from asset.models import AssetAssignment
 
     from_date, to_date = _parse_period(request)

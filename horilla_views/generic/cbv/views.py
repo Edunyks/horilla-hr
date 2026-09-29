@@ -462,7 +462,9 @@ class HorillaListView(ListView):
             data_dict = {
                 key: list(dict.fromkeys(values)) for key, values in data_dict.items()
             }
-            data_dict = get_key_instances(self.model, data_dict)
+            data_dict = get_key_instances(
+                self.model, data_dict, filter_class=self.filter_class
+            )
             remove_keys = set(
                 # nested_fields gets its own "Grouped by: X > Y" line instead of the generic filter-tag rendering.
                 ["filter_applied", "nav_url", "referrer", "nested_fields"]
@@ -1928,7 +1930,9 @@ class HorillaCardView(ListView):
             data_dict = {
                 key: list(dict.fromkeys(values)) for key, values in data_dict.items()
             }
-            data_dict = get_key_instances(self.model, data_dict)
+            data_dict = get_key_instances(
+                self.model, data_dict, filter_class=self.filter_class
+            )
             remove_keys = set(
                 # nested_fields gets its own "Grouped by: X > Y" line instead of the generic filter-tag rendering.
                 ["filter_applied", "nav_url", "referrer", "nested_fields"]

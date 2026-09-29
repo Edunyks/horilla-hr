@@ -744,7 +744,7 @@ def generate_colors(num_colors):
     return colors
 
 
-def get_key_instances(model, data_dict):
+def get_key_instances(model, data_dict, filter_class=None):
     # Get all the models in the Django project
     all_models = apps.get_models()
 
@@ -816,6 +816,35 @@ def get_key_instances(model, data_dict):
             data_dict[field_name] = related_strings
         except (ObjectDoesNotExist, ValueError):
             pass
+
+    # A FilterSet field can alias a foreign key under a query param name
+    # that doesn't match the model's field name (e.g. AssetFilter's
+    # "category" -> field_name="asset_category_id", kept short for
+    # dashboard-style deep links). Such a param is invisible to the
+    # field-name match above, so its filter tag would otherwise be left
+    # showing the raw id instead of the related instance's name.
+    if filter_class is not None:
+        for filter_name, filter_instance in filter_class.base_filters.items():
+            field_name = getattr(filter_instance, "field_name", None)
+            if not field_name or field_name == filter_name:
+                continue
+            if filter_name not in data_dict or field_name in data_dict:
+                continue
+            try:
+                field = model._meta.get_field(field_name)
+            except Exception:
+                continue
+            if not isinstance(field, (ForeignKey, OneToOneField)):
+                continue
+            try:
+                field_values = [int(value) for value in data_dict[filter_name]]
+                related_model = field.remote_field.model
+                related_instances = related_model.objects.filter(id__in=field_values)
+                data_dict[filter_name] = [
+                    str(instance) for instance in related_instances
+                ]
+            except (ObjectDoesNotExist, ValueError):
+                pass
 
     # Create a list of field names that are ManyToManyField
     many_to_many_field_names = [
