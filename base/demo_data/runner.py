@@ -26,6 +26,9 @@ from base.demo_data.modules.attendance_trend import (
 from base.demo_data.modules.date_clamp import clamp_demo_dates
 from base.demo_data.modules.employee_features import backfill_employee_feature_coverage
 from base.demo_data.modules.employee_lifecycle import backfill_employee_lifecycle
+from base.demo_data.modules.employee_work_history import (
+    backfill_employee_work_info_history,
+)
 from base.demo_data.modules.helpdesk_expansion import backfill_company_helpdesk_lookups
 from base.demo_data.modules.helpdesk_trend import (
     backfill_helpdesk_tickets,
@@ -164,6 +167,7 @@ def run_enterprise_demo_seeder(
     # read-receipts, multi-level approval managers) that ship with zero
     # demo rows connecting them to anything.
     result["employee_feature_coverage"] = backfill_employee_feature_coverage(today)
+    result["employee_work_info_history"] = backfill_employee_work_info_history(today)
     result["request_windows"] = backfill_request_windows(today)
     result["attendance_leave_reconcile"] = reconcile_attendance_with_leave(today)
     result["attendance_activities"] = backfill_attendance_activities(today)
