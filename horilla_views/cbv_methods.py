@@ -534,6 +534,8 @@ def sortby(
             none_ids.append(object.pk)
         elif isinstance(result, models.Model):
             result = str(result)
+        if isinstance(result, str):
+            result = result.lower()
         return result
 
     order = not reverse
