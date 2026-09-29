@@ -2,6 +2,7 @@
 My attendances
 """
 
+from datetime import datetime, timedelta
 from typing import Any
 
 from django.urls import reverse
@@ -168,6 +169,67 @@ class MyAttendanceList(MyAttendancesListView):
     ]
 
     row_status_class = "validated-{attendance_validated}  requested-{is_validate_request} approved-request-{is_validate_request_approved}"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        today = datetime.now().date()
+        yesterday = today - timedelta(days=1)
+        tomorrow = today + timedelta(days=1)
+        this_week = today + timedelta(days=7)
+
+        self.row_status_indications = (self.row_status_indications or []) + [
+            (
+                "filter--dot",
+                _("Yesterday"),
+                f"""
+                    onclick="
+                        $('#applyFilter').closest('form').find('[name=attendance_date__gte]').val('');
+                        $('#applyFilter').closest('form').find('[name=attendance_date__lte]').val('');
+                        $('#applyFilter').closest('form').find('[name=attendance_date]').val('{yesterday}');
+                        $('#applyFilter').click();
+                    "
+                """,
+            ),
+            (
+                "filter--dot",
+                _("Today"),
+                f"""
+                    onclick="
+                        $('#applyFilter').closest('form').find('[name=attendance_date__gte]').val('');
+                        $('#applyFilter').closest('form').find('[name=attendance_date__lte]').val('');
+                        $('#applyFilter').closest('form').find('[name=attendance_date]').val('{today}');
+                        $('#applyFilter').click();
+                    "
+                """,
+            ),
+            (
+                "filter--dot",
+                _("Tomorrow"),
+                f"""
+                    onclick="
+                        $('#applyFilter').closest('form').find('[name=attendance_date__gte]').val('');
+                        $('#applyFilter').closest('form').find('[name=attendance_date__lte]').val('');
+                        $('#applyFilter').closest('form').find('[name=attendance_date]').val('{tomorrow}');
+                        $('#applyFilter').click();
+                    "
+                """,
+            ),
+            (
+                "filter--dot",
+                _("This Week"),
+                f"""
+                    onclick="
+                        $('#applyFilter').closest('form').find('[name=attendance_date]').val('');
+                        $('#applyFilter').closest('form').find('[name=attendance_date__gte]').val('{today}');
+                        $('#applyFilter').closest('form').find('[name=attendance_date__lte]').val('{this_week}');
+                        $('#applyFilter').click();
+                    "
+                """,
+            ),
+        ]
+        context["row_status_indications"] = self.row_status_indications
+        return context
 
     def get_queryset(self):
         queryset = super().get_queryset()

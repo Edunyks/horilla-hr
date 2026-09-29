@@ -4,7 +4,7 @@ This page handles the cbv of leave requests page
 
 import ast
 import contextlib
-from datetime import date
+from datetime import date, timedelta
 from typing import Any
 
 from django.contrib import messages
@@ -209,6 +209,68 @@ class LeaveRequestsListView(HorillaListView):
     row_status_class = (
         "rejected-{status} cancelled-{status} requested-{status} approved-{status}"
     )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        today = date.today()
+        yesterday = today - timedelta(days=1)
+        tomorrow = today + timedelta(days=1)
+        this_week = today + timedelta(days=7)
+
+        # LeaveRequestFilter's from_date/to_date together match any leave
+        # request that overlaps the given range (see filter_from_date/
+        # to_date in leave/filters.py), so a single-day preset just sets
+        # both ends to the same date.
+        self.row_status_indications = self.row_status_indications + [
+            (
+                "filter--dot",
+                _("Yesterday"),
+                f"""
+                    onclick="
+                        $('#applyFilter').closest('form').find('[name=from_date]').val('{yesterday}');
+                        $('#applyFilter').closest('form').find('[name=to_date]').val('{yesterday}');
+                        $('#applyFilter').click();
+                    "
+                """,
+            ),
+            (
+                "filter--dot",
+                _("Today"),
+                f"""
+                    onclick="
+                        $('#applyFilter').closest('form').find('[name=from_date]').val('{today}');
+                        $('#applyFilter').closest('form').find('[name=to_date]').val('{today}');
+                        $('#applyFilter').click();
+                    "
+                """,
+            ),
+            (
+                "filter--dot",
+                _("Tomorrow"),
+                f"""
+                    onclick="
+                        $('#applyFilter').closest('form').find('[name=from_date]').val('{tomorrow}');
+                        $('#applyFilter').closest('form').find('[name=to_date]').val('{tomorrow}');
+                        $('#applyFilter').click();
+                    "
+                """,
+            ),
+            (
+                "filter--dot",
+                _("This Week"),
+                f"""
+                    onclick="
+                        $('#applyFilter').closest('form').find('[name=from_date]').val('{today}');
+                        $('#applyFilter').closest('form').find('[name=to_date]').val('{this_week}');
+                        $('#applyFilter').click();
+                    "
+                """,
+            ),
+        ]
+        context["row_status_indications"] = self.row_status_indications
+        return context
+
     # Mirrors LeaveRequestsNavView.nested_group_by_fields -- needed here
     # too since this (List) and Nav are separate classes; see the same
     # split in employee/cbv/employees.py's EmployeesList/EmployeeNav.
