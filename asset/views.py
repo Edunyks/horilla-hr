@@ -19,6 +19,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import gettext_noop
 
@@ -52,6 +53,8 @@ from asset.models import (
     AssetGeneralSetting,
     AssetLot,
     AssetRequest,
+    AssetServiceRequest,
+    AssetServiceRequestNote,
     ReturnImages,
 )
 from base.methods import (
@@ -990,6 +993,9 @@ def asset_allocate_return(request, assignment_id):
             asset_return_status = asset_return_form.cleaned_data["return_status"]
             asset_return_date = asset_return_form.cleaned_data["return_date"]
             asset_return_condition = asset_return_form.cleaned_data["return_condition"]
+            AssetServiceRequest.objects.filter(
+                assignment_id=asset_allocation, status__in=["Requested", "In Progress"]
+            ).update(status="Returned")
             files = request.FILES.getlist("return_images")
             attachments = []
             context = {
@@ -2157,3 +2163,37 @@ def enable_disable_asset_fine(request):
             messages.success(request, message)
 
     return HttpResponse("")
+
+
+@login_required
+@hx_request_required
+@permission_required(perm="asset.change_assetassignment")
+def asset_service_request_add_note(request, pk):
+    """
+    Standalone modal to add a note on a service request, launched from
+    the Service Request list row.
+    """
+    instance = AssetServiceRequest.objects.filter(pk=pk).first()
+    if not instance:
+        messages.error(request, _("Service request not found."))
+        return HorillaRedirect(request)
+    if request.method == "POST":
+        note_text = request.POST.get("note", "").strip()
+        if note_text:
+            AssetServiceRequestNote.objects.create(
+                request_id=instance,
+                employee_id=request.user.employee_get,
+                note=note_text,
+            )
+            messages.success(request, _("Note added."))
+        return render(
+            request,
+            "cbv/request_and_allocation/forms/service_request_add_note_success.html",
+            {"instance": instance},
+        )
+    context = {"service_request": instance}
+    return render(
+        request,
+        "cbv/request_and_allocation/forms/service_request_add_note_form.html",
+        context,
+    )

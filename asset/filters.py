@@ -15,7 +15,14 @@ from base.methods import reload_queryset
 from employee.models import Employee
 from horilla.filters import HorillaFilterSet, filter_name_or_badge_terms
 
-from .models import Asset, AssetAssignment, AssetCategory, AssetLot, AssetRequest
+from .models import (
+    Asset,
+    AssetAssignment,
+    AssetCategory,
+    AssetLot,
+    AssetRequest,
+    AssetServiceRequest,
+)
 
 
 class CustomFilterSet(HorillaFilterSet):
@@ -471,6 +478,56 @@ class AssetRequestFilter(CustomFilterSet):
         self.form.fields["name_or_badge"].widget.attrs["placeholder"] = _(
             "e.g. John, PEP01, PEP02"
         )
+
+
+class AssetServiceRequestFilter(CustomFilterSet):
+    """
+    Custom filter set for AssetServiceRequest instances.
+    """
+
+    search = django_filters.CharFilter(method="search_method")
+
+    ajax_fields = {
+        "requested_employee_id": {
+            "key": "asset-service-request-employee",
+            "queryset_fn": lambda request: Employee.objects.filter(is_active=True),
+            "display_fn": lambda obj: obj.get_full_name(),
+            "search_fields": ["employee_first_name", "employee_last_name", "badge_id"],
+            "placeholder": _("Search employee..."),
+        },
+    }
+
+    def search_method(self, queryset, _, value: str):
+        """
+        This method is used to search employees and assets
+        """
+        values = value.split(" ")
+        empty = queryset.model.objects.none()
+        for split in values:
+            empty = empty | (
+                queryset.filter(
+                    requested_employee_id__employee_first_name__icontains=split
+                )
+                | queryset.filter(
+                    requested_employee_id__employee_last_name__icontains=split
+                )
+                | queryset.filter(issue_description__icontains=split)
+                | queryset.filter(assignment_id__asset_id__asset_name__icontains=split)
+            )
+        return empty.distinct()
+
+    class Meta:
+        """
+        Specifies the model and fields to be used for filtering AssetServiceRequest instances.
+        """
+
+        model = AssetServiceRequest
+        fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for visible in self.form.visible_fields():
+            visible.field.widget.attrs["id"] = str(uuid.uuid4())
 
 
 class AssetAllocationFilter(CustomFilterSet):
