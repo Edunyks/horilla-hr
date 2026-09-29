@@ -544,3 +544,10 @@ body.dark .oh-sticky-dropdown_btn.is-column-config-trigger[aria-expanded="true"]
   background: rgba(229, 79, 56, 0.12);
   border-color: rgba(229, 79, 56, 0.35);
 }
+
+body.dark .bg-gray-100 {
+  background-color: #2a2a2a !important;
+}
+body.dark .hover\:bg-gray-200:hover {
+  background-color: #3a3a3a !important;
+}
