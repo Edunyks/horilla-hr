@@ -558,9 +558,25 @@ def dashboard_kpi_data(request):
     # Expected = active employees not on approved leave (excludes leave from
     # the denominator so "absent" is not inflated by people who should be out).
     expected_today = max(0, total_employees - on_leave)
-    # Employees expected to check in = everyone minus who's already present
-    # minus who's on approved leave — each employee counted at most once.
-    not_checked_in = max(0, total_employees - present_today - on_leave)
+
+    # "Offline" - shares its exact definition (and scope) with the Attendance
+    # dashboard's own Offline card: shift already started today, not on
+    # approved leave, no punch-in yet. Employees with no shift assigned are
+    # excluded (see _missing_punches_employees's own docstring) - not simply
+    # "everyone minus present minus on-leave", so the two dashboards' Offline
+    # counts always agree instead of silently drifting apart.
+    missing_punches_ids = []
+    try:
+        from attendance.dashboard import _missing_punches_employees
+
+        missing_punches_ids = list(
+            _missing_punches_employees(real_today, employee_ids=scoped_ids).values_list(
+                "id", flat=True
+            )
+        )
+    except Exception:
+        pass
+    not_checked_in = len(missing_punches_ids)
     expected_to_check_in = not_checked_in
     # Keep absent_today as an alias for not_checked_in for API compatibility.
     absent_today = not_checked_in
@@ -600,6 +616,7 @@ def dashboard_kpi_data(request):
             "absent_today": absent_today,
             "expected_today": expected_today,
             "not_checked_in": not_checked_in,
+            "missing_punches_ids": missing_punches_ids,
             "expected_to_check_in": expected_to_check_in,
             "attendance_rate": attendance_rate,
             "on_leave": on_leave,

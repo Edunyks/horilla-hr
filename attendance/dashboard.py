@@ -48,7 +48,7 @@ def _current_month_bounds():
     return start, end
 
 
-def _missing_punches_employees(today=None):
+def _missing_punches_employees(today=None, employee_ids=None):
     """
     Active employees who should already be at work today but haven't
     clocked in: their shift's scheduled start time for today has already
@@ -57,6 +57,11 @@ def _missing_punches_employees(today=None):
 
     Employees with no shift assigned are skipped entirely -- there's no
     schedule to compare "has it started" against.
+
+    `employee_ids`, when given (e.g. a manager's team-scoped id list from
+    base.dashboard._scoped_active_employee_ids), restricts the candidates
+    to that set -- shared with the main HR dashboard's own Offline KPI so
+    both cards agree on both definition and scope.
     """
     from attendance.models import AttendanceActivity
     from base.models import EmployeeShiftSchedule
@@ -80,6 +85,8 @@ def _missing_punches_employees(today=None):
         .exclude(id__in=checked_in_ids)
         .select_related("employee_work_info__shift_id")
     )
+    if employee_ids is not None:
+        candidates = candidates.filter(id__in=employee_ids)
 
     shift_ids = {
         emp.employee_work_info.shift_id_id
