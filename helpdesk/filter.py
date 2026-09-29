@@ -81,6 +81,17 @@ class TicketFilter(HorillaFilterSet):
         lookup_expr="lte",
         widget=forms.DateInput(attrs={"type": "date"}),
     )
+
+    created_date_from = DateFilter(
+        field_name="created_date",
+        lookup_expr="gte",
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+    created_date_till = DateFilter(
+        field_name="created_date",
+        lookup_expr="lte",
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
     pipeline_status = django_filters.CharFilter(
         field_name="status",
     )
@@ -146,19 +157,13 @@ class TicketFilter(HorillaFilterSet):
         filter(**{field__lookup: value}) call), offering the full
         gte/lte/gt/lt/exact set instead of the fixed gte-only from_date/
         lte-only to_date pair the template used to render (from_date
-        was declared but never actually rendered anywhere).
+        was declared but never actually rendered anywhere).1
         """
         fields = [
             {
                 "key": "deadline",
                 "field": "deadline",
                 "label": str(_("Deadline")),
-                "type": "date_range",
-            },
-            {
-                "key": "created_date",
-                "field": "created_date",
-                "label": str(_("Created Date")),
                 "type": "date_range",
             },
             {

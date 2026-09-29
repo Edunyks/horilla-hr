@@ -4,29 +4,27 @@ Modern helpdesk dashboard views — KPI summary + ApexCharts.
 Accessible at /helpdesk/dashboard/modern/ alongside the existing pipeline view.
 """
 
+import calendar
 from datetime import date, timedelta
 
-from django.db.models import Avg, Count, F, Q
+from django.db.models import Count
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from horilla.decorators import login_required, permission_required
 
 
 def _parse_period(request):
-    """Parse from_date and to_date from GET params. Defaults to current month."""
-    today = date.today()
-    from_str = request.GET.get("from_date")
-    to_str = request.GET.get("to_date")
-    try:
-        from_date = date.fromisoformat(from_str) if from_str else today.replace(day=1)
-    except (ValueError, TypeError):
-        from_date = today.replace(day=1)
-    try:
-        to_date = date.fromisoformat(to_str) if to_str else today
-    except (ValueError, TypeError):
-        to_date = today
+    """Return the current calendar month's bounds (first day to last day).
+
+    The dashboard always shows the current month; GET params are ignored,
+    so the range rolls forward on its own when the month changes.
+    """
+    today = timezone.now().date()
+    from_date = today.replace(day=1)
+    to_date = today.replace(day=calendar.monthrange(today.year, today.month)[1])
     return from_date, to_date
 
 
@@ -37,102 +35,8 @@ def helpdesk_dashboard_view(request):
     return render(request, "helpdesk/dashboard.html")
 
 
-@login_required
-@permission_required("helpdesk.view_ticket")
-def helpdesk_kpi_data(request):
-    """Return helpdesk KPI summary data as JSON.
-
-    Total / newly-created tickets reflect the picker range. Status-breakdown KPIs
-    (in-progress / on-hold / resolved / canceled / overdue) reflect current state.
-    """
-    from helpdesk.models import ClaimRequest, Ticket
-
-    from_date, to_date = _parse_period(request)
-    period_tickets = Ticket.objects.filter(
-        is_active=True,
-        created_date__gte=from_date,
-        created_date__lte=to_date,
-    )
-
-    total_tickets = period_tickets.count()
-    new_tickets = period_tickets.filter(status="new").count()
-    in_progress = Ticket.objects.filter(is_active=True, status="in_progress").count()
-    on_hold = Ticket.objects.filter(is_active=True, status="on_hold").count()
-    resolved = Ticket.objects.filter(is_active=True, status="resolved").count()
-    canceled = Ticket.objects.filter(is_active=True, status="canceled").count()
-
-    # Open tickets (current state: any active ticket not resolved/canceled)
-    open_tickets = Ticket.objects.filter(
-        is_active=True, status__in=["new", "in_progress", "on_hold"]
-    ).count()
-
-    # Resolution rate (period tickets resolved vs created)
-    period_resolved = period_tickets.filter(status="resolved").count()
-    resolution_rate = (
-        round((period_resolved / total_tickets * 100), 1) if total_tickets > 0 else 0
-    )
-
-    # Overdue tickets (past deadline, not resolved/canceled)
-    today = date.today()
-    overdue = Ticket.objects.filter(
-        is_active=True,
-        deadline__lt=today,
-        status__in=["new", "in_progress", "on_hold"],
-    ).count()
-
-    # Pending claims
-    pending_claims = ClaimRequest.objects.filter(
-        is_approved=False,
-        is_rejected=False,
-    ).count()
-
-    # Avg resolution time (days between created_date and resolved_date) for period tickets
-    avg_resolution = None
-    avg_resolution_count = 0
-    try:
-        resolved_tickets = period_tickets.filter(
-            status="resolved",
-            resolved_date__isnull=False,
-        )
-        if resolved_tickets.exists():
-            total_days = 0
-            count = 0
-            for t in resolved_tickets:
-                if t.resolved_date and t.created_date:
-                    delta = (t.resolved_date - t.created_date).days
-                    if delta >= 0:
-                        total_days += delta
-                        count += 1
-            avg_resolution = round(total_days / count, 1) if count > 0 else None
-            avg_resolution_count = count
-    except Exception:
-        pass
-
-    return JsonResponse(
-        {
-            "total_tickets": total_tickets,
-            "open_tickets": open_tickets,
-            "new_tickets": new_tickets,
-            "in_progress": in_progress,
-            "on_hold": on_hold,
-            "resolved": resolved,
-            "canceled": canceled,
-            "resolution_rate": resolution_rate,
-            # Echoed so the (non-clickable) "Resolution Rate" card's hover
-            # tooltip can show the exact numbers the % above was computed
-            # from -- period_resolved, not the current-state "resolved"
-            # count above, which is a different (unscoped) number.
-            "period_resolved": period_resolved,
-            "overdue": overdue,
-            "pending_claims": pending_claims,
-            "avg_resolution_days": avg_resolution,
-            "avg_resolution_count": avg_resolution_count,
-        }
-    )
-
-
 def _period_tickets(request):
-    """Return active Ticket queryset filtered to tickets created in the picker range."""
+    """Active tickets created in the current calendar month."""
     from helpdesk.models import Ticket
 
     from_date, to_date = _parse_period(request)
@@ -143,10 +47,124 @@ def _period_tickets(request):
     )
 
 
+def _resolved_this_month(request):
+    """Active tickets resolved in the current calendar month (by resolved_date).
+
+    Kept separate from `_period_tickets` (scoped by created_date) -- "resolved
+    this month" is about when a ticket was actually resolved, not when it
+    happened to be created.
+    """
+    from helpdesk.models import Ticket
+
+    from_date, to_date = _parse_period(request)
+    return Ticket.objects.filter(
+        is_active=True,
+        status="resolved",
+        resolved_date__gte=from_date,
+        resolved_date__lte=to_date,
+    )
+
+
+@login_required
+@permission_required("helpdesk.view_ticket")
+def helpdesk_kpi_data(request):
+    """Return helpdesk KPI summary data as JSON, scoped to the current month.
+
+    Ticket-volume/status KPIs reflect tickets created this month
+    (created_date). Resolution KPIs reflect tickets resolved this month
+    (resolved_date) -- not the created-this-month cohort's current status,
+    which would conflate "created this month" with "resolved this month".
+    Overdue and pending-claims are live, current-state counts, independent
+    of month, same reasoning as the asset dashboard's "expiring soon" /
+    "return requests" tiles (there's no "became overdue on" or "claim
+    raised on" date field to scope them by).
+    """
+    from helpdesk.models import ClaimRequest
+
+    from_date, to_date = _parse_period(request)
+    period_tickets = _period_tickets(request)
+    resolved_this_month = _resolved_this_month(request)
+
+    total_tickets = period_tickets.count()
+    new_tickets = period_tickets.filter(status="new").count()
+    in_progress = period_tickets.filter(status="in_progress").count()
+    on_hold = period_tickets.filter(status="on_hold").count()
+    canceled = period_tickets.filter(status="canceled").count()
+    open_tickets = period_tickets.filter(
+        status__in=["new", "in_progress", "on_hold"]
+    ).count()
+
+    period_resolved = resolved_this_month.count()
+    resolution_rate = (
+        round((period_resolved / total_tickets * 100), 1) if total_tickets > 0 else 0
+    )
+
+    # Overdue -- live, current-state count (past deadline as of today); a
+    # ticket created last month is just as overdue today as one created
+    # this month, so this intentionally ignores the month bounds above.
+    overdue = _overdue_count()
+
+    # Pending claims -- live, current-state count.
+    pending_claims = ClaimRequest.objects.filter(
+        is_approved=False,
+        is_rejected=False,
+    ).count()
+
+    # Avg resolution time (days between created_date and resolved_date) for
+    # tickets resolved this month.
+    avg_resolution = None
+    avg_resolution_count = 0
+    try:
+        total_days = 0
+        count = 0
+        for t in resolved_this_month.filter(created_date__isnull=False):
+            delta = (t.resolved_date - t.created_date).days
+            if delta >= 0:
+                total_days += delta
+                count += 1
+        avg_resolution = round(total_days / count, 1) if count > 0 else None
+        avg_resolution_count = count
+    except Exception:
+        pass
+
+    return JsonResponse(
+        {
+            "total_tickets": total_tickets,
+            "open_tickets": open_tickets,
+            "new_tickets": new_tickets,
+            "in_progress": in_progress,
+            "on_hold": on_hold,
+            "resolved": period_resolved,
+            "canceled": canceled,
+            "resolution_rate": resolution_rate,
+            "period_resolved": period_resolved,
+            "overdue": overdue,
+            "pending_claims": pending_claims,
+            "avg_resolution_days": avg_resolution,
+            "avg_resolution_count": avg_resolution_count,
+            "period_from_date": from_date.isoformat(),
+            "period_to_date": to_date.isoformat(),
+        }
+    )
+
+
+def _overdue_count():
+    """Tickets currently past their deadline and still open -- a live count."""
+    from helpdesk.models import Ticket
+
+    today = date.today()
+    return Ticket.objects.filter(
+        is_active=True,
+        deadline__lt=today,
+        status__in=["new", "in_progress", "on_hold"],
+    ).count()
+
+
 @login_required
 @permission_required("helpdesk.view_ticket")
 def helpdesk_status_distribution(request):
-    """Ticket count by status, for tickets created in the picker range."""
+    """Ticket count by current status, for tickets created this month."""
+    from_date, to_date = _parse_period(request)
     statuses = []
     status_choices = [
         ("new", _("New")),
@@ -161,13 +179,20 @@ def helpdesk_status_distribution(request):
         count = qs.filter(status=status).count()
         statuses.append({"status": status, "label": label, "count": count})
 
-    return JsonResponse({"statuses": statuses})
+    return JsonResponse(
+        {
+            "statuses": statuses,
+            "period_from_date": from_date.isoformat(),
+            "period_to_date": to_date.isoformat(),
+        }
+    )
 
 
 @login_required
 @permission_required("helpdesk.view_ticket")
 def helpdesk_priority_distribution(request):
-    """Ticket count by priority, for tickets created in the picker range."""
+    """Ticket count by priority, for tickets created this month."""
+    from_date, to_date = _parse_period(request)
     priorities = []
     priority_choices = [
         ("low", _("Low")),
@@ -180,13 +205,20 @@ def helpdesk_priority_distribution(request):
         count = qs.filter(priority=priority).count()
         priorities.append({"priority": priority, "label": label, "count": count})
 
-    return JsonResponse({"priorities": priorities})
+    return JsonResponse(
+        {
+            "priorities": priorities,
+            "period_from_date": from_date.isoformat(),
+            "period_to_date": to_date.isoformat(),
+        }
+    )
 
 
 @login_required
 @permission_required("helpdesk.view_ticket")
 def helpdesk_type_distribution(request):
-    """Ticket count by type, for tickets created in the picker range."""
+    """Ticket count by type, for tickets created this month."""
+    from_date, to_date = _parse_period(request)
     types = []
 
     try:
@@ -211,59 +243,73 @@ def helpdesk_type_distribution(request):
     except Exception:
         pass
 
-    return JsonResponse({"types": types})
+    return JsonResponse(
+        {
+            "types": types,
+            "period_from_date": from_date.isoformat(),
+            "period_to_date": to_date.isoformat(),
+        }
+    )
 
 
 @login_required
 @permission_required("helpdesk.view_ticket")
 def helpdesk_monthly_trend(request):
-    """Ticket creation/resolution trend per month within the selected period."""
+    """Weekly-bucketed created-vs-resolved trend for the current calendar month.
+
+    Bucketed by week (rather than by month) because the dashboard is always
+    pinned to a single calendar month -- a month-by-month trend would
+    collapse to one bar. Mirrors the same weekly-bucket approach used by
+    the main dashboard's attendance trend once it was pinned to the
+    current month.
+    """
     from helpdesk.models import Ticket
 
     from_date, to_date = _parse_period(request)
-    months = []
+    today = date.today()
+    weeks = []
 
-    cursor = from_date.replace(day=1)
-    end_marker = to_date.replace(day=1)
-    while cursor <= end_marker:
-        if cursor.month == 12:
-            next_month = date(cursor.year + 1, 1, 1)
-        else:
-            next_month = date(cursor.year, cursor.month + 1, 1)
-        month_start = cursor
-        month_end = next_month - timedelta(days=1)
+    bucket_start = from_date - timedelta(days=from_date.weekday())
+    last_monday = to_date - timedelta(days=to_date.weekday())
+    cursor = bucket_start
+    while cursor <= last_monday:
+        week_end = min(cursor + timedelta(days=6), to_date)
+        week_start = max(cursor, from_date)
 
         created = Ticket.objects.filter(
             is_active=True,
-            created_date__gte=month_start,
-            created_date__lte=month_end,
+            created_date__gte=week_start,
+            created_date__lte=week_end,
         ).count()
 
         resolved_count = Ticket.objects.filter(
             is_active=True,
             status="resolved",
-            resolved_date__gte=month_start,
-            resolved_date__lte=month_end,
+            resolved_date__gte=week_start,
+            resolved_date__lte=week_end,
         ).count()
 
-        months.append(
+        is_current = cursor <= today <= cursor + timedelta(days=6)
+        label = week_start.strftime("%b %d") + (" (now)" if is_current else "")
+        weeks.append(
             {
-                "month": month_start.strftime("%b %Y"),
-                "from_date": month_start.isoformat(),
-                "to_date": month_end.isoformat(),
+                "week": label,
+                "from_date": week_start.isoformat(),
+                "to_date": week_end.isoformat(),
                 "created": created,
                 "resolved": resolved_count,
             }
         )
-        cursor = next_month
+        cursor += timedelta(weeks=1)
 
-    return JsonResponse({"months": months})
+    return JsonResponse({"weeks": weeks})
 
 
 @login_required
 @permission_required("helpdesk.view_ticket")
 def helpdesk_department_breakdown(request):
-    """Tickets by department (via employee owner), for tickets created in the picker range."""
+    """Tickets by department (via employee owner), for tickets created this month."""
+    from_date, to_date = _parse_period(request)
     departments = []
 
     try:
@@ -287,13 +333,19 @@ def helpdesk_department_breakdown(request):
     except Exception:
         pass
 
-    return JsonResponse({"departments": departments})
+    return JsonResponse(
+        {
+            "departments": departments,
+            "period_from_date": from_date.isoformat(),
+            "period_to_date": to_date.isoformat(),
+        }
+    )
 
 
 @login_required
 @permission_required("helpdesk.view_ticket")
 def helpdesk_overdue_tickets(request):
-    """Tickets created in the selected period whose deadline has already passed."""
+    """Tickets created this month whose deadline has already passed."""
     _from, to_date = _parse_period(request)
     today = date.today()
     cutoff = min(today, to_date)
@@ -338,7 +390,7 @@ def helpdesk_overdue_tickets(request):
 @login_required
 @permission_required("helpdesk.view_ticket")
 def helpdesk_recent_tickets(request):
-    """Most recently created tickets within the selected period."""
+    """Most recently created tickets within the current month."""
     tickets = []
 
     try:
@@ -375,19 +427,14 @@ def helpdesk_recent_tickets(request):
 @login_required
 @permission_required("helpdesk.view_ticket")
 def helpdesk_sla_compliance(request):
-    """SLA compliance rate — tickets resolved within deadline, for tickets created in the picker range."""
-    from helpdesk.models import Ticket
-
+    """SLA compliance -- tickets resolved this month, on time vs late."""
+    from_date, to_date = _parse_period(request)
     resolved_on_time = 0
     resolved_late = 0
-    open_overdue = 0
-    today = date.today()
 
     try:
-        resolved_with_deadline = _period_tickets(request).filter(
-            status="resolved",
+        resolved_with_deadline = _resolved_this_month(request).filter(
             deadline__isnull=False,
-            resolved_date__isnull=False,
         )
 
         for t in resolved_with_deadline:
@@ -395,14 +442,10 @@ def helpdesk_sla_compliance(request):
                 resolved_on_time += 1
             else:
                 resolved_late += 1
-
-        open_overdue = Ticket.objects.filter(
-            is_active=True,
-            deadline__lt=today,
-            status__in=["new", "in_progress", "on_hold"],
-        ).count()
     except Exception:
         pass
+
+    open_overdue = _overdue_count()
 
     total_with_deadline = resolved_on_time + resolved_late
     compliance_rate = (
@@ -418,6 +461,8 @@ def helpdesk_sla_compliance(request):
             "resolved_late": resolved_late,
             "open_overdue": open_overdue,
             "total_with_deadline": total_with_deadline,
+            "period_from_date": from_date.isoformat(),
+            "period_to_date": to_date.isoformat(),
         }
     )
 
@@ -425,7 +470,8 @@ def helpdesk_sla_compliance(request):
 @login_required
 @permission_required("helpdesk.view_ticket")
 def helpdesk_assignee_workload(request):
-    """Open ticket count per assignee, restricted to tickets created in the selected period."""
+    """Open ticket count per assignee, restricted to tickets created this month."""
+    from_date, to_date = _parse_period(request)
     assignees = []
 
     try:
@@ -454,4 +500,10 @@ def helpdesk_assignee_workload(request):
     except Exception:
         pass
 
-    return JsonResponse({"assignees": assignees})
+    return JsonResponse(
+        {
+            "assignees": assignees,
+            "period_from_date": from_date.isoformat(),
+            "period_to_date": to_date.isoformat(),
+        }
+    )

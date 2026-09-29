@@ -289,7 +289,7 @@ class TicketListBase(HorillaListView):
 
     model = Ticket
     filter_class = TicketFilter
-    filter_keys_to_remove = ["ticket_tab", "view_type"]
+    filter_keys_to_remove = ["ticket_tab", "view_type", "open_tab"]
     # custom_empty_template = "cbv/pipeline/empty_list.html"
     bulk_update_fields = [
         "ticket_type",
@@ -307,6 +307,7 @@ class TicketListBase(HorillaListView):
         (_("Assigned to"), "get_assigned_to"),
         (_("Status"), "get_status_col"),
         (_("Priority"), "get_priority_stars"),
+        (_("Deadline"), "deadline"),
         (_("Tags"), "get_tags_col"),
     ]
 
@@ -496,7 +497,7 @@ class TicketCardBase(HorillaKanbanView):
     group_key = "status"
     records_per_page = 10
     show_kanban_confirmation = False
-    filter_keys_to_remove = ["ticket_tab", "view_type"]
+    filter_keys_to_remove = ["ticket_tab", "view_type", "open_tab"]
 
     details = {
         "title": "{title} ({ticket_type__prefix}-{pk})",

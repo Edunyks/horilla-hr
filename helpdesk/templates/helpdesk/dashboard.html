@@ -163,27 +163,27 @@
         <div class="hd-main">
             <div class="hd-chart-grid">
                 <div class="hd-chart-card" data-chart-id="ticket_status" data-chart-label="{% trans 'Ticket Status' %}">
-                    <div class="hd-chart-card__header"><div><div class="hd-chart-card__title">{% trans "Ticket Status" %}</div><div class="hd-chart-card__subtitle">{% trans "All active tickets" %}</div></div></div>
+                    <div class="hd-chart-card__header"><div><div class="hd-chart-card__title">{% trans "Ticket Status" %}</div><div class="hd-chart-card__subtitle">{% trans "Tickets created this month" %}</div></div></div>
                     <div class="hd-chart-card__body"><div id="chart-hd-status"></div></div>
                 </div>
                 <div class="hd-chart-card" data-chart-id="priority_breakdown" data-chart-label="{% trans 'Priority Breakdown' %}">
-                    <div class="hd-chart-card__header"><div><div class="hd-chart-card__title">{% trans "Priority Breakdown" %}</div><div class="hd-chart-card__subtitle">{% trans "Low, medium, high" %}</div></div></div>
+                    <div class="hd-chart-card__header"><div><div class="hd-chart-card__title">{% trans "Priority Breakdown" %}</div><div class="hd-chart-card__subtitle">{% trans "Low, medium, high — this month" %}</div></div></div>
                     <div class="hd-chart-card__body"><div id="chart-hd-priority"></div></div>
                 </div>
                 <div class="hd-chart-card" data-chart-id="tickets_by_type" data-chart-label="{% trans 'Tickets by Type' %}">
-                    <div class="hd-chart-card__header"><div><div class="hd-chart-card__title">{% trans "Tickets by Type" %}</div><div class="hd-chart-card__subtitle">{% trans "Suggestion, complaint, service, etc." %}</div></div></div>
+                    <div class="hd-chart-card__header"><div><div class="hd-chart-card__title">{% trans "Tickets by Type" %}</div><div class="hd-chart-card__subtitle">{% trans "Suggestion, complaint, service, etc. — this month" %}</div></div></div>
                     <div class="hd-chart-card__body"><div id="chart-hd-type"></div></div>
                 </div>
                 <div class="hd-chart-card" data-chart-id="tickets_by_dept" data-chart-label="{% trans 'Tickets by Department' %}">
-                    <div class="hd-chart-card__header"><div><div class="hd-chart-card__title">{% trans "Tickets by Department" %}</div><div class="hd-chart-card__subtitle">{% trans "Raised by department" %}</div></div></div>
+                    <div class="hd-chart-card__header"><div><div class="hd-chart-card__title">{% trans "Tickets by Department" %}</div><div class="hd-chart-card__subtitle">{% trans "Raised by department — this month" %}</div></div></div>
                     <div class="hd-chart-card__body"><div id="chart-hd-dept"></div></div>
                 </div>
                 <div class="hd-chart-card hd-chart-card--wide" data-chart-id="ticket_trend" data-chart-label="{% trans 'Ticket Trend' %}">
-                    <div class="hd-chart-card__header"><div><div class="hd-chart-card__title">{% trans "Ticket Trend" %}</div><div class="hd-chart-card__subtitle">{% trans "Created vs resolved — last 6 months" %}</div></div></div>
+                    <div class="hd-chart-card__header"><div><div class="hd-chart-card__title">{% trans "Ticket Trend" %}</div><div class="hd-chart-card__subtitle">{% trans "Created vs resolved — by week, this month" %}</div></div></div>
                     <div class="hd-chart-card__body"><div id="chart-hd-trend"></div></div>
                 </div>
                 <div class="hd-chart-card" data-chart-id="sla_compliance" data-chart-label="{% trans 'SLA Compliance' %}">
-                    <div class="hd-chart-card__header"><div><div class="hd-chart-card__title">{% trans "SLA Compliance" %}</div><div class="hd-chart-card__subtitle">{% trans "Resolved within deadline" %}</div></div></div>
+                    <div class="hd-chart-card__header"><div><div class="hd-chart-card__title">{% trans "SLA Compliance" %}</div><div class="hd-chart-card__subtitle">{% trans "Resolved within deadline — this month" %}</div></div></div>
                     <div class="hd-chart-card__body"><div id="chart-hd-sla"></div></div>
                 </div>
                 <div class="hd-chart-card" data-chart-id="assignee_workload" data-chart-label="{% trans 'Assignee Workload' %}">
@@ -239,6 +239,22 @@
     const statusColors = { new: '#3b82f6', in_progress: '#f59e0b', on_hold: '#ef4444', resolved: '#22c55e', canceled: '#94a3b8' };
     const priorityColors = { low: '#22c55e', medium: '#f59e0b', high: '#ef4444' };
     const emptyHtml = (msg) => `<div class="hd-empty"><img src="/static/images/ui/no_records.svg" alt="">${msg}</div>`;
+
+    function dateRangeParams(field, fromDate, toDate) {
+        if (!fromDate || !toDate) return '';
+        return '&custom_field=' + field + '&custom_lookup=gte&custom_value=' + encodeURIComponent(fromDate)
+             + '&custom_field=' + field + '&custom_lookup=lte&custom_value=' + encodeURIComponent(toDate);
+    }
+
+    // Dedicated Created Date range filter (TicketFilter.created_date_from/
+    // _till) -- unlike dateRangeParams above, these are plain declared
+    // filters, so the ticket list's filter-tag bar shows them as clean,
+    // correctly-labelled pills instead of the generic builder's garbled
+    // multi-row concatenation.
+    function createdDateRangeParams(fromDate, toDate) {
+        if (!fromDate || !toDate) return '';
+        return '&created_date_from=' + encodeURIComponent(fromDate) + '&created_date_till=' + encodeURIComponent(toDate);
+    }
 
     document.getElementById('hd-date').textContent = new Date().toLocaleDateString('en-US', {
         weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
@@ -396,7 +412,7 @@
         .then(r => r.json())
         .then(data => {
             document.getElementById('hd-kpi-grid').innerHTML = `
-                <a href="{% url 'ticket-view' %}?ticket_tab=all_tickets&open_tab=3&is_open=true&filter_applied=1" class="hd-kpi-card">
+                <a href="{% url 'ticket-view' %}?ticket_tab=all_tickets&open_tab=3&is_open=true&filter_applied=1${createdDateRangeParams(data.period_from_date, data.period_to_date)}" class="hd-kpi-card">
                     <div class="hd-kpi-card__icon hd-kpi-card__icon--blue"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg></div>
                     <div class="hd-kpi-card__label">{% trans "Open Tickets"|escapejs %}</div>
                     <div class="hd-kpi-card__value">${data.open_tickets}</div>
@@ -436,7 +452,7 @@
                 chart: { type: 'donut', height: 300, background: 'transparent', fontFamily: 'inherit',
                     events: { dataPointSelection: (e, ctx, config) => {
                         const status = data.statuses[config.dataPointIndex].status;
-                        window.location.href = "{% url 'ticket-view' %}?ticket_tab=all_tickets&status=" + encodeURIComponent(status);
+                        window.location.href = "{% url 'ticket-view' %}?ticket_tab=all_tickets&status=" + encodeURIComponent(status) + createdDateRangeParams(data.period_from_date, data.period_to_date);
                     }}
                 },
                 labels: data.statuses.map(s => s.label),
@@ -462,7 +478,7 @@
                 chart: { type: 'bar', height: 300, toolbar: { show: false }, background: 'transparent', fontFamily: 'inherit',
                     events: { dataPointSelection: (e, ctx, config) => {
                         const p = data.priorities[config.dataPointIndex];
-                        if (p && p.priority) window.location.href = "{% url 'ticket-view' %}?ticket_tab=all_tickets&priority=" + encodeURIComponent(p.priority);
+                        if (p && p.priority) window.location.href = "{% url 'ticket-view' %}?ticket_tab=all_tickets&priority=" + encodeURIComponent(p.priority) + createdDateRangeParams(data.period_from_date, data.period_to_date);
                     }}
                 },
                 colors: data.priorities.map(p => priorityColors[p.priority] || '#94a3b8'),
@@ -490,7 +506,8 @@
                     events: { dataPointSelection: (e, ctx, config) => {
                         const t = data.types[config.dataPointIndex];
                         const base = "{% url 'ticket-view' %}?ticket_tab=all_tickets";
-                        window.location.href = t && t.id ? base + "&ticket_type=" + t.id : base;
+                        const range = createdDateRangeParams(data.period_from_date, data.period_to_date);
+                        window.location.href = (t && t.id ? base + "&ticket_type=" + t.id : base) + range;
                     }}
                 },
                 labels: data.types.map(t => t.type),
@@ -516,7 +533,8 @@
                     events: { dataPointSelection: (e, ctx, config) => {
                         const d = data.departments[config.dataPointIndex];
                         const base = "{% url 'ticket-view' %}?ticket_tab=all_tickets";
-                        window.location.href = d && d.id ? base + "&department=" + d.id : base;
+                        const range = createdDateRangeParams(data.period_from_date, data.period_to_date);
+                        window.location.href = (d && d.id ? base + "&department=" + d.id : base) + range;
                     }}
                 },
                 colors: COLORS,
@@ -537,27 +555,27 @@
     fetchP("{% url 'helpdesk-dashboard-trend' %}")
         .then(r => r.json())
         .then(data => {
-            if (!data.months.length) { document.querySelector("#chart-hd-trend").innerHTML = emptyHtml('{% trans "No data"|escapejs %}'); return; }
+            if (!data.weeks.length) { document.querySelector("#chart-hd-trend").innerHTML = emptyHtml('{% trans "No data"|escapejs %}'); return; }
             renderChart('hd-trend', document.querySelector("#chart-hd-trend"), {
                 series: [
-                    { name: '{% trans "Created"|escapejs %}', data: data.months.map(m => m.created) },
-                    { name: '{% trans "Resolved"|escapejs %}', data: data.months.map(m => m.resolved) },
+                    { name: '{% trans "Created"|escapejs %}', data: data.weeks.map(w => w.created) },
+                    { name: '{% trans "Resolved"|escapejs %}', data: data.weeks.map(w => w.resolved) },
                 ],
                 chart: { type: 'bar', height: 280, toolbar: { show: false }, background: 'transparent', fontFamily: 'inherit',
                     events: { dataPointSelection: (e, ctx, config) => {
-                        const m = data.months[config.dataPointIndex];
+                        const w = data.weeks[config.dataPointIndex];
                         const base = "{% url 'ticket-view' %}?ticket_tab=all_tickets";
-                        if (!m || !m.from_date) { window.location.href = base; return; }
+                        if (!w || !w.from_date) { window.location.href = base; return; }
                         if (config.seriesIndex === 1) {
-                            window.location.href = base + "&status=resolved&resolved_date__gte=" + m.from_date + "&resolved_date__lte=" + m.to_date;
+                            window.location.href = base + "&status=resolved" + dateRangeParams('resolved_date', w.from_date, w.to_date);
                         } else {
-                            window.location.href = base + "&created_date__gte=" + m.from_date + "&created_date__lte=" + m.to_date;
+                            window.location.href = base + createdDateRangeParams(w.from_date, w.to_date);
                         }
                     }}
                 },
                 colors: ['#3b82f6', '#22c55e'],
                 plotOptions: { bar: { borderRadius: 5, columnWidth: '55%' } },
-                xaxis: { categories: data.months.map(m => m.month), labels: { style: { colors: textColor, fontSize: '11px' } }, axisBorder: { show: false }, axisTicks: { show: false } },
+                xaxis: { categories: data.weeks.map(w => w.week), labels: { style: { colors: textColor, fontSize: '11px' } }, axisBorder: { show: false }, axisTicks: { show: false } },
                 yaxis: { labels: { style: { colors: textColor } } },
                 grid: { borderColor: gridColor, strokeDashArray: 4 },
                 dataLabels: { enabled: true, style: { fontSize: '11px', colors: ['#fff'] } },
@@ -579,7 +597,7 @@
                 series: [data.compliance_rate],
                 chart: { type: 'radialBar', height: 300, background: 'transparent', fontFamily: 'inherit',
                     events: {
-                        click: () => { window.location.href = "{% url 'ticket-view' %}?ticket_tab=all_tickets&status=resolved"; },
+                        click: () => { window.location.href = "{% url 'ticket-view' %}?ticket_tab=all_tickets&status=resolved" + dateRangeParams('resolved_date', data.period_from_date, data.period_to_date); },
                     },
                 },
                 colors: [data.compliance_rate >= 90 ? '#22c55e' : data.compliance_rate >= 70 ? '#f59e0b' : '#ef4444'],
@@ -588,7 +606,7 @@
                 subtitle: { text: `${data.resolved_on_time} {% trans "on time"|escapejs %} · ${data.resolved_late} {% trans "late"|escapejs %} · ${data.open_overdue} {% trans "overdue"|escapejs %}`, align: 'center', style: { fontSize: '11px', color: textColor }, offsetY: 280 },
             });
             slaEl.style.cursor = 'pointer';
-            slaEl.addEventListener('click', () => { window.location.href = "{% url 'ticket-view' %}?ticket_tab=all_tickets&status=resolved"; });
+            slaEl.addEventListener('click', () => { window.location.href = "{% url 'ticket-view' %}?ticket_tab=all_tickets&status=resolved" + dateRangeParams('resolved_date', data.period_from_date, data.period_to_date); });
         });
     }
     loadSlaCompliance();
@@ -604,9 +622,10 @@
                 chart: { type: 'bar', height: 300, toolbar: { show: false }, background: 'transparent', fontFamily: 'inherit',
                     events: { dataPointSelection: (e, ctx, config) => {
                         const assignee = data.assignees[config.dataPointIndex];
+                        const range = createdDateRangeParams(data.period_from_date, data.period_to_date);
                         const url = assignee && assignee.id
-                            ? "{% url 'ticket-view' %}?ticket_tab=all_tickets&assigned_to=" + assignee.id
-                            : "{% url 'ticket-view' %}?ticket_tab=all_tickets";
+                            ? "{% url 'ticket-view' %}?ticket_tab=all_tickets&is_open=true&assigned_to=" + assignee.id + range
+                            : "{% url 'ticket-view' %}?ticket_tab=all_tickets&is_open=true" + range;
                         window.location.href = url;
                     }}
                 },
