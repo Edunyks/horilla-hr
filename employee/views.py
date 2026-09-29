@@ -2335,7 +2335,19 @@ def employee_reset_password_admin(request, emp_id):
     employee = get_object_or_404(Employee, id=emp_id)
     results = []
     user = employee.employee_user_id
-    if user:
+    if user == request.user:
+        # Resetting your own password here would change the live
+        # credentials of the session making this request -- Django
+        # invalidates the session's auth hash on password change, logging
+        # the admin out immediately and confusingly mid-action. Route them
+        # to the normal self-service change-password flow instead.
+        messages.warning(
+            request,
+            _(
+                "You can't reset your own password here — use Change Password from your profile menu instead."
+            ),
+        )
+    elif user:
         new_password = generate_random_password()
         user.set_password(new_password)
         user.is_new_employee = True
@@ -2355,15 +2367,29 @@ def employee_bulk_reset_password_admin(request):
     ids = json.loads(request.POST.get("ids", "[]"))
     employees = Employee.objects.filter(id__in=ids).select_related("employee_user_id")
     results = []
+    skipped_self = False
     for employee in employees:
         user = employee.employee_user_id
         if not user:
+            continue
+        if user == request.user:
+            # Same reasoning as the individual action: changing the
+            # requesting admin's own password mid-bulk-action would
+            # invalidate their own session immediately.
+            skipped_self = True
             continue
         new_password = generate_random_password()
         user.set_password(new_password)
         user.is_new_employee = True
         user.save()
         results.append({"employee": employee, "password": new_password})
+    if skipped_self:
+        messages.warning(
+            request,
+            _(
+                "Your own account was skipped — use Change Password from your profile menu instead."
+            ),
+        )
     return render(request, "employee/reset_password_result.html", {"results": results})
 
 
