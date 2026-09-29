@@ -245,13 +245,11 @@ def candidate_survey(request):
                     "survey/candidate_survey_form.html",
                     {"form": form, "candidate": candidate},
                 )
-            attachment_path = f"recruitment_attachment/{attachment.name}"
-            attachment_dir = os.path.dirname(default_storage.path(attachment_path))
-            if not os.path.exists(attachment_dir):
-                os.makedirs(attachment_dir)
-            with default_storage.open(attachment_path, "wb+") as destination:
-                for chunk in attachment.chunks():
-                    destination.write(chunk)
+            original_name = os.path.basename(attachment.name)
+            safe_name = f"{uuid4().hex}_{original_name}"
+            attachment_path = default_storage.save(
+                f"recruitment_attachment/{safe_name}", attachment
+            )
             answer.attachment = attachment_path
             answer_data[key] = [attachment_path]
         answer.answer_json = json.dumps(answer_data)
