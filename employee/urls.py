@@ -475,6 +475,11 @@ urlpatterns = [
         name="policies-discipline-policies-tab",
     ),
     path(
+        "policies-discipline/faq-tab/",
+        policies.policies_discipline_faq_tab,
+        name="policies-discipline-faq-tab",
+    ),
+    path(
         "policies-discipline/action-type-tab/",
         policies.policies_discipline_action_type_tab,
         name="policies-discipline-action-type-tab",

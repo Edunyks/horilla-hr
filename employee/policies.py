@@ -92,6 +92,26 @@ def policies_discipline_policies_tab(request):
 
 @login_required
 @hx_request_required
+def policies_discipline_faq_tab(request):
+    """
+    HTMX tab body for FAQs under policies & discipline. Reuses the FAQ
+    model/templates from the helpdesk app -- only this page's tab and
+    the standalone helpdesk FAQ URLs surface it, the feature itself
+    still lives in helpdesk.
+    """
+    from helpdesk.models import FAQ, FAQCategory
+
+    faq_categories = FAQCategory.objects.all()
+    questions = FAQ.objects.values_list("question", flat=True)
+    return render(
+        request,
+        "policies/policies_discipline_faq_tab.html",
+        {"faq_categories": faq_categories, "questions": list(questions)},
+    )
+
+
+@login_required
+@hx_request_required
 def policies_discipline_action_type_tab(request):
     """
     HTMX tab body for disciplinary action types under policies & discipline.
