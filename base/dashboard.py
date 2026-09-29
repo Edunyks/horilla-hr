@@ -558,25 +558,14 @@ def dashboard_kpi_data(request):
     # Expected = active employees not on approved leave (excludes leave from
     # the denominator so "absent" is not inflated by people who should be out).
     expected_today = max(0, total_employees - on_leave)
-
-    # "Offline" - shares its exact definition (and scope) with the Attendance
-    # dashboard's own Offline card: shift already started today, not on
-    # approved leave, no punch-in yet. Employees with no shift assigned are
-    # excluded (see _missing_punches_employees's own docstring) - not simply
-    # "everyone minus present minus on-leave", so the two dashboards' Offline
-    # counts always agree instead of silently drifting apart.
-    missing_punches_ids = []
-    try:
-        from attendance.dashboard import _missing_punches_employees
-
-        missing_punches_ids = list(
-            _missing_punches_employees(real_today, employee_ids=scoped_ids).values_list(
-                "id", flat=True
-            )
-        )
-    except Exception:
-        pass
-    not_checked_in = len(missing_punches_ids)
+    # "Offline" is deliberately the exact remainder of the other two top-row
+    # cards, not the Attendance dashboard's shift-aware "missing punches"
+    # definition (which excludes employees with no shift assigned or whose
+    # shift hasn't started yet) -- Present Today + Offline + On Leave must
+    # always add up to Total Employees for these three cards to read
+    # correctly together. The Attendance dashboard's own Offline card is a
+    # different, more granular metric and isn't held to this identity.
+    not_checked_in = max(0, total_employees - present_today - on_leave)
     expected_to_check_in = not_checked_in
     # Keep absent_today as an alias for not_checked_in for API compatibility.
     absent_today = not_checked_in
@@ -616,7 +605,6 @@ def dashboard_kpi_data(request):
             "absent_today": absent_today,
             "expected_today": expected_today,
             "not_checked_in": not_checked_in,
-            "missing_punches_ids": missing_punches_ids,
             "expected_to_check_in": expected_to_check_in,
             "attendance_rate": attendance_rate,
             "on_leave": on_leave,
