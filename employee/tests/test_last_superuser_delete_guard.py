@@ -43,9 +43,7 @@ class LastSuperuserDeleteGuardTests(TestCase):
         # ProtectedError before the guard under test ever runs. Deactivating
         # it here isolates the last-superuser check from that unrelated,
         # pre-existing behavior.
-        Contract.objects.filter(employee_id=employee).update(
-            contract_status="expired"
-        )
+        Contract.objects.filter(employee_id=employee).update(contract_status="expired")
         return employee
 
     def _client_as(self, employee):
@@ -141,9 +139,7 @@ class LastSuperuserDeleteGuardTests(TestCase):
             first_name="Requester",
             user=requester_user,
         )
-        Contract.objects.filter(employee_id=requester).update(
-            contract_status="expired"
-        )
+        Contract.objects.filter(employee_id=requester).update(contract_status="expired")
         client = Client()
         client.force_login(requester_user)
 

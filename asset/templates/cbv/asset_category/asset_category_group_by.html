@@ -175,7 +175,7 @@ Bulk-select, per-group pagination and the accordion's three-dot menu
                                 class="inline-flex items-center justify-center rounded-full font-semibold min-w-[22px] h-[22px] px-1.5 text-[11px] bg-primary-600 text-white"
                                 title="{{group.list.paginator.count}} {% trans 'Records' %}"
                             >{{ group.list.paginator.count }}</span>
-                            <span class="text-[13.5px] font-semibold text-[#26251F]">{{ group.grouper|capfirst }}</span>
+                            <span class="text-[13.5px] font-semibold text-gray-700">{{ group.grouper|capfirst }}</span>
                         </div>
                         <div class="flex items-center gap-2" onclick="event.stopPropagation()">
                             {% if accordian_action %}
@@ -201,7 +201,7 @@ Bulk-select, per-group pagination and the accordion's three-dot menu
                                 </div>
                             {% endif %}
                             <span class="w-6 h-6 flex items-center justify-center rounded-full hover:bg-[#F3F2EE] transition-colors shrink-0">
-                                <ion-icon name="chevron-down-outline" class="icon text-sm text-[#9C9A92]"></ion-icon>
+                                <ion-icon name="chevron-down-outline" class="icon text-sm text-gray-600"></ion-icon>
                             </span>
                         </div>
                     </div>

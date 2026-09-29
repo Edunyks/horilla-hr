@@ -46,13 +46,13 @@
                         >
                             {{ skill_zone.list|length }}
                         </span>
-                        <span class="oh-tabs__movable-title !text-[13.5px] !font-semibold !text-[#26251F]">{{ skill_zone.grouper.title|title }}</span>
+                        <span class="oh-tabs__movable-title !text-[13.5px] !font-semibold !text-gray-700">{{ skill_zone.grouper.title|title }}</span>
                     </div>
 
                     {% if perms.recruitment.add_skillzonecandidate or perms.recruitment.change_skillzone or perms.recruitment.delete_skillzone %}
                         <div class="d-flex align-items-center">
                         <span class="w-6 h-6 flex items-center justify-center rounded-full hover:bg-white/50 transition-colors shrink-0 me-2">
-                            <ion-icon name="chevron-up-outline" class="oh-tabs__movable-fold-icon text-sm text-[#9C9A92]"></ion-icon>
+                            <ion-icon name="chevron-up-outline" class="oh-tabs__movable-fold-icon text-sm text-gray-600"></ion-icon>
                         </span>
                         <div onclick="event.stopPropagation()" class="oh-dropdown" x-data="{open: false}">
                             <button

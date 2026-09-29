@@ -88,16 +88,6 @@
                 id="filterForm{{ search_swap_target|cut:'#' }}"
                 onsubmit="event.preventDefault()"
                 hx-get="{{ search_url }}"
-                {# `apply_first_filter` means "this page's content is already #}
-                {# fetched by whoever embedded this Nav - only submit from    #}
-                {# here". generic/horilla_nav.html has always gated its load  #}
-                {# trigger on it; this template checked only default_group_by,#}
-                {# so a Nav with apply_first_filter set still fired a `load`   #}
-                {# fetch into its own swap target. Where a shell already loads #}
-                {# that same target (the pipeline's per-tab shell does), the   #}
-                {# result was every row fetched twice and the already-rendered #}
-                {# content blanked and rebuilt when this late-arriving Nav     #}
-                {# fired. #}
                 hx-trigger="{% if default_group_by or apply_first_filter %}submit{% else %}load, submit{% endif %}"
                 hx-replace-url="false"
                 hx-target="{{ search_swap_target }}"
@@ -314,7 +304,7 @@
                                                 class="text-xs text-primary-600 hover:underline mt-2"
                                                 onclick="ngbAddLevel(this)"
                                             >+ {% trans "Add level" %}</button>
-                                            <div id="nestedGroupByPreview" class="text-xs text-[#9C9A92] mt-2 pt-2 border-t border-[#EAE8E3]"></div>
+                                            <div id="nestedGroupByPreview" class="text-xs text-gray-600 mt-2 pt-2 border-t border-[#EAE8E3]"></div>
                                         </div>
                                     </div>
                                     <script>
