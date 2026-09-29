@@ -467,7 +467,8 @@ class HorillaListView(ListView):
             )
             remove_keys = set(
                 # nested_fields gets its own "Grouped by: X > Y" line instead of the generic filter-tag rendering.
-                ["filter_applied", "nav_url", "referrer", "nested_fields"]
+                # open_tab only controls which tab opens on load; it's not a real filter.
+                ["filter_applied", "nav_url", "referrer", "nested_fields", "open_tab"]
                 + self.filter_keys_to_remove
             )
 
@@ -1935,7 +1936,8 @@ class HorillaCardView(ListView):
             )
             remove_keys = set(
                 # nested_fields gets its own "Grouped by: X > Y" line instead of the generic filter-tag rendering.
-                ["filter_applied", "nav_url", "referrer", "nested_fields"]
+                # open_tab only controls which tab opens on load; it's not a real filter.
+                ["filter_applied", "nav_url", "referrer", "nested_fields", "open_tab"]
                 + self.filter_keys_to_remove
             )
 
