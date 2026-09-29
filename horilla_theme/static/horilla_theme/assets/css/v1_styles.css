@@ -1714,6 +1714,11 @@ table .oh-btn-group a {
   align-items: center;
 }
 
+td .oh-profile {
+  max-width: 100%;
+  overflow: hidden;
+}
+
 .oh-profile__avatar {
   border-radius: 50%;
   flex-shrink: 0;
