@@ -915,6 +915,7 @@ def get_key_instances(model, data_dict, filter_class=None):
             "assign_sortby",
             "request_sortby",
             "asset_under",
+            "breadcrumb_nav",
         ]
         or "dynamic_page" in key
     ]
