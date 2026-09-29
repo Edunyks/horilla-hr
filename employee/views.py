@@ -2217,13 +2217,23 @@ def employee_delete(request, obj_id):
     try:
         view = request.POST.get("view")
         employee = Employee.objects.get(id=obj_id)
+        user = employee.employee_user_id
+        if (
+            user is not None
+            and user.is_superuser
+            and Employee.objects.filter(
+                is_active=True, employee_user_id__is_superuser=True
+            ).count()
+            <= 1
+        ):
+            messages.error(request, _("You can't delete the last superuser."))
+            return HorillaRedirect(request, fallback_url=f"/view={view}")
         if apps.is_installed("payroll"):
             if employee.contract_set.all().exists():
                 contracts = employee.contract_set.all()
                 for contract in contracts:
                     if contract.contract_status != "active":
                         contract.delete()
-        user = employee.employee_user_id
         try:
             user.delete()
         except AttributeError:
@@ -2254,17 +2264,25 @@ def employee_bulk_delete(request):
     if not ids:
         messages.error(request, _("No IDs provided."))
     deleted_count = 0
+    active_superuser_count = Employee.objects.filter(
+        is_active=True, employee_user_id__is_superuser=True
+    ).count()
     employees = Employee.objects.filter(id__in=ids).select_related("employee_user_id")
     for employee in employees:
         try:
+            user = employee.employee_user_id
+            if user is not None and user.is_superuser and active_superuser_count <= 1:
+                messages.error(request, _("You can't delete the last superuser."))
+                continue
             if apps.is_installed("payroll"):
                 if employee.contract_set.all().exists():
                     contracts = employee.contract_set.all()
                     for contract in contracts:
                         if contract.contract_status != "active":
                             contract.delete()
-            user = employee.employee_user_id
             user.delete()
+            if user is not None and user.is_superuser:
+                active_superuser_count -= 1
             deleted_count += 1
         except Employee.DoesNotExist:
             messages.error(request, _("Employee not found."))
