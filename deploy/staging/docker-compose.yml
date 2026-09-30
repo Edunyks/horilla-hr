@@ -13,7 +13,7 @@ services:
     volumes:
       - horilla-staging-postgres:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -23,16 +23,21 @@ services:
   redis:
     image: redis:7-alpine
     restart: unless-stopped
-    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:?set REDIS_PASSWORD}
+    # Exec form so a password with spaces or quotes stays one argument.
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "${REDIS_PASSWORD:?set REDIS_PASSWORD}"]
+    environment:
+      # redis-cli reads this, so the healthcheck needs no escaped variable:
+      # Coolify does not reliably preserve Compose $$ escapes.
+      REDISCLI_AUTH: ${REDIS_PASSWORD:?set REDIS_PASSWORD}
     volumes:
       - horilla-staging-redis:/data
     healthcheck:
-      test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" --no-auth-warning ping"]
+      # Plain `redis-cli ping` exits 0 on a NOAUTH error, so check for PONG.
+      test: ["CMD-SHELL", "redis-cli ping | grep -q PONG"]
       interval: 10s
       timeout: 5s
       retries: 5
-    environment:
-      REDIS_PASSWORD: ${REDIS_PASSWORD:?set REDIS_PASSWORD}
+      start_period: 10s
 
   # One-shot release step: docker/entrypoint.sh runs `migrate` and
   # `collectstatic --clear`, then execs the command (`true`) and exits 0.
