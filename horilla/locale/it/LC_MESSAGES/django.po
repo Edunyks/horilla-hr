@@ -66,7 +66,7 @@ msgstr "Gruppi"
 msgid "Default Accessibility"
 msgstr "Accessibilità Predefinita"
 
-msgid "Limit default view access to horilla feature"
+msgid "Limit default view access to Candour feature"
 msgstr ""
 "Limita l'accesso alla visualizzazione predefinita alla funzione horilla"
 
@@ -4034,8 +4034,8 @@ msgstr "Imposta i tipi di impegno — Tempo pieno, Part time, Contratto."
 msgid "Mail Server"
 msgstr "Mail Server"
 
-msgid "Configure an outgoing mail server so Horilla can send emails."
-msgstr "Configura un server di posta in uscita così Horilla può inviare email."
+msgid "Configure an outgoing mail server so Candour can send emails."
+msgstr "Configura un server di posta in uscita così Candour può inviare email."
 
 msgid "First Employee"
 msgstr "Primo dipendente"
@@ -5478,8 +5478,8 @@ msgstr "Salva Password"
 msgid "Forgot password"
 msgstr "Password dimenticata"
 
-msgid "Horilla"
-msgstr "Horilla"
+msgid "Candour"
+msgstr "Candour"
 
 msgid "Assign"
 msgstr "Assegna"
@@ -6102,8 +6102,8 @@ msgstr "Controlli dati e accesso"
 msgid "About"
 msgstr "Informazioni"
 
-msgid "Horilla HR"
-msgstr "Horilla HR"
+msgid "Candour HR"
+msgstr "Candour HR"
 
 msgid "Quote this version when reporting a problem."
 msgstr "Cita questa versione quando segnali un problema."
@@ -6114,8 +6114,8 @@ msgstr "Note di rilascio"
 msgid "HR setup checklist"
 msgstr "Checklist di configurazione HR"
 
-msgid "Get started with Horilla HR"
-msgstr "Inizia con Horilla HR"
+msgid "Get started with Candour HR"
+msgstr "Inizia con Candour HR"
 
 #, python-format
 msgid ""
@@ -7644,8 +7644,8 @@ msgstr "{} non trovato."
 msgid "%(model__meta_verbose_name)s object does not exist."
 msgstr "%(model__meta_verbose_name)s l'oggetto non esiste."
 
-msgid "Test mail from Horilla"
-msgstr "Test mail da Horilla"
+msgid "Test mail from Candour"
+msgstr "Test mail da Candour"
 
 msgid "Something went wrong :"
 msgstr "Qualcosa è andato storto:"
@@ -11464,8 +11464,8 @@ msgstr "Data sconosciuta"
 msgid "Yesterday"
 msgstr "Ieri"
 
-msgid "Horilla Bot"
-msgstr "Horilla Bot"
+msgid "Candour Bot"
+msgstr "Candour Bot"
 
 msgid "record created"
 msgstr "record creato"
@@ -11603,8 +11603,8 @@ msgstr "Configurazione tracciamento audit aggiornata."
 msgid "Tracked fields updated for %(model)s."
 msgstr "Campi tracciati aggiornati per %(model)s."
 
-msgid "Horilla Auth"
-msgstr "Horilla Auth"
+msgid "Candour Auth"
+msgstr "Candour Auth"
 
 msgid "Users"
 msgstr "Utenti"
@@ -12193,12 +12193,12 @@ msgstr "Google Incontra Integrazione"
 msgid "Enable Google meet"
 msgstr "Abilita Google meet"
 
-msgid "Enable this to integrate Google meet to Horilla."
-msgstr "Abilita questa opzione per integrare Google meet a Horilla."
+msgid "Enable this to integrate Google meet to Candour."
+msgstr "Abilita questa opzione per integrare Google meet a Candour."
 
-msgid "Schedule and join Google Meet video calls directly from Horilla."
+msgid "Schedule and join Google Meet video calls directly from Candour."
 msgstr ""
-"Programma e partecipa a videochiamate Google Meet direttamente da Horilla."
+"Programma e partecipa a videochiamate Google Meet direttamente da Candour."
 
 msgid "Google Cloud Credential not found."
 msgstr "Credenziale Google Cloud non trovata."
@@ -13725,8 +13725,8 @@ msgstr "La Mia Azienda"
 msgid "Main navigation"
 msgstr "Navigazione principale"
 
-msgid "Horilla HR version"
-msgstr "Versione Horilla HR"
+msgid "Candour HR version"
+msgstr "Versione Candour HR"
 
 msgid "Version"
 msgstr "Versione"
@@ -13939,8 +13939,8 @@ msgstr "HR"
 msgid "Please login to access the dashboard."
 msgstr "Effettua il login per accedere alla dashboard."
 
-msgid "e.g. adam.luis@horilla.com"
-msgstr "es. adam.luis@horilla.com"
+msgid "e.g. adam.luis@candoursystems.com"
+msgstr "es. adam.luis@candoursystems.com"
 
 msgid "Sign In"
 msgstr "Accedi"
@@ -15167,14 +15167,14 @@ msgstr "Nessuna impostazione trovata"
 msgid "Enable Linkedin"
 msgstr "Abilita Linkedin"
 
-msgid "Enable this to integrate linkedin to Horilla."
-msgstr "Abilita questa opzione per integrare linkedin a Horilla."
+msgid "Enable this to integrate linkedin to Candour."
+msgstr "Abilita questa opzione per integrare linkedin a Candour."
 
 msgid ""
-"Post job openings directly to LinkedIn and manage applicants from Horilla."
+"Post job openings directly to LinkedIn and manage applicants from Candour."
 msgstr ""
 "Pubblica offerte di lavoro direttamente su LinkedIn e gestisci i candidati "
-"da Horilla."
+"da Candour."
 
 msgid "Prefix added to every auto-generated employee badge ID (e.g. PEP0001)."
 msgstr ""
@@ -22367,8 +22367,8 @@ msgstr ""
 "Si è verificato un errore durante l'eliminazione del rifiuto del candidato"
 
 #, python-format
-msgid "Horilla report ready: %(name)s"
-msgstr "Report Horilla pronto: %(name)s"
+msgid "Candour report ready: %(name)s"
+msgstr "Report Candour pronto: %(name)s"
 
 #, python-format
 msgid ""
@@ -22383,8 +22383,8 @@ msgstr ""
 "Formato: %(fmt)s"
 
 #, python-format
-msgid "Horilla report export failed: %(name)s"
-msgstr "Esportazione del report Horilla non riuscita: %(name)s"
+msgid "Candour report export failed: %(name)s"
+msgstr "Esportazione del report Candour non riuscita: %(name)s"
 
 #, python-format
 msgid ""
@@ -22440,8 +22440,8 @@ msgstr "Iscrizione aggiornata."
 msgid "Comparison"
 msgstr "Confronto"
 
-msgid "Attached is your scheduled Horilla report:"
-msgstr "In allegato il tuo report Horilla programmato:"
+msgid "Attached is your scheduled Candour report:"
+msgstr "In allegato il tuo report Candour programmato:"
 
 #, python-format
 msgid "Showing first %(n)s rows."
@@ -24507,8 +24507,8 @@ msgstr " Importazione Riuscita"
 msgid "Download Error File"
 msgstr "File Errore Di Download"
 
-msgid "Horilla HRMS"
-msgstr "Horilla HRMS"
+msgid "Candour HRMS"
+msgstr "Candour HRMS"
 
 msgid "Sign Up"
 msgstr "Registrati"
@@ -24520,12 +24520,12 @@ msgid "Go To Home"
 msgstr "Vai A Home"
 
 msgid ""
-"Authenticate with your password to initialize the Horilla HRMS database."
+"Authenticate with your password to initialize the Candour HRMS database."
 msgstr ""
-"Autenticare con la password per inizializzare il database HRMS di Horilla."
+"Autenticare con la password per inizializzare il database HRMS di Candour."
 
-msgid "Please sign up to access the Horilla HRMS."
-msgstr "Per accedere all'HRMS Horilla ti invitiamo a registrarti."
+msgid "Please sign up to access the Candour HRMS."
+msgstr "Per accedere all'HRMS Candour ti invitiamo a registrarti."
 
 msgid "e.g. Adam"
 msgstr "es. Adam"
@@ -24704,20 +24704,20 @@ msgstr "Segreto dell'app"
 
 msgid ""
 "Meta app secret, used to verify the X-Hub-Signature-256 header on incoming "
-"webhook calls. Without it Horilla cannot tell a real delivery from a forged "
+"webhook calls. Without it Candour cannot tell a real delivery from a forged "
 "one, so unsigned payloads are rejected. Find it under App Settings > Basic "
 "in the Meta developer console."
 msgstr ""
 "Segreto dell'app Meta, usato per verificare l'header X-Hub-Signature-256 "
-"nelle chiamate webhook in arrivo. Senza di esso Horilla non può distinguere "
+"nelle chiamate webhook in arrivo. Senza di esso Candour non può distinguere "
 "una consegna reale da una falsificata, quindi i payload non firmati vengono "
 "rifiutati. Lo trovi in App Settings > Basic nella console sviluppatori Meta."
 
 msgid "WhatsApp Integration"
 msgstr "Integrazione WhatsApp"
 
-msgid "Enable this to integrate WhatsApp to Horilla."
-msgstr "Abilita questa opzione per integrare WhatsApp in Horilla."
+msgid "Enable this to integrate WhatsApp to Candour."
+msgstr "Abilita questa opzione per integrare WhatsApp in Candour."
 
 msgid ""
 "Send HR notifications and updates directly through WhatsApp for better "
