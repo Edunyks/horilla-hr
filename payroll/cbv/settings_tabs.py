@@ -9,15 +9,15 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 
-from candour_views.cbv_methods import hx_request_required, login_required
-from candour_views.generic.cbv.views import CandourTabView, TemplateView
+from horilla_views.cbv_methods import hx_request_required, login_required
+from horilla_views.generic.cbv.views import HorillaTabView, TemplateView
 from payroll.cbv.allowances import AllowanceListView
 from payroll.cbv.deduction import DeductionListView
 from payroll.cbv.payslip_automation import PaySlipAutomationListView
 
 
 def _payroll_settings_tab_badge_count(request, view_cls):
-    """Same queryset rules as the tab's CandourListView (filters, permissions)."""
+    """Same queryset rules as the tab's HorillaListView (filters, permissions)."""
     view = view_cls()
     view.request = request
     view.args = ()
@@ -36,7 +36,7 @@ class PayrollSettingsView(TemplateView):
 
 
 @method_decorator(login_required, name="dispatch")
-class PayrollSettingsTabView(CandourTabView):
+class PayrollSettingsTabView(HorillaTabView):
     """
     tab view for payroll settings, shows payslip auto generation as a tab
     """

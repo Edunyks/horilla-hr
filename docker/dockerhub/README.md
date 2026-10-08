@@ -1,10 +1,10 @@
-# Candour HR
+# Horilla HR
 
 Free and open source HR software. Recruitment, onboarding, attendance, leave, payroll, performance, assets and helpdesk in one Django application.
 
-- **Source:** https://github.com/candour/candour-hr
-- **Docs:** https://docs.candoursystems.com
-- **Website:** https://www.candoursystems.com
+- **Source:** https://github.com/horilla/horilla-hr
+- **Docs:** https://docs.horilla.com
+- **Website:** https://www.horilla.com
 - **License:** LGPL-2.1
 
 __NOTICE__
@@ -22,16 +22,16 @@ __NOTICE__
 **Architectures:** `linux/amd64`, `linux/arm64` (single multi-arch manifest — Docker picks the right one).
 
 ```bash
-docker pull candour/candour-hr
+docker pull horilla/horilla-hr
 # or pin an exact version:
-docker pull candour/candour-hr:__VERSION__
+docker pull horilla/horilla-hr:__VERSION__
 ```
 
 ---
 
 ## Quick start
 
-Candour needs PostgreSQL. The fastest way to a working instance is Compose:
+Horilla needs PostgreSQL. The fastest way to a working instance is Compose:
 
 ```yaml
 # compose.yaml
@@ -39,18 +39,18 @@ services:
   db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_DB: candour_db
-      POSTGRES_USER: candour_user
+      POSTGRES_DB: horilla_db
+      POSTGRES_USER: horilla_user
       POSTGRES_PASSWORD: change-me-db-password
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U candour_user -d candour_db"]
+      test: ["CMD-SHELL", "pg_isready -U horilla_user -d horilla_db"]
       interval: 5s
       retries: 10
 
   web:
-    image: candour/candour-hr:__VERSION__
+    image: horilla/horilla-hr:__VERSION__
     depends_on:
       db:
         condition: service_healthy
@@ -61,7 +61,7 @@ services:
       SECRET_KEY: "replace-with-50-plus-random-characters"
       ALLOWED_HOSTS: "localhost,127.0.0.1"
       CSRF_TRUSTED_ORIGINS: "http://localhost:8000"
-      DATABASE_URL: "postgres://candour_user:change-me-db-password@db:5432/candour_db"
+      DATABASE_URL: "postgres://horilla_user:change-me-db-password@db:5432/horilla_db"
       DB_HOST: db
       DB_PORT: "5432"
       DB_INIT_PASSWORD: "replace-with-your-own-init-password"
@@ -86,7 +86,7 @@ Then open http://localhost:8000.
 Generate a real `SECRET_KEY`:
 
 ```bash
-docker run --rm candour/candour-hr:__VERSION__ \
+docker run --rm horilla/horilla-hr:__VERSION__ \
   python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
 ```
 
@@ -121,7 +121,7 @@ The container refuses to start in production without these. There are no usable 
 
 | Variable | Default | Notes |
 |---|---|---|
-| `CANDOUR_ENV` | — | Set to `production` to force security checks even if `DEBUG` is accidentally `1`. |
+| `HORILLA_ENV` | — | Set to `production` to force security checks even if `DEBUG` is accidentally `1`. |
 | `REDIS_URL` | unset | Enables Redis caching. |
 | `SECURE_SSL_REDIRECT` | `False` | Turn on when TLS terminates in front of the app. |
 | `TIME_ZONE` | `Asia/Kolkata` | |
@@ -172,7 +172,7 @@ docker compose exec web python manage.py createsuperuser
 ## Production notes
 
 - **Run behind a reverse proxy** that terminates TLS. Set `CSRF_TRUSTED_ORIGINS` to the public `https://` origin and enable `SECURE_SSL_REDIRECT`.
-- **Pin an exact version** (`candour/candour-hr:__VERSION__`), not `latest`, so a deploy cannot pick up a new major release unattended.
+- **Pin an exact version** (`horilla/horilla-hr:__VERSION__`), not `latest`, so a deploy cannot pick up a new major release unattended.
 - **Back up `/app/media` and your database together.** The auto-generated `SECRET_KEY` lives in the media volume; losing it invalidates every session and signed token.
 - **Migrations run on every container start.** With more than one replica, start one first and let it finish before scaling up — there is no advisory lock coordinating concurrent migrations.
 - The image runs as a **non-root user** (`appuser`, uid 1000). Mounted volumes must be writable by uid 1000.
@@ -190,7 +190,7 @@ docker compose exec web python manage.py createsuperuser
 Each image carries OCI labels — `org.opencontainers.image.version`, `.revision`, `.source` — so any published image traces back to the exact commit it was built from:
 
 ```bash
-docker inspect candour/candour-hr:__VERSION__ \
+docker inspect horilla/horilla-hr:__VERSION__ \
   --format '{{json .Config.Labels}}' | python3 -m json.tool
 ```
 
@@ -198,7 +198,7 @@ docker inspect candour/candour-hr:__VERSION__ \
 
 ## How these images are built
 
-Built and published by GitHub Actions from [candour/candour-hr](https://github.com/candour/candour-hr) on every release tag. Before any image is pushed, the pipeline:
+Built and published by GitHub Actions from [horilla/horilla-hr](https://github.com/horilla/horilla-hr) on every release tag. Before any image is pushed, the pipeline:
 
 1. Asserts the code's `__version__` matches the release tag
 2. Builds for amd64 and arm64
@@ -211,5 +211,5 @@ An image that builds but does not run cannot be published.
 
 ## Support
 
-- Issues: https://github.com/candour/candour-hr/issues
-- Documentation: https://docs.candoursystems.com
+- Issues: https://github.com/horilla/horilla-hr/issues
+- Documentation: https://docs.horilla.com

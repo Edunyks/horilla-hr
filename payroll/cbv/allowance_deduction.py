@@ -15,11 +15,11 @@ from django.utils.translation import gettext_lazy as _
 
 from employee.models import Employee
 from employee.views import return_none
-from candour_views.cbv_methods import login_required
-from candour_views.generic.cbv.views import (
-    CandourDetailedView,
-    CandourListView,
-    CandourTabView,
+from horilla_views.cbv_methods import login_required
+from horilla_views.generic.cbv.views import (
+    HorillaDetailedView,
+    HorillaListView,
+    HorillaTabView,
 )
 from payroll.cbv.allowances import AllowanceListView
 from payroll.cbv.deduction import DeductionListView
@@ -39,7 +39,7 @@ operator_mapping = {
 
 
 @method_decorator(login_required, name="dispatch")
-class AllowanceDeductionTabView(CandourTabView):
+class AllowanceDeductionTabView(HorillaTabView):
     """
     generic tab view for allowance and deduction
     """
@@ -169,7 +169,7 @@ class AllowanceTabList(AllowanceListView):
         the employee's active contract and specific conditions
         """
 
-        queryset = CandourListView.get_queryset(self)
+        queryset = HorillaListView.get_queryset(self)
         pk = self.kwargs.get("pk")
         employee = Employee.objects.get(id=pk)
         active_contracts = (
@@ -289,7 +289,7 @@ class DeductionTab(DeductionListView):
         the employee's active contract and specific conditions
         """
 
-        queryset = CandourListView.get_queryset(self)
+        queryset = HorillaListView.get_queryset(self)
         pk = self.kwargs.get("pk")
         employee = Employee.objects.get(id=pk)
         active_contracts = (
@@ -342,7 +342,7 @@ class DeductionTab(DeductionListView):
 
 
 @method_decorator(login_required, name="dispatch")
-class DeductionDetailView(CandourDetailedView):
+class DeductionDetailView(HorillaDetailedView):
     """
     Detail View
     """
@@ -369,7 +369,7 @@ class DeductionDetailView(CandourDetailedView):
 
 
 @method_decorator(login_required, name="dispatch")
-class AllowanceDetailView(CandourDetailedView):
+class AllowanceDetailView(HorillaDetailedView):
     """
     detail view for allowance tab
     """

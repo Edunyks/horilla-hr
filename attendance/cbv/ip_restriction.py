@@ -4,12 +4,12 @@ from django.utils.translation import gettext_lazy as _
 
 from base.methods import get_session_company
 from base.models import AttendanceAllowedIP
-from candour_views.cbv_methods import (
+from horilla_views.cbv_methods import (
     login_required,
     permission_required,
     render_template,
 )
-from candour_views.generic.cbv.views import CandourListView, CandourNavView
+from horilla_views.generic.cbv.views import HorillaListView, HorillaNavView
 
 
 @method_decorator(login_required, name="dispatch")
@@ -17,7 +17,7 @@ from candour_views.generic.cbv.views import CandourListView, CandourNavView
     permission_required("base.view_attendanceallowedip"),
     name="dispatch",
 )
-class IpRestrictionList(CandourListView):
+class IpRestrictionList(HorillaListView):
     """
     List view of the page
     """
@@ -65,7 +65,7 @@ class IpRestrictionList(CandourListView):
     permission_required("base.view_attendanceallowedip"),
     name="dispatch",
 )
-class IpRestrictionnav(CandourNavView):
+class IpRestrictionnav(HorillaNavView):
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)

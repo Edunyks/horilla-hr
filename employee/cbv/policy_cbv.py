@@ -12,13 +12,13 @@ from django.utils.translation import gettext_lazy as _
 from employee.filters import PolicyFilter
 from employee.forms import PolicyForm
 from employee.models import Policy
-from candour_views.cbv_methods import login_required, permission_required
-from candour_views.generic.cbv.views import CandourFormView, CandourNavView
+from horilla_views.cbv_methods import login_required, permission_required
+from horilla_views.generic.cbv.views import HorillaFormView, HorillaNavView
 
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="employee.add_policy"), name="dispatch")
-class PolicyFormView(CandourFormView):
+class PolicyFormView(HorillaFormView):
     """
     form view for create policy
     """
@@ -47,7 +47,7 @@ class PolicyFormView(CandourFormView):
 
 
 @method_decorator(login_required, name="dispatch")
-class PoliciesNav(CandourNavView):
+class PoliciesNav(HorillaNavView):
     """
     Policies Nav
     """

@@ -13,7 +13,7 @@ from django_filters import FilterSet
 
 from base.methods import reload_queryset
 from employee.models import Employee
-from candour.filters import CandourFilterSet, filter_name_or_badge_terms
+from horilla.filters import HorillaFilterSet, filter_name_or_badge_terms
 
 from .models import (
     Asset,
@@ -25,7 +25,7 @@ from .models import (
 )
 
 
-class CustomFilterSet(CandourFilterSet):
+class CustomFilterSet(HorillaFilterSet):
     """
     Custom FilterSet class that applies specific CSS classes to filter
     widgets.
@@ -53,8 +53,8 @@ class CustomFilterSet(CandourFilterSet):
             }
         )
         for field_name, field in self.form.fields.items():
-            # Skip fields already handed a CandourAjaxSelectWidget by
-            # CandourFilterSet._apply_ajax_fields (called from
+            # Skip fields already handed a HorillaAjaxSelectWidget by
+            # HorillaFilterSet._apply_ajax_fields (called from
             # super().__init__() above) -- it's a forms.SelectMultiple
             # subclass, so it would otherwise match the plain "Select"
             # branch below and pick up a bare "oh-select" class
@@ -158,7 +158,7 @@ class AssetFilter(CustomFilterSet):
         field_name="expiry_date", lookup_expr="lte"
     )
 
-    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
+    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
     # -- Asset Batch Number and Category opt into AJAX-searched comboboxes
     # instead of pre-rendering their whole queryset as <option> tags.
     ajax_fields = {
@@ -217,7 +217,7 @@ class AssetFilter(CustomFilterSet):
     def _build_custom_filter_fields(self):
         """
         Registry backing the Advanced section's "+ Add filter" builder
-        (see CandourFilterSet._build_custom_filter_fields's docstring
+        (see HorillaFilterSet._build_custom_filter_fields's docstring
         for the two supported entry shapes) -- same "choose field, then
         lookup, then value" pattern used by AttendanceFilters/
         EmployeeFilter/PMS FeedbackFilter. Purchase Date is a plain
@@ -251,7 +251,7 @@ class AssetFilter(CustomFilterSet):
 
     def filter_queryset(self, queryset):
         """
-        CandourFilterSet._apply_custom_filters isn't wired into the base
+        HorillaFilterSet._apply_custom_filters isn't wired into the base
         filter_queryset automatically -- this is the minimal "call it at
         the end" hookup, same as AttendanceFilters/FeedbackFilter.
         """
@@ -290,7 +290,7 @@ class CustomAssetFilter(CustomFilterSet):
     def _build_custom_filter_fields(self):
         """
         Registry backing the Advanced section's "+ Add filter" builder
-        (see CandourFilterSet._build_custom_filter_fields's docstring
+        (see HorillaFilterSet._build_custom_filter_fields's docstring
         for the two supported entry shapes) -- same "choose field, then
         lookup, then value" pattern used by AttendanceFilters/
         EmployeeFilter/AssetFilter/AssetAllocationFilter (which shares
@@ -332,7 +332,7 @@ class CustomAssetFilter(CustomFilterSet):
 
     def filter_queryset(self, queryset):
         """
-        CandourFilterSet._apply_custom_filters isn't wired into the base
+        HorillaFilterSet._apply_custom_filters isn't wired into the base
         filter_queryset automatically -- this is the minimal "call it at
         the end" hookup, same as AttendanceFilters/FeedbackFilter/
         AssetFilter.
@@ -351,7 +351,7 @@ class AssetRequestFilter(CustomFilterSet):
     # Dedicated comma-separated "Name or Badge ID" search, alongside the
     # AJAX requested_employee_id picker below rather than instead of it --
     # same field/behavior as every other modernized panel this session;
-    # see candour.filters.filter_name_or_badge_terms for the shared
+    # see horilla.filters.filter_name_or_badge_terms for the shared
     # matching logic. requested_employee_id is the only employee-role
     # field on this filter, so it has a clear single owner to search
     # against.
@@ -359,7 +359,7 @@ class AssetRequestFilter(CustomFilterSet):
         method="filter_name_or_badge", label=_("Name or Badge ID")
     )
 
-    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
+    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
     # -- Requesting User and Asset Category opt into AJAX-searched
     # comboboxes instead of pre-rendering their whole queryset as
     # <option> tags.
@@ -402,7 +402,7 @@ class AssetRequestFilter(CustomFilterSet):
     def filter_name_or_badge(self, queryset, name, value):
         """
         Filter panel's dedicated "Name or Badge ID" field (see
-        name_or_badge above) -- see candour.filters.
+        name_or_badge above) -- see horilla.filters.
         filter_name_or_badge_terms for the shared comma-separated
         matching logic.
         """
@@ -417,7 +417,7 @@ class AssetRequestFilter(CustomFilterSet):
     def _build_custom_filter_fields(self):
         """
         Registry backing the Advanced section's "+ Add filter" builder
-        (see CandourFilterSet._build_custom_filter_fields's docstring
+        (see HorillaFilterSet._build_custom_filter_fields's docstring
         for the two supported entry shapes) -- same "choose field, then
         lookup, then value" pattern used by AttendanceFilters/
         EmployeeFilter/PMS FeedbackFilter/AssetFilter. Asset Request
@@ -451,7 +451,7 @@ class AssetRequestFilter(CustomFilterSet):
 
     def filter_queryset(self, queryset):
         """
-        CandourFilterSet._apply_custom_filters isn't wired into the base
+        HorillaFilterSet._apply_custom_filters isn't wired into the base
         filter_queryset automatically -- this is the minimal "call it at
         the end" hookup, same as AttendanceFilters/FeedbackFilter/
         AssetFilter.
@@ -549,7 +549,7 @@ class AssetAllocationFilter(CustomFilterSet):
         )
     )
 
-    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
+    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
     # -- Allocated User, Asset, and Allocated By opt into AJAX-searched
     # comboboxes instead of pre-rendering their whole queryset as
     # <option> tags. No dedicated "Name or Badge ID" field is added:
@@ -606,7 +606,7 @@ class AssetAllocationFilter(CustomFilterSet):
     def _build_custom_filter_fields(self):
         """
         Registry backing the Advanced section's "+ Add filter" builder
-        (see CandourFilterSet._build_custom_filter_fields's docstring
+        (see HorillaFilterSet._build_custom_filter_fields's docstring
         for the two supported entry shapes) -- same "choose field, then
         lookup, then value" pattern used by AttendanceFilters/
         EmployeeFilter/PMS FeedbackFilter/AssetFilter. Assigned Date,
@@ -646,7 +646,7 @@ class AssetAllocationFilter(CustomFilterSet):
 
     def filter_queryset(self, queryset):
         """
-        CandourFilterSet._apply_custom_filters isn't wired into the base
+        HorillaFilterSet._apply_custom_filters isn't wired into the base
         filter_queryset automatically -- this is the minimal "call it at
         the end" hookup, same as AttendanceFilters/FeedbackFilter/
         AssetFilter/AssetRequestFilter.
@@ -777,7 +777,7 @@ class AssetHistoryFilter(CustomFilterSet):
         widget=forms.DateInput(attrs={"type": "date"}),
     )
 
-    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
+    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
     # -- Allocated User, Asset, and Allocated By opt into AJAX-searched
     # comboboxes instead of pre-rendering their whole queryset as
     # <option> tags. No dedicated "Name or Badge ID" field is added:
@@ -819,7 +819,7 @@ class AssetHistoryFilter(CustomFilterSet):
     def _build_custom_filter_fields(self):
         """
         Registry backing the Advanced section's "+ Add filter" builder
-        (see CandourFilterSet._build_custom_filter_fields's docstring
+        (see HorillaFilterSet._build_custom_filter_fields's docstring
         for the two supported entry shapes) -- same "choose field, then
         lookup, then value" pattern used by AttendanceFilters/
         EmployeeFilter/PMS FeedbackFilter/AssetFilter/
@@ -860,7 +860,7 @@ class AssetHistoryFilter(CustomFilterSet):
 
     def filter_queryset(self, queryset):
         """
-        CandourFilterSet._apply_custom_filters isn't wired into the base
+        HorillaFilterSet._apply_custom_filters isn't wired into the base
         filter_queryset automatically -- this is the minimal "call it at
         the end" hookup, same as AttendanceFilters/FeedbackFilter/
         AssetFilter/AssetRequestFilter/AssetAllocationFilter.
@@ -896,7 +896,7 @@ class AssetHistoryReGroup:
     ]
 
 
-class AssetRenewalFilter(CandourFilterSet):
+class AssetRenewalFilter(HorillaFilterSet):
     """
     Filter set for the Asset Renewal page — expiring/expired active assignments.
     Filters operate on AssetAssignment with traversal into the related Asset.

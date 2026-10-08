@@ -13,21 +13,21 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 
 from base.forms import MailTemplateForm
-from base.models import CandourMailTemplate
-from candour.http.response import CandourRedirect
-from candour_views.cbv_methods import login_required, permission_required
-from candour_views.generic.cbv.views import CandourFormView, CandourNavView
+from base.models import HorillaMailTemplate
+from horilla.http.response import HorillaRedirect
+from horilla_views.cbv_methods import login_required, permission_required
+from horilla_views.generic.cbv.views import HorillaFormView, HorillaNavView
 
 
 @method_decorator(login_required, name="dispatch")
-@method_decorator(permission_required("base.add_candourmailtemplate"), name="dispatch")
-class MailTemplateFormView(CandourFormView):
+@method_decorator(permission_required("base.add_horillamailtemplate"), name="dispatch")
+class MailTemplateFormView(HorillaFormView):
     """
     form view for create and edit mail template
     """
 
     form_class = MailTemplateForm
-    model = CandourMailTemplate
+    model = HorillaMailTemplate
     template_name = "cbv/mail_template/form_inherit.html"
     new_display_title = _("Add Template")
 
@@ -48,23 +48,23 @@ class MailTemplateFormView(CandourFormView):
             form.save()
 
             messages.success(self.request, message)
-            return CandourRedirect(self.request)
+            return HorillaRedirect(self.request)
         return super().form_valid(form)
 
 
 @method_decorator(login_required, name="dispatch")
-@method_decorator(permission_required("base.add_candourmailtemplate"), name="dispatch")
-class MailTemplateDuplicateForm(CandourFormView):
+@method_decorator(permission_required("base.add_horillamailtemplate"), name="dispatch")
+class MailTemplateDuplicateForm(HorillaFormView):
     """
     from view for duplicate mail templates
     """
 
-    model = CandourMailTemplate
+    model = HorillaMailTemplate
     form_class = MailTemplateForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        original_object = CandourMailTemplate.objects.get(id=self.kwargs["pk"])
+        original_object = HorillaMailTemplate.objects.get(id=self.kwargs["pk"])
         form = self.form_class(instance=original_object)
 
         for field_name, field in form.fields.items():
@@ -98,13 +98,13 @@ class MailTemplateDuplicateForm(CandourFormView):
             message = _("Template Added")
             messages.success(self.request, message)
             form.save()
-            return CandourRedirect(self.request)
+            return HorillaRedirect(self.request)
         return self.form_invalid(form)
 
 
 @method_decorator(login_required, name="dispatch")
-@method_decorator(permission_required("base.view_candourmailtemplate"), name="dispatch")
-class MailTemplateNavView(CandourNavView):
+@method_decorator(permission_required("base.view_horillamailtemplate"), name="dispatch")
+class MailTemplateNavView(HorillaNavView):
     """
     Mail Template Nav View
     """

@@ -27,9 +27,9 @@ from base.filters import RosterFilter
 from base.forms import RosterCellUpdateForm
 from base.models import CompanyLeaves, EmployeeShift, Holidays, Roster, RosterPublishLog
 from employee.models import Employee
-from candour.decorators import hx_request_required
-from candour_views.cbv_methods import login_required, paginator_qry
-from candour_views.generic.cbv.views import CandourCardView, CandourNavView
+from horilla.decorators import hx_request_required
+from horilla_views.cbv_methods import login_required, paginator_qry
+from horilla_views.generic.cbv.views import HorillaCardView, HorillaNavView
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -64,7 +64,7 @@ class RosterHomeView(TemplateView):
 
 
 @method_decorator(login_required, name="dispatch")
-class RosterNavView(CandourNavView):
+class RosterNavView(HorillaNavView):
     nav_title = _("Roster Planner")
     template_name = "generic/inline_nav.html"
     search_url = reverse_lazy("roster-grid")
@@ -74,7 +74,7 @@ class RosterNavView(CandourNavView):
     filter_form_context_name = "form"
     apply_first_filter = True
     # Modern slide-over filter panel (generic/inline_nav.html's own
-    # {% if modern_filter %} branch, mirroring candour_nav.html's
+    # {% if modern_filter %} branch, mirroring horilla_nav.html's
     # .oh-filter-modern styles) -- same treatment as every other panel
     # this session. RosterFilter.ajax_fields carries the AJAX-loaded
     # Employee/Department comboboxes this needs.
@@ -120,7 +120,7 @@ class RosterNavView(CandourNavView):
         # blank on first load (apply_first_filter submits the form empty)
         # while the grid behind them is in fact showing this week's data.
         # Set directly on the widget rather than passed as the form's
-        # `initial=` (which CandourNavView's own filterset construction
+        # `initial=` (which HorillaNavView's own filterset construction
         # doesn't expose a hook for), and only when nothing was actually
         # submitted -- an explicitly empty From/To after the user clears
         # it themselves must stay empty, not silently snap back to
@@ -138,7 +138,7 @@ class RosterNavView(CandourNavView):
 
 
 @method_decorator(login_required, name="dispatch")
-class RosterGridView(CandourCardView):
+class RosterGridView(HorillaCardView):
     model = Roster
     filter_class = RosterFilter
     template_name = "base/roster/roster_grid.html"
@@ -696,7 +696,7 @@ class RosterTemplateDownloadView(View):
                     c.fill = off_fill
                     c.font = off_font
                     if off_reason != "Weekly Off Day":
-                        c.comment = Comment(f"Holiday: {off_reason}", "Candour")
+                        c.comment = Comment(f"Holiday: {off_reason}", "Horilla")
                 elif d.weekday() >= 5:
                     c.fill = weekend_fill
 

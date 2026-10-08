@@ -15,11 +15,11 @@ from base.decorators import manager_can_enter
 from base.filters import PenaltyFilter
 from base.methods import filtersubordinates, has_export_access, is_reportingmanager
 from base.models import PenaltyAccounts
-from candour_views.cbv_methods import hx_request_required, login_required
-from candour_views.generic.cbv.views import (
-    CandourDetailedView,
-    CandourListView,
-    CandourNavView,
+from horilla_views.cbv_methods import hx_request_required, login_required
+from horilla_views.generic.cbv.views import (
+    HorillaDetailedView,
+    HorillaListView,
+    HorillaNavView,
     TemplateView,
 )
 
@@ -42,7 +42,7 @@ class LateComeAndEarlyOut(TemplateView):
     manager_can_enter(perm="attendance.view_attendancelatecomeearlyout"),
     name="dispatch",
 )
-class LateComeAndEarlyOutList(CandourListView):
+class LateComeAndEarlyOutList(HorillaListView):
     """
     List view
     """
@@ -154,7 +154,7 @@ class LateComeAndEarlyOutList(CandourListView):
     manager_can_enter(perm="attendance.view_attendancelatecomeearlyout"),
     name="dispatch",
 )
-class LateComeAndEarlyOutListNav(CandourNavView):
+class LateComeAndEarlyOutListNav(HorillaNavView):
     """
     Nav bar
     """
@@ -202,7 +202,7 @@ class LateComeAndEarlyOutListNav(CandourNavView):
     filter_body_template = "cbv/late_come_and_early_out/late_early_filter.html"
     filter_form_context_name = "form"
     search_swap_target = "#listContainer"
-    # Modern slide-over filter panel (candour_nav.html's .oh-filter-modern
+    # Modern slide-over filter panel (horilla_nav.html's .oh-filter-modern
     # styles) -- LateComeEarlyOutFilter.ajax_fields carries the
     # AJAX-loaded comboboxes this needs, same as AttendancesNavView/
     # AttendanceActivityNavView.
@@ -289,7 +289,7 @@ class LateEarlyExportView(TemplateView):
 
 
 @method_decorator(login_required, name="dispatch")
-class LateComeEarlyOutDetailView(CandourDetailedView):
+class LateComeEarlyOutDetailView(HorillaDetailedView):
     """
     Detail View
     """

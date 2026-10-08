@@ -24,7 +24,7 @@ from django.utils.translation import gettext_lazy as _
 from PIL import Image
 
 from accessibility.accessibility import ACCESSBILITY_FEATURE
-from base.candour_company_manager import CandourCompanyManager
+from base.horilla_company_manager import HorillaCompanyManager
 from base.models import (
     Company,
     Department,
@@ -36,18 +36,18 @@ from base.models import (
     validate_time_format,
 )
 from employee.methods.duration_methods import format_time, strtime_seconds
-from candour import candour_middlewares
-from candour.candour_middlewares import _thread_locals
-from candour.methods import get_candour_model_class
-from candour.models import CandourModel, has_xss, upload_path
-from candour_audit.methods import get_diff
-from candour_audit.models import CandourAuditInfo, CandourAuditLog
-from candour_auth.methods import (
+from horilla import horilla_middlewares
+from horilla.horilla_middlewares import _thread_locals
+from horilla.methods import get_horilla_model_class
+from horilla.models import HorillaModel, has_xss, upload_path
+from horilla_audit.methods import get_diff
+from horilla_audit.models import HorillaAuditInfo, HorillaAuditLog
+from horilla_auth.methods import (
     generate_random_password,
     generate_unique_fallback_username,
 )
-from candour_auth.models import CandourUser
-from candour_views.cbv_methods import render_template
+from horilla_auth.models import HorillaUser
+from horilla_views.cbv_methods import render_template
 
 # create your model
 
@@ -82,7 +82,7 @@ class Employee(models.Model):
     )
     badge_id = models.CharField(max_length=50, null=True, blank=True)
     employee_user_id = models.OneToOneField(
-        CandourUser,
+        HorillaUser,
         on_delete=models.CASCADE,
         blank=True,
         null=True,
@@ -140,7 +140,7 @@ class Employee(models.Model):
     is_directly_converted = models.BooleanField(
         default=False, null=True, blank=True, editable=False
     )
-    objects = CandourCompanyManager(
+    objects = HorillaCompanyManager(
         related_company_field="employee_work_info__company_id"
     )
 
@@ -417,7 +417,7 @@ class Employee(models.Model):
         """Mirror ``is_active`` onto the linked user account.
 
         Archiving an employee is the expected way to offboard someone, but the
-        login gate is ``CandourUser.is_active`` -- ``CompanyScopedBackend``
+        login gate is ``HorillaUser.is_active`` -- ``CompanyScopedBackend``
         inherits ``ModelBackend.user_can_authenticate``, which reads that flag
         and knows nothing about ``Employee.is_active``. Setting the employee
         flag alone therefore hid the person from every list while leaving their
@@ -453,16 +453,16 @@ class Employee(models.Model):
         a dictionary is returned with a list of related models of that employee.
         """
         if apps.is_installed("onboarding"):
-            OnboardingStage = get_candour_model_class("onboarding", "onboardingstage")
-            OnboardingTask = get_candour_model_class("onboarding", "onboardingtask")
+            OnboardingStage = get_horilla_model_class("onboarding", "onboardingstage")
+            OnboardingTask = get_horilla_model_class("onboarding", "onboardingtask")
             onboarding_stage_query = OnboardingStage.objects.filter(employee_id=self.pk)
             onboarding_task_query = OnboardingTask.objects.filter(employee_id=self.pk)
         else:
             onboarding_stage_query = None
             onboarding_task_query = None
         if apps.is_installed("recruitment"):
-            Recruitment = get_candour_model_class("recruitment", "recruitment")
-            Stage = get_candour_model_class("recruitment", "stage")
+            Recruitment = get_horilla_model_class("recruitment", "recruitment")
+            Stage = get_horilla_model_class("recruitment", "stage")
             recruitment_stage_query = Stage.objects.filter(stage_managers=self.pk)
             recruitment_manager_query = Recruitment.objects.filter(
                 recruitment_managers=self.pk
@@ -557,9 +557,9 @@ class Employee(models.Model):
         Renders a clickable icon that opens this employee's activity-history
         feed -- the same feed shown on the profile page's History tab -- in
         the shared #historySidebar, matching the History column every
-        CandourModel-based list already gets automatically (see
-        CandourListView's history_tracking handling). Employee doesn't
-        subclass CandourModel, so it's added explicitly here instead.
+        HorillaModel-based list already gets automatically (see
+        HorillaListView's history_tracking handling). Employee doesn't
+        subclass HorillaModel, so it's added explicitly here instead.
         """
         return render_template(
             path="cbv/employees/history_col.html",
@@ -630,8 +630,8 @@ class Employee(models.Model):
         This method is used to check if the user is in the list of online users.
         """
         if apps.is_installed("attendance"):
-            Attendance = get_candour_model_class("attendance", "attendance")
-            request = getattr(candour_middlewares._thread_locals, "request", None)
+            Attendance = get_horilla_model_class("attendance", "attendance")
+            request = getattr(horilla_middlewares._thread_locals, "request", None)
 
             if request is not None:
                 if (
@@ -770,7 +770,7 @@ class Employee(models.Model):
         self.full_clean()
         super().save(*args, **kwargs)
 
-        request = getattr(candour_middlewares._thread_locals, "request", None)
+        request = getattr(horilla_middlewares._thread_locals, "request", None)
         if request and not self.is_active and self.get_archive_condition() is not False:
             self.is_active = True
             super().save(*args, **kwargs)
@@ -782,21 +782,21 @@ class Employee(models.Model):
             password = generate_random_password()
 
             # The email is unique among Employees, but an unrelated
-            # CandourUser can already own it as a username -- e.g. an
+            # HorillaUser can already own it as a username -- e.g. an
             # orphaned account left behind by a deleted employee. Fall back
             # to a random username rather than crashing on the uniqueness
             # constraint; email stays the real address either way.
-            if CandourUser.objects.filter(username=username).exists():
+            if HorillaUser.objects.filter(username=username).exists():
                 username = generate_unique_fallback_username()
 
-            user = CandourUser.objects.create_user(
+            user = HorillaUser.objects.create_user(
                 username=username,
                 email=self.email,
                 password=password,
                 is_new_employee=True,
             )
             if not user:
-                user = CandourUser.objects.create_user(
+                user = HorillaUser.objects.create_user(
                     username=username, email=self.email, password=password
                 )
             self.employee_user_id = user
@@ -813,7 +813,7 @@ class Employee(models.Model):
         return self
 
 
-class EmployeeTag(CandourModel):
+class EmployeeTag(HorillaModel):
     """
     EmployeeTag Model
     """
@@ -953,13 +953,13 @@ class EmployeeWorkInformation(models.Model):
     )
     additional_info = models.JSONField(null=True, blank=True)
     experience = models.FloatField(null=True, blank=True, default=0)
-    history = CandourAuditLog(
+    history = HorillaAuditLog(
         related_name="history_set",
         bases=[
-            CandourAuditInfo,
+            HorillaAuditInfo,
         ],
     )
-    objects = CandourCompanyManager()
+    objects = HorillaCompanyManager()
 
     def __str__(self) -> str:
         return f"{self.employee_id} - {self.job_position_id}"
@@ -1046,7 +1046,7 @@ class EmployeeWorkInformation(models.Model):
         return self
 
 
-class EmployeeBankDetails(CandourModel):
+class EmployeeBankDetails(HorillaModel):
     """
     EmployeeBankDetails model
     """
@@ -1076,7 +1076,7 @@ class EmployeeBankDetails(CandourModel):
         max_length=50, null=True, blank=True, verbose_name="Bank Code #2"
     )
     additional_info = models.JSONField(null=True, blank=True)
-    objects = CandourCompanyManager(
+    objects = HorillaCompanyManager(
         related_company_field="employee_id__employee_work_info__company_id"
     )
 
@@ -1102,7 +1102,7 @@ class EmployeeBankDetails(CandourModel):
                 )
 
 
-class NoteFiles(CandourModel):
+class NoteFiles(HorillaModel):
     files = models.FileField(upload_to=upload_path, blank=True, null=True)
     objects = models.Manager()
 
@@ -1110,7 +1110,7 @@ class NoteFiles(CandourModel):
         return self.files.name.split("/")[-1]
 
 
-class EmployeeNote(CandourModel):
+class EmployeeNote(HorillaModel):
     """
     EmployeeNote model
     """
@@ -1123,7 +1123,7 @@ class EmployeeNote(CandourModel):
     description = models.TextField(verbose_name=_("Description"), null=True)  # 905
     note_files = models.ManyToManyField(NoteFiles, blank=True)
     updated_by = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    objects = CandourCompanyManager(
+    objects = HorillaCompanyManager(
         related_company_field="employee_id__employee_work_info__company_id"
     )
 
@@ -1131,7 +1131,7 @@ class EmployeeNote(CandourModel):
         return f"{self.description}"
 
 
-class PolicyMultipleFile(CandourModel):
+class PolicyMultipleFile(HorillaModel):
     """
     PoliciesMultipleFile model
     """
@@ -1160,7 +1160,7 @@ class PolicyMultipleFile(CandourModel):
         )
 
 
-class Policy(CandourModel):
+class Policy(HorillaModel):
     """
     Policies model
     """
@@ -1196,7 +1196,7 @@ class Policy(CandourModel):
         ),
     )
 
-    objects = CandourCompanyManager("company_id")
+    objects = HorillaCompanyManager("company_id")
 
     class Meta:
         verbose_name = _("Policy")
@@ -1207,7 +1207,7 @@ class Policy(CandourModel):
         self.attachments.all().delete()
 
 
-class BonusPoint(CandourModel):
+class BonusPoint(HorillaModel):
     """
     Model representing bonus points for employees with associated conditions.
     """
@@ -1234,13 +1234,13 @@ class BonusPoint(CandourModel):
     )
     redeeming_points = models.IntegerField(blank=True, null=True)
     reason = models.TextField(blank=True, null=True, max_length=255)
-    history = CandourAuditLog(
+    history = HorillaAuditLog(
         related_name="history_set",
         bases=[
-            CandourAuditInfo,
+            HorillaAuditInfo,
         ],
     )
-    objects = CandourCompanyManager(
+    objects = HorillaCompanyManager(
         related_company_field="employee_id__employee_work_info__company_id"
     )
 
@@ -1268,7 +1268,7 @@ class BonusPoint(CandourModel):
             BonusPoint.objects.create(employee_id=instance)
 
 
-class Actiontype(CandourModel):
+class Actiontype(HorillaModel):
     """
     Action type model
     """
@@ -1333,7 +1333,7 @@ class Actiontype(CandourModel):
         return self.id
 
 
-class DisciplinaryAction(CandourModel):
+class DisciplinaryAction(HorillaModel):
     """
     Disciplinary model
     """
@@ -1352,7 +1352,7 @@ class DisciplinaryAction(CandourModel):
     )
     start_date = models.DateField(null=True)
     attachment = models.FileField(upload_to=upload_path, null=True, blank=True)
-    objects = CandourCompanyManager("employee_id__employee_work_info__company_id")
+    objects = HorillaCompanyManager("employee_id__employee_work_info__company_id")
 
     def __str__(self) -> str:
         return f"{self.action}"
@@ -1452,17 +1452,17 @@ class DisciplinaryAction(CandourModel):
         return url
 
 
-class EmployeeGeneralSetting(CandourModel):
+class EmployeeGeneralSetting(HorillaModel):
     """
     EmployeeGeneralSetting
     """
 
     badge_id_prefix = models.CharField(max_length=5, default="PEP")
     company_id = models.ForeignKey(Company, null=True, on_delete=models.CASCADE)
-    objects = CandourCompanyManager("company_id")
+    objects = HorillaCompanyManager("company_id")
 
 
-class ProfileEditFeature(CandourModel):
+class ProfileEditFeature(HorillaModel):
     """
     ProfileEditFeature
     """

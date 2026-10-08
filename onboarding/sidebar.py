@@ -1,7 +1,7 @@
 """
 onboarding/sidebar.py
 
-To set Candour sidebar for onboarding
+To set Horilla sidebar for onboarding
 """
 
 from django.contrib.auth.context_processors import PermWrapper

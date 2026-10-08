@@ -1,7 +1,7 @@
 from django.urls import path
 from django.views.generic import TemplateView
 
-from candour.decorators import login_required
+from horilla.decorators import login_required
 from whatsapp import views
 from whatsapp.cbv import whatsapp
 

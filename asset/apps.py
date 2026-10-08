@@ -23,7 +23,7 @@ class AssetConfig(AppConfig):
     def ready(self):
         from django.urls import include, path
 
-        from candour.urls import urlpatterns
+        from horilla.urls import urlpatterns
 
         settings.APPS.append("asset")
         urlpatterns.append(

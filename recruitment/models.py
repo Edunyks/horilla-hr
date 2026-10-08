@@ -31,15 +31,15 @@ from django.utils.html import format_html
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
-from base.candour_company_manager import CandourCompanyManager
+from base.horilla_company_manager import HorillaCompanyManager
 from base.models import Company, JobPosition
 from employee.models import Employee
-from candour.candour_middlewares import _thread_locals
-from candour.models import CandourModel, upload_path
-from candour_audit.methods import get_diff
-from candour_audit.models import CandourAuditInfo, CandourAuditLog
-from candour_auth.models import CandourUser
-from candour_views.cbv_methods import render_template
+from horilla.horilla_middlewares import _thread_locals
+from horilla.models import HorillaModel, upload_path
+from horilla_audit.methods import get_diff
+from horilla_audit.models import HorillaAuditInfo, HorillaAuditLog
+from horilla_auth.models import HorillaUser
+from horilla_views.cbv_methods import render_template
 
 # Create your models here.
 
@@ -83,7 +83,7 @@ def candidate_photo_upload_path(instance, filename):
     return os.path.join("recruitment/profile/", filename)
 
 
-class SurveyTemplate(CandourModel):
+class SurveyTemplate(HorillaModel):
     """
     SurveyTemplate Model
     """
@@ -98,7 +98,7 @@ class SurveyTemplate(CandourModel):
         blank=True,
         verbose_name=_("Company"),
     )
-    objects = CandourCompanyManager("company_id")
+    objects = HorillaCompanyManager("company_id")
 
     def __str__(self) -> str:
         return self.title
@@ -109,7 +109,7 @@ class SurveyTemplate(CandourModel):
         ordering = ["-id"]
 
 
-class Skill(CandourModel):
+class Skill(HorillaModel):
     title = models.CharField(max_length=100)
 
     def save(self, *args, **kwargs):
@@ -156,7 +156,7 @@ class Skill(CandourModel):
         verbose_name_plural = _("Skills")
 
 
-class Recruitment(CandourModel):
+class Recruitment(HorillaModel):
     """
     Recruitment model
     """
@@ -233,7 +233,7 @@ class Recruitment(CandourModel):
         ),
         verbose_name=_("Post on LinkedIn"),
     )
-    objects = CandourCompanyManager()
+    objects = HorillaCompanyManager()
     default = models.manager.Manager()
     optional_profile_image = models.BooleanField(
         default=False,
@@ -440,7 +440,7 @@ class Recruitment(CandourModel):
                 return True
 
 
-class Stage(CandourModel):
+class Stage(HorillaModel):
     """
     Stage model
     """
@@ -468,11 +468,11 @@ class Stage(CandourModel):
         verbose_name=_("Stage Type"),
     )
     sequence = models.IntegerField(null=True, default=0)
-    objects = CandourCompanyManager(related_company_field="recruitment_id__company_id")
-    history = CandourAuditLog(
+    objects = HorillaCompanyManager(related_company_field="recruitment_id__company_id")
+    history = HorillaAuditLog(
         related_name="history_set",
         bases=[
-            CandourAuditInfo,
+            HorillaAuditInfo,
         ],
     )
 
@@ -621,7 +621,7 @@ def candidate_upload_path(instance, filename):
     return f"recruitment/{name_slug}/{unique_filename}"
 
 
-class Candidate(CandourModel):
+class Candidate(HorillaModel):
     """
     Candidate model
     """
@@ -760,10 +760,10 @@ class Candidate(CandourModel):
     joining_date = models.DateField(
         blank=True, null=True, verbose_name=_("Joining Date")
     )
-    history = CandourAuditLog(
+    history = HorillaAuditLog(
         related_name="history_set",
         bases=[
-            CandourAuditInfo,
+            HorillaAuditInfo,
         ],
     )
     sequence = models.IntegerField(null=True, default=0)
@@ -776,7 +776,7 @@ class Candidate(CandourModel):
         editable=False,
         verbose_name=_("Offer Letter Status"),
     )
-    objects = CandourCompanyManager(related_company_field="recruitment_id__company_id")
+    objects = HorillaCompanyManager(related_company_field="recruitment_id__company_id")
     last_updated = models.DateField(null=True, auto_now=True)
 
     converted_employee_id.exclude_from_automation = True
@@ -971,7 +971,7 @@ class Candidate(CandourModel):
             mails = list(Candidate.objects.values_list("email", flat=True))
             setattr(request, "mails", mails)
 
-        emp_list = CandourUser.objects.filter(username__in=mails).values_list(
+        emp_list = HorillaUser.objects.filter(username__in=mails).values_list(
             "email", flat=True
         )
 
@@ -1429,7 +1429,7 @@ class Candidate(CandourModel):
         verbose_name_plural = _("Candidates")
 
 
-class RejectReason(CandourModel):
+class RejectReason(HorillaModel):
     """
     RejectReason
     """
@@ -1445,7 +1445,7 @@ class RejectReason(CandourModel):
         blank=True,
         verbose_name=_("Company"),
     )
-    objects = CandourCompanyManager()
+    objects = HorillaCompanyManager()
 
     def __str__(self) -> str:
         return self.title
@@ -1475,7 +1475,7 @@ class RejectReason(CandourModel):
         verbose_name_plural = _("Rejection Reasons")
 
 
-class RejectedCandidate(CandourModel):
+class RejectedCandidate(HorillaModel):
     """
     RejectedCandidate
     """
@@ -1490,13 +1490,13 @@ class RejectedCandidate(CandourModel):
         RejectReason, verbose_name="Reject reason", blank=True
     )
     description = models.TextField(max_length=255)
-    objects = CandourCompanyManager(
+    objects = HorillaCompanyManager(
         related_company_field="candidate_id__recruitment_id__company_id"
     )
-    history = CandourAuditLog(
+    history = HorillaAuditLog(
         related_name="history_set",
         bases=[
-            CandourAuditInfo,
+            HorillaAuditInfo,
         ],
     )
 
@@ -1505,14 +1505,14 @@ class RejectedCandidate(CandourModel):
         return f"{self.candidate_id} - {reasons if reasons else _('No Reason')}"
 
 
-class StageFiles(CandourModel):
+class StageFiles(HorillaModel):
     files = models.FileField(upload_to=upload_path, blank=True, null=True)
 
     def __str__(self):
         return self.files.name.split("/")[-1]
 
 
-class StageNote(CandourModel):
+class StageNote(HorillaModel):
     """
     StageNote model
     """
@@ -1525,7 +1525,7 @@ class StageNote(CandourModel):
         Employee, on_delete=models.CASCADE, null=True, blank=True
     )
     candidate_can_view = models.BooleanField(default=False)
-    objects = CandourCompanyManager(
+    objects = HorillaCompanyManager(
         related_company_field="candidate_id__recruitment_id__company_id"
     )
 
@@ -1539,7 +1539,7 @@ class StageNote(CandourModel):
             return self.candidate_id
 
 
-class RecruitmentSurvey(CandourModel):
+class RecruitmentSurvey(HorillaModel):
     """
     RecruitmentSurvey model
     """
@@ -1576,7 +1576,7 @@ class RecruitmentSurvey(CandourModel):
     options = models.TextField(
         null=True, default="", help_text=_("Separate choices by ',  '"), max_length=255
     )
-    objects = CandourCompanyManager(related_company_field="recruitment_ids__company_id")
+    objects = HorillaCompanyManager(related_company_field="recruitment_ids__company_id")
 
     def __str__(self) -> str:
         return str(self.question)
@@ -1645,7 +1645,7 @@ class RecruitmentSurvey(CandourModel):
         ]
 
 
-class QuestionOrdering(CandourModel):
+class QuestionOrdering(HorillaModel):
     """
     Survey Template model
     """
@@ -1653,10 +1653,10 @@ class QuestionOrdering(CandourModel):
     question_id = models.ForeignKey(RecruitmentSurvey, on_delete=models.CASCADE)
     recruitment_id = models.ForeignKey(Recruitment, on_delete=models.CASCADE)
     sequence = models.IntegerField(default=0)
-    objects = CandourCompanyManager(related_company_field="recruitment_ids__company_id")
+    objects = HorillaCompanyManager(related_company_field="recruitment_ids__company_id")
 
 
-class RecruitmentSurveyAnswer(CandourModel):
+class RecruitmentSurveyAnswer(HorillaModel):
     """
     RecruitmentSurveyAnswer
     """
@@ -1676,7 +1676,7 @@ class RecruitmentSurveyAnswer(CandourModel):
     )
     answer_json = models.JSONField()
     attachment = models.FileField(upload_to=upload_path, null=True, blank=True)
-    objects = CandourCompanyManager(related_company_field="recruitment_id__company_id")
+    objects = HorillaCompanyManager(related_company_field="recruitment_id__company_id")
 
     @property
     def answer(self):
@@ -1693,7 +1693,7 @@ class RecruitmentSurveyAnswer(CandourModel):
         return f"{self.candidate_id.name}-{self.recruitment_id}"
 
 
-class SkillZone(CandourModel):
+class SkillZone(HorillaModel):
     """ "
     Model for talent pool
     """
@@ -1707,7 +1707,7 @@ class SkillZone(CandourModel):
         on_delete=models.CASCADE,
         verbose_name=_("Company"),
     )
-    objects = CandourCompanyManager()
+    objects = HorillaCompanyManager()
 
     class Meta:
         verbose_name = _("Talent Pool")
@@ -1742,7 +1742,7 @@ class SkillZone(CandourModel):
         return f"{base_url}?{query_string}"
 
 
-class SkillZoneCandidate(CandourModel):
+class SkillZoneCandidate(HorillaModel):
     """
     Model for saving candidate data's for future recruitment
     """
@@ -1771,7 +1771,7 @@ class SkillZoneCandidate(CandourModel):
 
     reason = models.CharField(max_length=200, verbose_name=_("Reason"))
     added_on = models.DateField(auto_now_add=True)
-    objects = CandourCompanyManager(
+    objects = HorillaCompanyManager(
         related_company_field="candidate_id__recruitment_id__company_id"
     )
 
@@ -1801,7 +1801,7 @@ class SkillZoneCandidate(CandourModel):
         ordering = ["-id"]
 
 
-class CandidateRating(CandourModel):
+class CandidateRating(HorillaModel):
     employee_id = models.ForeignKey(
         Employee, on_delete=models.PROTECT, related_name="candidate_rating"
     )
@@ -1819,7 +1819,7 @@ class CandidateRating(CandourModel):
         return f"{self.employee_id} - {self.candidate_id} rating {self.rating}"
 
 
-class RecruitmentGeneralSetting(CandourModel):
+class RecruitmentGeneralSetting(HorillaModel):
     """
     RecruitmentGeneralSettings model
     """
@@ -1829,10 +1829,10 @@ class RecruitmentGeneralSetting(CandourModel):
     company_id = models.OneToOneField(
         Company, on_delete=models.CASCADE, null=True, blank=True, unique=True
     )
-    objects = CandourCompanyManager()
+    objects = HorillaCompanyManager()
 
 
-class InterviewSchedule(CandourModel):
+class InterviewSchedule(HorillaModel):
     """
     Interview Scheduling Model
     """
@@ -1853,7 +1853,7 @@ class InterviewSchedule(CandourModel):
     completed = models.BooleanField(
         default=False, verbose_name=_("Is Interview Completed")
     )
-    objects = CandourCompanyManager("candidate_id__recruitment_id__company_id")
+    objects = HorillaCompanyManager("candidate_id__recruitment_id__company_id")
 
     def __str__(self) -> str:
         return f"{self.candidate_id} -Interview."
@@ -1997,7 +1997,7 @@ FORMATS = [
 ]
 
 
-class CandidateDocumentRequest(CandourModel):
+class CandidateDocumentRequest(HorillaModel):
     title = models.CharField(max_length=100, verbose_name=_("Title"))
     candidate_id = models.ManyToManyField(Candidate)
     format = models.CharField(choices=FORMATS, max_length=10, verbose_name=_("Format"))
@@ -2005,7 +2005,7 @@ class CandidateDocumentRequest(CandourModel):
         blank=True, null=True, verbose_name=_("Max size (In MB)")
     )
     description = models.TextField(blank=True, null=True, verbose_name=_("Description"))
-    objects = CandourCompanyManager(
+    objects = HorillaCompanyManager(
         related_company_field="candidate_id__recruitment_id__company_id"
     )
 
@@ -2013,7 +2013,7 @@ class CandidateDocumentRequest(CandourModel):
         return self.title
 
 
-class CandidateDocument(CandourModel):
+class CandidateDocument(HorillaModel):
     title = models.CharField(max_length=250, verbose_name=_("Title"))
     candidate_id = models.ForeignKey(
         Candidate, on_delete=models.PROTECT, verbose_name=_("Candidate")
@@ -2097,7 +2097,7 @@ class CandidateDocument(CandourModel):
         return reverse("candidate-view-file", args=[self.id])
 
 
-class LinkedInAccount(CandourModel):
+class LinkedInAccount(HorillaModel):
     username = models.CharField(max_length=250, verbose_name=_("App Name"))
     email = models.EmailField(max_length=254, verbose_name=_("Email"))
     api_token = models.CharField(max_length=500, verbose_name=_("API Token"))
@@ -2109,7 +2109,7 @@ class LinkedInAccount(CandourModel):
     # pk (recruitment/cbvs.py, recruitment/views/linkedin.py) with no company
     # check of their own -- an IDOR on a credential. Scoping the manager fixes
     # every one of those call sites at once.
-    objects = CandourCompanyManager()
+    objects = HorillaCompanyManager()
 
     class Meta:
         verbose_name = _("LinkedIn Account")

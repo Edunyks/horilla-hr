@@ -21,7 +21,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.models import Company, Department, JobPosition
-from candour_auth.models import CandourUser
+from horilla_auth.models import HorillaUser
 from recruitment.models import Candidate, Recruitment, Stage, StageNote
 from recruitment.views.views import candidate_reachable_by
 
@@ -103,11 +103,11 @@ class CandidateNoteScopingTests(TestCase):
 
     def test_recruiter_permission_still_reaches_every_candidate(self):
         """The half a naive fix breaks: recruiters add notes as their job."""
-        user = CandourUser.objects.create_user(
+        user = HorillaUser.objects.create_user(
             username="recruiter", password="Test-Passw0rd!"
         )
         user.user_permissions.add(Permission.objects.get(codename="view_candidate"))
-        user = CandourUser.objects.get(pk=user.pk)  # refresh the perm cache
+        user = HorillaUser.objects.get(pk=user.pk)  # refresh the perm cache
         self.assertEqual(
             candidate_reachable_by(_Request(user, {}), self.victim.id), self.victim
         )

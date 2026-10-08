@@ -12,14 +12,14 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 
 from base.methods import filtersubordinates, is_reportingmanager
-from candour_views.cbv_methods import login_required
-from candour_views.generic.cbv.views import (
-    CandourDetailedView,
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
-    CandourTabContentShell,
-    CandourTabView,
+from horilla_views.cbv_methods import login_required
+from horilla_views.generic.cbv.views import (
+    HorillaDetailedView,
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
+    HorillaTabContentShell,
+    HorillaTabView,
     TemplateView,
 )
 from leave.decorators import is_compensatory_leave_enabled
@@ -43,7 +43,7 @@ class CompensatoryLeaveView(TemplateView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(is_compensatory_leave_enabled(), name="dispatch")
-class CompensatoryListView(CandourListView):
+class CompensatoryListView(HorillaListView):
     """
     generic list view of page
     """
@@ -129,7 +129,7 @@ class CompensatoryListView(CandourListView):
     row_status_class = "status-{status}"
 
 
-class _CompensatoryTabNavBase(CandourNavView):
+class _CompensatoryTabNavBase(HorillaNavView):
     """
     Shared Search/Filter/Create wiring for each Compensatory Leave tab's
     own, independent Nav - only search_url/search_swap_target differ per
@@ -177,20 +177,20 @@ class CompensatoryLeaveNav(_CompensatoryTabNavBase):
         self.search_swap_target = "#compensatoryListContainer"
 
 
-class MyCompensatoryTabShell(CandourTabContentShell):
+class MyCompensatoryTabShell(HorillaTabContentShell):
     nav_url_name = "my-compensatory-nav"
     container_id = "myCompensatoryListContainer"
     tabs_root_id = "compensatory-tab-view"
 
 
-class CompensatoryTabShell(CandourTabContentShell):
+class CompensatoryTabShell(HorillaTabContentShell):
     nav_url_name = "compensatory-nav"
     container_id = "compensatoryListContainer"
     tabs_root_id = "compensatory-tab-view"
 
 
 def _compensatory_tab_badge_count(request, view_cls):
-    """Same queryset rules as the tab's CandourListView (filters, subordinates)."""
+    """Same queryset rules as the tab's HorillaListView (filters, subordinates)."""
     view = view_cls()
     view.request = request
     view.args = ()
@@ -201,7 +201,7 @@ def _compensatory_tab_badge_count(request, view_cls):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(is_compensatory_leave_enabled(), name="dispatch")
-class CompensatoryLeaveTabView(CandourTabView):
+class CompensatoryLeaveTabView(HorillaTabView):
     """
     tabview of the page
     """
@@ -305,7 +305,7 @@ class CompensatoryLeaveTab(CompensatoryListView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(is_compensatory_leave_enabled(), name="dispatch")
-class CompensatoryGenericDetailView(CandourDetailedView):
+class CompensatoryGenericDetailView(HorillaDetailedView):
     """
     Generic Detail view of page
     """
@@ -351,7 +351,7 @@ class CompensatoryTabDetailView(CompensatoryGenericDetailView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(is_compensatory_leave_enabled(), name="dispatch")
-class CompensatoryForm(CandourFormView):
+class CompensatoryForm(HorillaFormView):
     """
     for view
     """
@@ -394,7 +394,7 @@ class CompensatoryForm(CandourFormView):
         return super().form_valid(form)
 
 
-# class CompensatoryRejectForm(CandourFormView):
+# class CompensatoryRejectForm(HorillaFormView):
 #     """
 #     for view
 #     """

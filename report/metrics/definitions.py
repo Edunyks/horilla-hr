@@ -425,7 +425,7 @@ def _load():
                 "Prefer ReportAccess matrix for production tenants."
             ),
             permission="employee.view_employee",
-            alt_permissions=("candour_audit.view_audittag",),
+            alt_permissions=("horilla_audit.view_audittag",),
             query_fn=compliance.audit_activity,
             export_model=None,
             required_apps=(),
@@ -492,13 +492,13 @@ def _load():
             name=_("Document Expiry Aging"),
             domain="compliance",
             description=_(
-                "Overdue and upcoming candour_documents expiry buckets (90-day horizon)."
+                "Overdue and upcoming horilla_documents expiry buckets (90-day horizon)."
             ),
             permission="employee.view_employee",
-            alt_permissions=("candour_documents.view_document",),
+            alt_permissions=("horilla_documents.view_document",),
             query_fn=packs.document_expiry_aging,
             export_model="employee.Employee",
-            required_apps=("employee", "candour_documents"),
+            required_apps=("employee", "horilla_documents"),
             filter_fields=_COMPLIANCE,
         )
     )
@@ -583,7 +583,7 @@ def _load():
             ),
             permission="employee.view_employee",
             alt_permissions=(
-                "candour_documents.view_document",
+                "horilla_documents.view_document",
                 "payroll.view_contract",
             ),
             query_fn=compliance.visa_contract_expiry,

@@ -45,7 +45,7 @@ from base.methods import (
 )
 from base.models import CompanyLeaves, Holidays, PenaltyAccounts
 from employee.models import Employee
-from candour.decorators import (
+from horilla.decorators import (
     hx_request_required,
     logger,
     login_required,
@@ -53,10 +53,10 @@ from candour.decorators import (
     owner_can_enter,
     permission_required,
 )
-from candour.group_by import group_by_queryset
-from candour.http.response import CandourRedirect
-from candour.methods import (
-    get_candour_model_class,
+from horilla.group_by import group_by_queryset
+from horilla.http.response import HorillaRedirect
+from horilla.methods import (
+    get_horilla_model_class,
     handle_no_permission,
     remove_dynamic_url,
 )
@@ -534,11 +534,11 @@ def leave_request_creation(request, type_id=None, emp_id=None):
                     )
                 form = LeaveRequestCreationForm()
                 if referer_parts[-2] == "employee-view":
-                    return CandourRedirect(request)
+                    return HorillaRedirect(request)
 
             leave_requests = LeaveRequest.objects.all()
             if len(leave_requests) == 1:
-                return CandourRedirect(request)
+                return HorillaRedirect(request)
     referrer = request.META.get("HTTP_REFERER", "")
     referrer = "/" + "/".join(referrer.split("/")[3:])
     if referrer == "/":
@@ -603,7 +603,7 @@ def leave_request_view(request):
         for leave_request in leave_requests:
 
             # Fetch interviews for the employee within the requested leave period
-            InterviewSchedule = get_candour_model_class(
+            InterviewSchedule = get_horilla_model_class(
                 app_label="recruitment", model="interviewschedule"
             )
 
@@ -832,7 +832,7 @@ def leave_request_filter(request):
         for leave_request in leave_requests:
 
             # Fetch interviews for the employee within the requested leave period
-            InterviewSchedule = get_candour_model_class(
+            InterviewSchedule = get_horilla_model_class(
                 app_label="recruitment", model="interviewschedule"
             )
 
@@ -950,7 +950,7 @@ def leave_request_update(request, id):
                         icon="people-circle",
                         redirect=reverse("request-view") + f"?id={leave_request.id}",
                     )
-                return CandourRedirect(request)
+                return HorillaRedirect(request)
     else:
         form = LeaveRequestUpdationForm(instance=leave_request)
         form = choosesubordinates(request, form, "leave.add_leaverequest")
@@ -990,13 +990,13 @@ def _may_act_on_leave_request(request, leave_request, perm, owner_allowed=False)
 
 def _leave_decision_denied(request):
     """Denial in the shape the approve/reject callers read: the leave list
-    and the calendar take the outcome from HX-Trigger's candourMessage."""
+    and the calendar take the outcome from HX-Trigger's horillaMessage."""
     if not request.headers.get("HX-Request"):
         return handle_no_permission(request)
     response = HttpResponse("", status=200)
     response["HX-Trigger"] = json.dumps(
         {
-            "candourMessage": {
+            "horillaMessage": {
                 "level": "error",
                 "text": str(_("You don't have permission.")),
             }
@@ -1038,7 +1038,7 @@ def leave_request_delete(request, id):
         if leave_requests.exists():
             return redirect(f"/leave/request-filter?{previous_data}")
         else:
-            return CandourRedirect(request)
+            return HorillaRedirect(request)
     return redirect(reverse("request-filter"))
 
 
@@ -1060,7 +1060,7 @@ def leave_request_approve(request, id, emp_id=None):
     """
     leave_request = LeaveRequest.find(id)
     if not leave_request:
-        return CandourRedirect(
+        return HorillaRedirect(
             request, message=_("No leave request found matching the query.")
         )
     if not _may_act_on_leave_request(
@@ -1074,7 +1074,7 @@ def leave_request_approve(request, id, emp_id=None):
             if emp_id is not None:
                 employee_id = emp_id
                 return redirect(f"/employee/employee-view/{employee_id}/")
-            return CandourRedirect(request)
+            return HorillaRedirect(request)
     leave_type_id = leave_request.leave_type_id
     try:
         available_leave = AvailableLeave.objects.get(
@@ -1090,7 +1090,7 @@ def leave_request_approve(request, id, emp_id=None):
             response["HX-Trigger"] = json.dumps(
                 {
                     "reloadLeaveRequestList": {"target": "body"},
-                    "candourMessage": {
+                    "horillaMessage": {
                         "level": "error",
                         "text": str(
                             _(
@@ -1101,7 +1101,7 @@ def leave_request_approve(request, id, emp_id=None):
                 }
             )
             return response
-        return CandourRedirect(request)
+        return HorillaRedirect(request)
 
     total_available_leave = (
         available_leave.available_days + available_leave.carryforward_days
@@ -1206,12 +1206,12 @@ def leave_request_approve(request, id, emp_id=None):
         response = HttpResponse("", status=200)
         trigger_data = {"reloadLeaveRequestList": {"target": "body"}}
         if approved:
-            trigger_data["candourMessage"] = {
+            trigger_data["horillaMessage"] = {
                 "level": "success",
                 "text": str(_("Leave request approved successfully..")),
             }
         elif error_message:
-            trigger_data["candourMessage"] = {
+            trigger_data["horillaMessage"] = {
                 "level": "error",
                 "text": error_message,
             }
@@ -1220,7 +1220,7 @@ def leave_request_approve(request, id, emp_id=None):
     if emp_id is not None:
         employee_id = emp_id
         return redirect(f"/employee/employee-view/{employee_id}/")
-    return CandourRedirect(request)
+    return HorillaRedirect(request)
 
 
 @login_required
@@ -1271,7 +1271,7 @@ def leave_request_bulk_approve(request):
             except (ValueError, OverflowError, LeaveRequest.DoesNotExist):
                 messages.error(request, _("Leave request not found"))
                 pass
-    return CandourRedirect(request)
+    return HorillaRedirect(request)
 
 
 @login_required
@@ -1285,7 +1285,7 @@ def leave_bulk_reject(request):
         )
         leave_request_cancel(request, leave_request.id)
 
-    return CandourRedirect(request)
+    return HorillaRedirect(request)
 
 
 @login_required
@@ -1373,7 +1373,7 @@ def leave_request_cancel(request, id, emp_id=None):
                 response["HX-Trigger"] = json.dumps(
                     {
                         "reloadLeaveRequestList": {"target": "body"},
-                        "candourMessage": {
+                        "horillaMessage": {
                             "level": "success",
                             "text": str(_("Leave request rejected successfully..")),
                         },
@@ -1383,7 +1383,7 @@ def leave_request_cancel(request, id, emp_id=None):
             if emp_id is not None:
                 employee_id = emp_id
                 return redirect(f"/employee/employee-view/{employee_id}/")
-            return CandourRedirect(request)
+            return HorillaRedirect(request)
     return render(
         request, "leave/leave_request/cancel_form.html", {"form": form, "id": id}
     )
@@ -1428,16 +1428,16 @@ def user_leave_cancel(request, id):
                         request, leave_request, type="cancel"
                     )
                     mail_thread.start()
-                    return CandourRedirect(request)
+                    return HorillaRedirect(request)
             return render(
                 request,
                 "leave/leave_request/user_cancel_form.html",
                 {"form": form, "id": id},
             )
         messages.error(request, _("You can't cancel this leave request."))
-        return CandourRedirect(request)
+        return HorillaRedirect(request)
     messages.error(request, _("You don't have the permission."))
-    return CandourRedirect(request)
+    return HorillaRedirect(request)
 
 
 @login_required
@@ -1829,7 +1829,7 @@ def leave_assign(request):
                 )
 
         if page_reload:
-            return CandourRedirect(request)
+            return HorillaRedirect(request)
 
     return render(
         request, "leave/leave_assign/leave_assign_form.html", {"assign_form": form}
@@ -1902,7 +1902,7 @@ def leave_assign_delete(request, obj_id):
         messages.error(request, _("Related entries exists"))
     if not request.GET.get("instances_ids"):
         if not AvailableLeave.objects.filter():
-            return CandourRedirect(request)
+            return HorillaRedirect(request)
         return redirect("/leave/assign-filter?field=leave_type_id")
     else:
         instances_ids = request.GET.get("instances_ids")
@@ -2159,7 +2159,7 @@ def restrict_creation(request):
             form = RestrictLeaveForm()
             messages.success(request, _("Restricted day created successfully.."))
             if RestrictLeave.objects.filter().count() == 1:
-                return CandourRedirect(request)
+                return HorillaRedirect(request)
     return render(
         request,
         "leave/restrict/restrict_form.html",
@@ -2295,7 +2295,7 @@ def restrict_delete(request, id):
                 f"/leave/restricted-days-detail-view/{next_instance}/?{previous_data}&instance_ids={instances_list}&deleted=true"
             )
     if not RestrictLeave.objects.filter():
-        return CandourRedirect(request)
+        return HorillaRedirect(request)
     return redirect(f"/leave/restrict-filter?{query_string}")
 
 
@@ -2495,7 +2495,7 @@ def user_leave_request(request, id):
                 ) == 1 or request.META.get("HTTP_REFERER").endswith(
                     "employee-profile/"
                 ):
-                    return CandourRedirect(request)
+                    return HorillaRedirect(request)
 
         return render(
             request,
@@ -2623,7 +2623,7 @@ def user_request_update(request, id):
             )
         else:
             messages.error(request, _("You can't update this leave request..."))
-            return CandourRedirect(request)
+            return HorillaRedirect(request)
     except Exception as e:
         messages.error(request, _("User has no leave request.."))
     return render(
@@ -2664,10 +2664,10 @@ def user_request_delete(request, id):
     except ProtectedError:
         messages.error(request, _("Related entries exists"))
     if hx_target and hx_target == "genericModalBody":
-        return CandourRedirect(request)
+        return HorillaRedirect(request)
 
     if not LeaveRequest.objects.filter(employee_id=request.user.employee_get):
-        return CandourRedirect(request)
+        return HorillaRedirect(request)
     else:
         return redirect(f"/leave/user-request-filter?{previous_data}")
 
@@ -2728,7 +2728,7 @@ def user_request_view(request):
             for leave_request in leave_requests:
 
                 # Fetch interviews for the employee within the requested leave period
-                InterviewSchedule = get_candour_model_class(
+                InterviewSchedule = get_horilla_model_class(
                     app_label="recruitment", model="interviewschedule"
                 )
 
@@ -2804,7 +2804,7 @@ def user_request_filter(request):
             for leave_request in leave_requests:
 
                 # Fetch interviews for the employee within the requested leave period
-                InterviewSchedule = get_candour_model_class(
+                InterviewSchedule = get_horilla_model_class(
                     app_label="recruitment", model="interviewschedule"
                 )
 
@@ -3467,7 +3467,7 @@ def leave_request_create(request):
                     mail_thread.start()
                     form = UserLeaveRequestCreationForm(employee=emp)
                     if len(LeaveRequest.objects.filter(employee_id=emp_id)) == 1:
-                        return CandourRedirect(request)
+                        return HorillaRedirect(request)
             return render(
                 request,
                 "leave/user_leave/request_form.html",
@@ -3478,7 +3478,7 @@ def leave_request_create(request):
             )
         else:
             messages.error(request, _("You don't have permission"))
-            return CandourRedirect(request)
+            return HorillaRedirect(request)
     return render(
         request,
         "leave/user_leave/request_form.html",
@@ -3494,7 +3494,7 @@ def employee_leave_details(request):
     balance_count = ""
     employee = request.POST.get("employee_id")
     if not employee:
-        return CandourRedirect(request, message=_("No leave found matching the query."))
+        return HorillaRedirect(request, message=_("No leave found matching the query."))
     date = request.POST.get("date", "")
     if request.POST["leave_type"] and request.POST["employee_id"]:
         leave_type_id = request.POST["leave_type"]
@@ -3662,7 +3662,7 @@ def leave_allocation_request_create(request):
                     redirect=reverse("leave-allocation-request-view")
                     + f"?id={leave_allocation_request.id}",
                 )
-            return CandourRedirect(request)
+            return HorillaRedirect(request)
     context = {"form": form}
     return render(
         request,
@@ -3803,7 +3803,7 @@ def leave_allocation_request_update(request, req_id):
                         redirect=reverse("leave-allocation-request-view")
                         + f"?id={leave_allocation_request.id}",
                     )
-                return CandourRedirect(request)
+                return HorillaRedirect(request)
         return render(
             request,
             "leave/leave_allocation_request/leave_allocation_request_update.html",
@@ -3811,7 +3811,7 @@ def leave_allocation_request_update(request, req_id):
         )
     else:
         messages.error(request, _("You can't update this request..."))
-        return CandourRedirect(request)
+        return HorillaRedirect(request)
 
 
 @login_required
@@ -3861,7 +3861,7 @@ def leave_allocation_request_approve(request, req_id):
             )
     else:
         messages.error(request, _("The leave allocation request can't be approved"))
-    return CandourRedirect(request)
+    return HorillaRedirect(request)
 
 
 @login_required
@@ -3917,7 +3917,7 @@ def leave_allocation_request_reject(request, req_id):
                         redirect=reverse("leave-allocation-request-view")
                         + f"?id={leave_allocation_request.id}",
                     )
-                return CandourRedirect(request)
+                return HorillaRedirect(request)
         return render(
             request,
             "leave/leave_allocation_request/leave_allocation_request_reject_form.html",
@@ -3925,7 +3925,7 @@ def leave_allocation_request_reject(request, req_id):
         )
     else:
         messages.error(request, _("The leave allocation request can't be rejected"))
-        return CandourRedirect(request)
+        return HorillaRedirect(request)
 
 
 @login_required
@@ -3970,7 +3970,7 @@ def leave_allocation_request_delete(request, req_id):
         if leave_allocations.exists():
             return redirect(f"/leave/leave-allocation-request-filter?{previous_data}")
         else:
-            return CandourRedirect(request)
+            return HorillaRedirect(request)
     elif hx_target and hx_target == "genericModalBody":
         instances_ids = request.GET.get("instances_ids")
         instances_list = json.loads(instances_ids)
@@ -4380,7 +4380,7 @@ def create_leaverequest_comment(request, leave_id):
     """
     leave = LeaveRequest.objects.filter(id=leave_id).first()
     if not leave:
-        return CandourRedirect(request, message=_("Leave request not found."))
+        return HorillaRedirect(request, message=_("Leave request not found."))
     # Same visibility rule as reading: commenting on a request you cannot see
     # both writes to another employee's record and confirms the id exists.
     if not can_view_leave_request(request, leave):
@@ -4548,7 +4548,7 @@ def create_allocationrequest_comment(request, leave_id):
     previous_data = request.GET.urlencode()
     leave = LeaveAllocationRequest.objects.filter(id=leave_id).first()
     if not leave:
-        return CandourRedirect(
+        return HorillaRedirect(
             request, message=_("Leave allocation request not found.")
         )
 
@@ -4738,7 +4738,7 @@ def delete_allocation_comment_file(request):
     comment_id = request.GET.get("comment_id")
     comment = LeaveallocationrequestComment.find(comment_id)
     if not comment:
-        return CandourRedirect(
+        return HorillaRedirect(
             request, message=_("No comment found matching the query.")
         )
     if request.user.employee_get == comment.employee_id or _may_act_on_leave_request(
@@ -4830,7 +4830,7 @@ def _get_or_create_compensatory_leave_type(selected_company):
     company_id_id=selected_company, ...) used to be called directly here --
     but that extra company_id_id lookup ignores an already-existing
     *shared* (company_id=None) compensatory leave type, which
-    CandourCompanyManager's own scoping would otherwise find under any
+    HorillaCompanyManager's own scoping would otherwise find under any
     company. The result: visiting this settings page under a specific
     company minted a brand new per-company duplicate every time, even
     though a perfectly usable shared one already existed -- exactly the
@@ -4998,11 +4998,11 @@ def delete_leave_comment_file(request):
     ids = request.GET.getlist("ids")
     leave_id = request.GET.get("leave_id")
     if not leave_id:
-        return CandourRedirect(request, message=_("No leave found matching the query."))
+        return HorillaRedirect(request, message=_("No leave found matching the query."))
     comment_id = request.GET.get("comment_id")
     comment = LeaverequestComment.find(comment_id)
     if not comment:
-        return CandourRedirect(
+        return HorillaRedirect(
             request, message=_("No comment found matching the query.")
         )
     if request.user.employee_get == comment.employee_id or _may_act_on_leave_request(
@@ -5057,7 +5057,7 @@ if apps.is_installed("attendance"):
                 },
             )
             return HttpResponse(f"{attendance_id}")
-        return CandourRedirect(
+        return HorillaRedirect(
             request, message=_("No attendance found matching the query.")
         )
 
@@ -5069,7 +5069,7 @@ if apps.is_installed("attendance"):
         ids = request.GET.getlist("ids")
         leave_id = request.GET.get("leave_id")
         if not leave_id:
-            return CandourRedirect(
+            return HorillaRedirect(
                 request, message=_("No leave comment found matching the query.")
             )
         comments = CompensatoryLeaverequestComment.objects.all()
@@ -5295,7 +5295,7 @@ if apps.is_installed("attendance"):
                     messages.success(request, _("Compensatory Leave updated."))
                 else:
                     messages.success(request, _("Compensatory Leave created."))
-                return CandourRedirect(request)
+                return HorillaRedirect(request)
 
         context = {
             "employee": employee,
@@ -5332,7 +5332,7 @@ if apps.is_installed("attendance"):
         if request.GET.get("list") == "True":
             return redirect(filter_compensatory_leave)
         else:
-            return CandourRedirect(request)
+            return HorillaRedirect(request)
 
     @login_required
     @is_compensatory_leave_enabled()
@@ -5370,7 +5370,7 @@ if apps.is_installed("attendance"):
         except:
             messages.error(request, _("Sorry, something went wrong!"))
         if request.GET.get("individual"):
-            return CandourRedirect(request)
+            return HorillaRedirect(request)
         return redirect("compensatory-tab-view")
 
     @login_required
@@ -5412,7 +5412,7 @@ if apps.is_installed("attendance"):
                             redirect=reverse("view-compensatory-leave")
                             + f"?id={comp_leave_req.id}",
                         )
-                    return CandourRedirect(request)
+                    return HorillaRedirect(request)
             return render(
                 request,
                 "leave/compensatory_leave/compensatory_leave_reject_form..html",
@@ -5420,7 +5420,7 @@ if apps.is_installed("attendance"):
             )
         else:
             messages.error(request, _("The leave allocation request can't be rejected"))
-            return CandourRedirect(request)
+            return HorillaRedirect(request)
 
     @login_required
     @is_compensatory_leave_enabled()
@@ -5504,7 +5504,7 @@ if apps.is_installed("attendance"):
         """
         comp_leave = CompensatoryLeaveRequest.objects.filter(id=comp_leave_id).first()
         if not comp_leave:
-            return CandourRedirect(
+            return HorillaRedirect(
                 request, message=_("Compensatory leave request not found.")
             )
 
@@ -5634,7 +5634,7 @@ if apps.is_installed("recruitment"):
             date_list = [
                 start_date_obj + timedelta(days=i) for i in range(delta.days + 1)
             ]
-            InterviewSchedule = get_candour_model_class(
+            InterviewSchedule = get_horilla_model_class(
                 app_label="recruitment", model="interviewschedule"
             )
 
@@ -5650,7 +5650,7 @@ if apps.is_installed("recruitment"):
             return JsonResponse(response)
         except Exception as e:
             logger.error(e)
-            return CandourRedirect(
+            return HorillaRedirect(
                 request, message=_("No interview found matching the query.")
             )
 
@@ -5687,7 +5687,7 @@ def employee_past_leave_restriction(request):
             messages.success(
                 request, _("Past Date Leave Request Restriction has been disabled")
             )
-        return CandourRedirect(request)
+        return HorillaRedirect(request)
 
     # This endpoint is now only a toggle handler for the merged "Leave Rules"
     # page; direct GET access should land on that unified settings page.
@@ -5742,7 +5742,7 @@ def employee_view_individual_leave_tab(request, pk, **kwargs):
     """
     employee = Employee.objects.filter(id=pk).first()
     if not employee:
-        return CandourRedirect(
+        return HorillaRedirect(
             request, message=_("No leave request found matching the query.")
         )
     instances = (

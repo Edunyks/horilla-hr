@@ -11,15 +11,15 @@ from django.utils.translation import gettext_noop
 
 from employee.cbv.employee_profile import EmployeeProfileView
 from employee.models import Employee
-from candour.http.response import CandourRedirect
-from candour_views.cbv_methods import login_required
-from candour_views.generic.cbv.views import (
-    CandourDetailedView,
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
-    CandourTabContentShell,
-    CandourTabView,
+from horilla.http.response import HorillaRedirect
+from horilla_views.cbv_methods import login_required
+from horilla_views.generic.cbv.views import (
+    HorillaDetailedView,
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
+    HorillaTabContentShell,
+    HorillaTabView,
     TemplateView,
 )
 from notifications.signals import notify
@@ -53,7 +53,7 @@ class ObjectiveTemplateView(TemplateView):
 
 
 @method_decorator(login_required, name="dispatch")
-class ObjectivesList(CandourListView):
+class ObjectivesList(HorillaListView):
     """
     List view of the page
     """
@@ -211,7 +211,7 @@ class ObjectiveTemplateList(AllObjectives):
 
 
 @method_decorator(login_required, name="dispatch")
-class ObjectivesTab(CandourTabView):
+class ObjectivesTab(HorillaTabView):
     """
     Tab View
     """
@@ -294,7 +294,7 @@ class ObjectivesTab(CandourTabView):
         return context
 
 
-class _ObjectivesTabNavBase(CandourNavView):
+class _ObjectivesTabNavBase(HorillaNavView):
     """
     Shared Search/Filter/Create wiring for each Objectives tab's own,
     independent Nav - only search_url/search_swap_target differ per tab.
@@ -304,7 +304,7 @@ class _ObjectivesTabNavBase(CandourNavView):
     filter_instance = ActualObjectiveFilter()
     filter_form_context_name = "form"
     filter_body_template = "cbv/objectives/filter.html"
-    # Modern slide-over filter panel (generic/candour_nav.html's own
+    # Modern slide-over filter panel (generic/horilla_nav.html's own
     # {% if modern_filter %} branch, inherited by ObjectiveTemplateNav's
     # generic/inline_nav.html too) -- same treatment as every other
     # panel this session. ActualObjectiveFilter.ajax_fields carries the
@@ -363,13 +363,13 @@ class AllObjectivesNav(_ObjectivesTabNavBase):
         self.search_swap_target = "#allObjectivesListContainer"
 
 
-class MyObjectivesTabShell(CandourTabContentShell):
+class MyObjectivesTabShell(HorillaTabContentShell):
     nav_url_name = "my-objectives-nav"
     container_id = "myObjectivesListContainer"
     tabs_root_id = "objContainer"
 
 
-class AllObjectivesTabShell(CandourTabContentShell):
+class AllObjectivesTabShell(HorillaTabContentShell):
     nav_url_name = "all-objectives-nav"
     container_id = "allObjectivesListContainer"
     tabs_root_id = "objContainer"
@@ -406,7 +406,7 @@ class DynamicKeyResultCreateForm(KeyResultFormView):
 
 
 @method_decorator(login_required, name="dispatch")
-class CreateEmployeeObjectiveForm(CandourFormView):
+class CreateEmployeeObjectiveForm(HorillaFormView):
     """
     form view for create employee objective
     """
@@ -460,7 +460,7 @@ class CreateEmployeeObjectiveForm(CandourFormView):
 
 
 @method_decorator(login_required, name="dispatch")
-class CreateObjectiveFormView(CandourFormView):
+class CreateObjectiveFormView(HorillaFormView):
     """
     form view for create objectives
     """
@@ -600,12 +600,12 @@ class CreateTemplateObjectiveFormView(CreateObjectiveFormView):
             messages.info(
                 request, _("You don't have permission to perform this action")
             )
-            return CandourRedirect(request)
+            return HorillaRedirect(request)
         return super().dispatch(request, *args, **kwargs)
 
 
 @method_decorator(login_required, name="dispatch")
-class AddAssigneesFormView(CandourFormView):
+class AddAssigneesFormView(HorillaFormView):
     """
     form view for add assignees
     """
@@ -624,12 +624,12 @@ class AddAssigneesFormView(CandourFormView):
         obj_id = kwargs.get("pk")
 
         if not obj_id:
-            return CandourRedirect(request, message=_("Objective ID is missing"))
+            return HorillaRedirect(request, message=_("Objective ID is missing"))
 
         self.object = Objective.objects.filter(pk=obj_id).first()
 
         if not self.object:
-            return CandourRedirect(request, message=_("Invalid Objective"))
+            return HorillaRedirect(request, message=_("Invalid Objective"))
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -682,7 +682,7 @@ class AddAssigneesFormView(CandourFormView):
 
 
 @method_decorator(login_required, name="dispatch")
-class CreateEmployeeKeyResultFormView(CandourFormView):
+class CreateEmployeeKeyResultFormView(HorillaFormView):
     """
     form view for create employee key result form
     """
@@ -709,11 +709,11 @@ class CreateEmployeeKeyResultFormView(CandourFormView):
 
         if (emp_obj_id or pk) and not self.emp_objective:
             messages.error(request, _("Employee objective not found."))
-            return CandourRedirect(request)
+            return HorillaRedirect(request)
 
         if not self.has_key_result_permission():
             messages.info(request, _("You don't have permission"))
-            return CandourRedirect(request)
+            return HorillaRedirect(request)
         return super().dispatch(request, *args, **kwargs)
 
     def has_key_result_permission(self):
@@ -795,7 +795,7 @@ class CreateEmployeeKeyResultFormView(CandourFormView):
 
 
 @method_decorator(login_required, name="dispatch")
-class EmployeeObjectiveDetailView(CandourDetailedView):
+class EmployeeObjectiveDetailView(HorillaDetailedView):
     """
     Generic Detail view of page
     """
@@ -832,7 +832,7 @@ EmployeeKeyResult.get_history_url = get_history_url
 
 
 @method_decorator(login_required, name="dispatch")
-class EmployeeObjectiveKeyResultDetailListView(CandourListView):
+class EmployeeObjectiveKeyResultDetailListView(HorillaListView):
     """
     List view of the page
     """
@@ -1001,7 +1001,7 @@ class EKRTab(EmployeeObjectiveKeyResultDetailListView):
     filter_selected = False
 
     def get_queryset(self, queryset=None, filtered=False, *args, **kwargs):
-        self.queryset = CandourListView.get_queryset(
+        self.queryset = HorillaListView.get_queryset(
             self, queryset, filtered, *args, **kwargs
         ).filter(employee_objective_id__employee_id__pk=self.kwargs["pk"])
         self._saved_filters = self._saved_filters.copy()

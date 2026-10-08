@@ -1,6 +1,6 @@
 from datetime import date, datetime, time, timedelta
 
-from candour.scheduling import register_job
+from horilla.scheduling import register_job
 
 
 def update_experience():
@@ -22,7 +22,7 @@ def block_unblock_disciplinary():
     """
     from base.models import EmployeeShiftSchedule
     from employee.models import DisciplinaryAction
-    from candour_auth.models import CandourUser
+    from horilla_auth.models import HorillaUser
 
     today = date.today()
     now = datetime.now().time()
@@ -89,12 +89,12 @@ def block_unblock_disciplinary():
                         user.save()
 
             if dis.days and active is not None:
-                CandourUser.objects.filter(id__in=user_ids).update(is_active=active)
+                HorillaUser.objects.filter(id__in=user_ids).update(is_active=active)
 
         elif dis.action.action_type == "dismissal":
             if today >= dis.start_date:
                 active = False
-                CandourUser.objects.filter(id__in=user_ids).update(is_active=active)
+                HorillaUser.objects.filter(id__in=user_ids).update(is_active=active)
 
 
 register_job(update_experience, "interval", hours=4)

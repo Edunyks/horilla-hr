@@ -4,7 +4,7 @@ from datetime import date, datetime, timedelta
 from django.urls import reverse
 from django.utils.translation import gettext_noop
 
-from candour.scheduling import register_job
+from horilla.scheduling import register_job
 from notifications.signals import notify
 
 
@@ -12,7 +12,7 @@ def update_rotating_work_type_assign(rotating_work_type, new_date):
     """
     Here will update the employee work information details and send notification
     """
-    from candour_auth.models import CandourUser
+    from horilla_auth.models import HorillaUser
 
     employee = rotating_work_type.employee_id
     employee_work_info = employee.employee_work_info
@@ -41,7 +41,7 @@ def update_rotating_work_type_assign(rotating_work_type, new_date):
     rotating_work_type.current_work_type = rotating_work_type.next_work_type
     rotating_work_type.next_work_type = next_work_type
     rotating_work_type.save()
-    bot = CandourUser.objects.filter(username="Candour Bot").first()
+    bot = HorillaUser.objects.filter(username="Horilla Bot").first()
     if bot is not None:
         employee = rotating_work_type.employee_id
         notify.send(
@@ -124,7 +124,7 @@ def update_rotating_shift_assign(rotating_shift, new_date):
     """
     Here will update the employee work information and send notification
     """
-    from candour_auth.models import CandourUser
+    from horilla_auth.models import HorillaUser
 
     next_shift_index = 0
     employee = rotating_shift.employee_id
@@ -150,7 +150,7 @@ def update_rotating_shift_assign(rotating_shift, new_date):
     rotating_shift.current_shift = rotating_shift.next_shift
     rotating_shift.next_shift = next_shift
     rotating_shift.save()
-    bot = CandourUser.objects.filter(username="Candour Bot").first()
+    bot = HorillaUser.objects.filter(username="Horilla Bot").first()
     if bot is not None:
         employee = rotating_shift.employee_id
         notify.send(
@@ -247,7 +247,7 @@ def switch_shift():
     This method change employees shift information regards to the shift request
     """
     from base.models import ShiftRequest
-    from candour_auth.models import CandourUser
+    from horilla_auth.models import HorillaUser
 
     today = date.today()
 
@@ -263,7 +263,7 @@ def switch_shift():
             request.approved = True
             request.shift_changed = True
             request.save()
-            bot = CandourUser.objects.filter(username="Candour Bot").first()
+            bot = HorillaUser.objects.filter(username="Horilla Bot").first()
             if bot is not None:
                 employee = request.employee_id
                 notify.send(
@@ -281,7 +281,7 @@ def undo_shift():
     This method undo previous employees shift information regards to the shift request
     """
     from base.models import ShiftRequest
-    from candour_auth.models import CandourUser
+    from horilla_auth.models import HorillaUser
 
     today = date.today()
     # here will get all the active shift requests
@@ -300,7 +300,7 @@ def undo_shift():
             # making the instance in-active
             request.is_active = False
             request.save()
-            bot = CandourUser.objects.filter(username="Candour Bot").first()
+            bot = HorillaUser.objects.filter(username="Horilla Bot").first()
             if bot is not None:
                 employee = request.employee_id
                 notify.send(
@@ -320,7 +320,7 @@ def switch_work_type():
     This method change employees work type information regards to the work type request
     """
     from base.models import WorkTypeRequest
-    from candour_auth.models import CandourUser
+    from horilla_auth.models import HorillaUser
 
     today = date.today()
     work_type_requests = WorkTypeRequest.objects.filter(
@@ -337,7 +337,7 @@ def switch_work_type():
         request.approved = True
         request.work_type_changed = True
         request.save()
-        bot = CandourUser.objects.filter(username="Candour Bot").first()
+        bot = HorillaUser.objects.filter(username="Horilla Bot").first()
         if bot is not None:
             employee = request.employee_id
             notify.send(
@@ -355,7 +355,7 @@ def undo_work_type():
     This method undo previous employees work type information regards to the work type request
     """
     from base.models import WorkTypeRequest
-    from candour_auth.models import CandourUser
+    from horilla_auth.models import HorillaUser
 
     today = date.today()
     # here will get all the active work type requests
@@ -374,7 +374,7 @@ def undo_work_type():
         # making the instance is in-active
         request.is_active = False
         request.save()
-        bot = CandourUser.objects.filter(username="Candour Bot").first()
+        bot = HorillaUser.objects.filter(username="Horilla Bot").first()
         if bot is not None:
             employee = request.employee_id
             notify.send(

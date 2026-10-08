@@ -12,7 +12,7 @@ from datetime import date, timedelta
 from django.test import TestCase
 from django.urls import reverse
 
-from candour.testkit import make_company, make_employee, make_user
+from horilla.testkit import make_company, make_employee, make_user
 from leave.models import AvailableLeave, LeaveType
 
 
@@ -23,7 +23,7 @@ class EmployeeLeaveDetailsForecastTests(TestCase):
         cls.user = make_user("forecast-balance")
         cls.employee = make_employee(
             company=company,
-            email="forecast-balance@test.candour",
+            email="forecast-balance@test.horilla",
             user=cls.user,
         )
         # reset_based monthly with a reset already behind us, so the

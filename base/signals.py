@@ -23,7 +23,7 @@ from base.models import (
     PenaltyAccounts,
 )
 from employee.models import Employee, Policy
-from candour.methods import get_candour_model_class
+from horilla.methods import get_horilla_model_class
 
 
 @receiver(post_save, sender=Company)
@@ -67,7 +67,7 @@ def create_deduction_cutleave_from_penalty(sender, instance, created, **kwargs):
     if created:
         penalty_amount = instance.penalty_amount
         if apps.is_installed("payroll") and penalty_amount:
-            Deduction = get_candour_model_class(app_label="payroll", model="deduction")
+            Deduction = get_horilla_model_class(app_label="payroll", model="deduction")
             penalty = Deduction()
             if instance.late_early_id:
                 penalty.title = f"{instance.late_early_id.get_type_display()} penalty"
@@ -115,7 +115,7 @@ def delete_deduction_cutleave_from_penalty(sender, instance, **kwargs):
     """
     # Check if the deduction model is installed
     if apps.is_installed("payroll"):
-        Deduction = get_candour_model_class(app_label="payroll", model="deduction")
+        Deduction = get_horilla_model_class(app_label="payroll", model="deduction")
 
         # A CASCADE delete of the related AttendanceLateComeEarlyOut (e.g.
         # reset_backfilled_rows_before_reload) deletes this PenaltyAccounts
@@ -241,7 +241,7 @@ _HRMS_GROUP_MIGRATE_APPS = {
     "project",
     "pms",
     "biometric",
-    "candour_documents",
+    "horilla_documents",
 }
 
 # name -> permission rules
@@ -263,7 +263,7 @@ _DEFAULT_HRMS_GROUPS = {
             "onboarding",
             "offboarding",
             "asset",
-            "candour_documents",
+            "horilla_documents",
             "helpdesk",
             "pms",
         ),
@@ -347,9 +347,9 @@ _ALL_HRMS_APP_LABELS = (
     "project",
     "pms",
     "biometric",
-    "candour_documents",
-    "candour_automations",
-    "candour_audit",
+    "horilla_documents",
+    "horilla_automations",
+    "horilla_audit",
     "accessibility",
 )
 

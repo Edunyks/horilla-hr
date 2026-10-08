@@ -9,12 +9,12 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 
-from candour_views.cbv_methods import login_required
-from candour_views.generic.cbv.views import (
-    CandourDetailedView,
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
+from horilla_views.cbv_methods import login_required
+from horilla_views.generic.cbv.views import (
+    HorillaDetailedView,
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
     TemplateView,
 )
 from report.access import company_id_from_request, user_can_subscribe_report
@@ -28,7 +28,7 @@ def _subscription_actions():
     Edit/Send now/Pause-Activate/Delete action buttons, shared verbatim
     between the subscriptions list row and the detail-view modal footer -
     both render a dict-based `actions` list the same way (see
-    candour_detailed_view.html and candour_list_table.html, both do
+    horilla_detailed_view.html and horilla_list_table.html, both do
     `{{action.attrs|format:object_or_instance}}`), so one shared list keeps
     them from drifting out of sync.
     """
@@ -88,7 +88,7 @@ class ReportSubscriptionsView(TemplateView):
 
 
 @method_decorator(login_required, name="dispatch")
-class ReportSubscriptionsNav(CandourNavView):
+class ReportSubscriptionsNav(HorillaNavView):
     nav_title = _("Report Subscriptions")
 
     def __init__(self, **kwargs: Any) -> None:
@@ -110,14 +110,14 @@ class ReportSubscriptionsNav(CandourNavView):
 
 
 @method_decorator(login_required, name="dispatch")
-class ReportSubscriptionsListView(CandourListView):
+class ReportSubscriptionsListView(HorillaListView):
     """List of the current user's own report subscriptions."""
 
     model = ReportSubscription
     # True (not False) is what actually unlocks the checkbox column that
     # both the colored row_status_class border-div and the
     # row_status_indications pills below render inside of — see
-    # candour_views/templates/generic/candour_list_table.html lines 32-34 /
+    # horilla_views/templates/generic/horilla_list_table.html lines 32-34 /
     # 131-155. It does not add any bulk-delete/bulk-update UI on its own
     # (those are separately gated by bulk_path/quick_export, both unset
     # here), matching payroll's Payslip list, whose own status pills use
@@ -179,8 +179,8 @@ class ReportSubscriptionsListView(CandourListView):
         self.actions = _subscription_actions()
 
     def get_queryset(self, queryset=None, filtered=False, *args, **kwargs):
-        # CandourListView's base get_queryset() ultimately calls the manager's
-        # .all(), which auto-hides is_active=False rows (CandourCompanyManager
+        # HorillaListView's base get_queryset() ultimately calls the manager's
+        # .all(), which auto-hides is_active=False rows (HorillaCompanyManager
         # convention). A paused subscription is a real, user-toggleable state
         # here, not a soft-delete — it must stay visible so the owner can
         # re-activate it. Seed from .get_queryset() (company-scoped only, no
@@ -198,7 +198,7 @@ class ReportSubscriptionsListView(CandourListView):
 
 
 @method_decorator(login_required, name="dispatch")
-class ReportSubscriptionFormView(CandourFormView):
+class ReportSubscriptionFormView(HorillaFormView):
     """Create/edit form for a report subscription."""
 
     model = ReportSubscription
@@ -306,7 +306,7 @@ class ReportSubscriptionFormView(CandourFormView):
 
 
 @method_decorator(login_required, name="dispatch")
-class ReportSubscriptionDetailView(CandourDetailedView):
+class ReportSubscriptionDetailView(HorillaDetailedView):
     """Detail view for a single report subscription."""
 
     model = ReportSubscription

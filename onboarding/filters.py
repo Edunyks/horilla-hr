@@ -11,7 +11,7 @@ from django_filters import filters
 from base.filters import FilterSet
 from base.models import Company
 from employee.models import Employee
-from candour.filters import CandourFilterSet
+from horilla.filters import HorillaFilterSet
 from onboarding.models import (
     CandidateStage,
     CandidateTask,
@@ -23,7 +23,7 @@ from recruitment.filters import RecruitmentFilter as rec_filter
 from recruitment.models import Candidate, Recruitment
 
 
-class CandidateTaskFilter(CandourFilterSet):
+class CandidateTaskFilter(HorillaFilterSet):
     """
     Task filter class
     """
@@ -88,7 +88,7 @@ class RecruitmentFilter(rec_filter):
         return queryset.distinct()
 
 
-class PipelineCandidateFilter(CandourFilterSet):
+class PipelineCandidateFilter(HorillaFilterSet):
     """
     FilterSet class for Candidate model
     """
@@ -184,7 +184,7 @@ class PipelineCandidateFilter(CandourFilterSet):
     def _build_custom_filter_fields(self):
         """
         Registry backing the Advanced section's "+ Add filter" builder
-        (see CandourFilterSet._build_custom_filter_fields's docstring for
+        (see HorillaFilterSet._build_custom_filter_fields's docstring for
         the two supported entry shapes) -- same "choose field, then
         lookup, then value" pattern used by recruitment.filters.
         CandidateFilter, which this class mirrors. Exposes the full
@@ -246,7 +246,7 @@ class PipelineCandidateFilter(CandourFilterSet):
 
     def filter_queryset(self, queryset):
         """
-        CandourFilterSet._apply_custom_filters isn't wired into the base
+        HorillaFilterSet._apply_custom_filters isn't wired into the base
         filter_queryset automatically -- this is the minimal "call it at
         the end" hookup, same as CandidateFilter/PipelineEmployeeFilter.
         """
@@ -370,7 +370,7 @@ class CandidateFilter(FilterSet):
         fields = {}
 
 
-class OnboardingStageFilter(CandourFilterSet):
+class OnboardingStageFilter(HorillaFilterSet):
     """
     OnboardingStageFilter
     """
@@ -408,7 +408,7 @@ class OnboardingStageFilter(CandourFilterSet):
         label="Candidates",
     )
 
-    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
+    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
     # -- Stage Manager opts into an AJAX-searched combobox instead of
     # pre-rendering its whole queryset as <option> tags.
     ajax_fields = {
@@ -478,7 +478,7 @@ class OnboardingStageFilter(CandourFilterSet):
         return queryset.distinct()
 
 
-class OnboardingCandidateFilter(CandourFilterSet):
+class OnboardingCandidateFilter(HorillaFilterSet):
     """
     OnboardingStageFilter
     """
@@ -504,7 +504,7 @@ class OnboardingCandidateFilter(CandourFilterSet):
         widget=forms.DateInput(attrs={"type": "date"}),
     )
 
-    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
+    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
     # -- Tasks opts into an AJAX-searched combobox instead of
     # pre-rendering its whole queryset as <option> tags.
     ajax_fields = {

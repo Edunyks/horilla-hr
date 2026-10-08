@@ -18,7 +18,7 @@ from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
 
 from base.forms import ModelForm as BaseForm
-from base.forms import ModelForm as CandourModelForm
+from base.forms import ModelForm as HorillaModelForm
 from base.methods import (
     filtersubordinatesemployeemodel,
     is_reportingmanager,
@@ -26,9 +26,9 @@ from base.methods import (
 )
 from base.models import Company
 from employee.filters import EmployeeFilter
-from candour import candour_middlewares
-from candour_widgets.widgets.candour_multi_select_field import CandourMultiSelectField
-from candour_widgets.widgets.select_widgets import CandourMultiSelectWidget
+from horilla import horilla_middlewares
+from horilla_widgets.widgets.horilla_multi_select_field import HorillaMultiSelectField
+from horilla_widgets.widgets.select_widgets import HorillaMultiSelectWidget
 from pms.models import (
     AnonymousFeedback,
     BonusPointSetting,
@@ -118,9 +118,9 @@ class ObjectiveForm(BaseForm):
             "employee", None
         )  # access the logged-in user's information
         super().__init__(*args, **kwargs)
-        self.fields["assignees"] = CandourMultiSelectField(
+        self.fields["assignees"] = HorillaMultiSelectField(
             queryset=Employee.objects.all(),
-            widget=CandourMultiSelectWidget(
+            widget=HorillaMultiSelectWidget(
                 filter_route_name="employee-widget-filter",
                 filter_class=EmployeeFilter,
                 filter_instance_context_name="f",
@@ -131,9 +131,9 @@ class ObjectiveForm(BaseForm):
             label="Assignees",
         )
 
-        self.fields["managers"] = CandourMultiSelectField(
+        self.fields["managers"] = HorillaMultiSelectField(
             queryset=Employee.objects.all(),
-            widget=CandourMultiSelectWidget(
+            widget=HorillaMultiSelectWidget(
                 filter_route_name="employee-widget-filter",
                 filter_class=EmployeeFilter,
                 filter_instance_context_name="f",
@@ -159,7 +159,7 @@ class ObjectiveForm(BaseForm):
         cleaned_data = super().clean()
         add_assignees = cleaned_data.get("add_assignees")
         for field_name, field_instance in self.fields.items():
-            if isinstance(field_instance, CandourMultiSelectField):
+            if isinstance(field_instance, HorillaMultiSelectField):
                 self.errors.pop(field_name, None)
                 if (
                     add_assignees
@@ -353,7 +353,7 @@ class EmployeeObjectiveCreateForm(BaseForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        request = getattr(candour_middlewares._thread_locals, "request", None)
+        request = getattr(horilla_middlewares._thread_locals, "request", None)
 
         if request.user.has_perm("pms.add_keyresult"):
             self.fields["key_result_id"].choices = list(
@@ -443,7 +443,7 @@ class EmployeeKeyResultForm(BaseForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        request = getattr(candour_middlewares._thread_locals, "request", None)
+        request = getattr(horilla_middlewares._thread_locals, "request", None)
         if self.initial.get("employee_objective_id"):
             if (
                 type(self.initial.get("employee_objective_id")) is int
@@ -467,7 +467,7 @@ class EmployeeKeyResultForm(BaseForm):
             )
 
 
-class KRForm(CandourModelForm):
+class KRForm(HorillaModelForm):
     """
     A form used for creating KeyResult object
     """
@@ -676,7 +676,7 @@ class KeyResultForm(ModelForm):
         return cleaned_data
 
 
-class FeedbackForm(CandourModelForm):
+class FeedbackForm(HorillaModelForm):
     """
     FeedbackForm for better performance.
     """
@@ -754,7 +754,7 @@ class FeedbackForm(CandourModelForm):
         """
         Initializes the form and queryset filtering.
         """
-        request = getattr(candour_middlewares._thread_locals, "request", None)
+        request = getattr(horilla_middlewares._thread_locals, "request", None)
         super().__init__(*args, **kwargs)
         # if instance:
         #     kwargs["initial"] = set_date_field_initial(instance)
@@ -827,10 +827,10 @@ class FeedbackForm(CandourModelForm):
                 else Employee.objects.none()
             )
 
-        # # Candour multi-select filter for subordinates
-        # self.fields["subordinate_id"] = CandourMultiSelectField(
+        # # Horilla multi-select filter for subordinates
+        # self.fields["subordinate_id"] = HorillaMultiSelectField(
         #     queryset=Employee.objects.all(),
-        #     widget=CandourMultiSelectWidget(
+        #     widget=HorillaMultiSelectWidget(
         #         filter_route_name="employee-widget-filter",
         #         filter_class=EmployeeFilter,
         #         filter_instance_context_name="f",
@@ -1122,7 +1122,7 @@ class MeetingsForm(BaseForm):
         Render the form fields as HTML table rows with Bootstrap styling.
         """
         context = {"form": self}
-        table_html = render_to_string("candour_form.html", context)
+        table_html = render_to_string("horilla_form.html", context)
         return table_html
 
     def clean(self):
@@ -1136,7 +1136,7 @@ class MeetingsForm(BaseForm):
         employees = Employee.objects.filter(id__in=employee_id)
         cleaned_data["employee_id"] = employees
 
-        if isinstance(self.fields["employee_id"], CandourMultiSelectField):
+        if isinstance(self.fields["employee_id"], HorillaMultiSelectField):
             ids = self.data.getlist("employee_id")
             if ids:
                 self.errors.pop("employee_id", None)
@@ -1154,9 +1154,9 @@ class MeetingsForm(BaseForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["employee_id"] = CandourMultiSelectField(
+        self.fields["employee_id"] = HorillaMultiSelectField(
             queryset=Employee.objects.filter(employee_work_info__isnull=False),
-            widget=CandourMultiSelectWidget(
+            widget=HorillaMultiSelectWidget(
                 filter_route_name="employee-widget-filter",
                 filter_class=EmployeeFilter,
                 filter_instance_context_name="f",
@@ -1191,7 +1191,7 @@ class MeetingResponseForm(ModelForm):
         }
 
 
-class BonusPointSettingForm(CandourModelForm):
+class BonusPointSettingForm(HorillaModelForm):
     """
     BonusPointSetting form
     """
@@ -1246,7 +1246,7 @@ class BonusPointSettingForm(CandourModelForm):
         return cleaned_data
 
 
-class EmployeeBonusPointForm(CandourModelForm):
+class EmployeeBonusPointForm(HorillaModelForm):
     """
     EmployeeBonusPoint form
     """
@@ -1257,7 +1257,7 @@ class EmployeeBonusPointForm(CandourModelForm):
         exclude = ["bonus_point_id", "instance", "is_active"]
 
     def __init__(self, *args, **kwargs):
-        request = getattr(candour_middlewares._thread_locals, "request", None)
+        request = getattr(horilla_middlewares._thread_locals, "request", None)
         super().__init__(*args, **kwargs)
         if request.GET.get("employee_id"):
             employee = Employee.objects.filter(id=request.GET["employee_id"])
@@ -1275,7 +1275,7 @@ class EmployeeBonusPointForm(CandourModelForm):
         return cleaned_data
 
 
-class EmployeeFeedbackForm(CandourModelForm):
+class EmployeeFeedbackForm(HorillaModelForm):
 
     cols = {"others_id": 12}
 
@@ -1285,9 +1285,9 @@ class EmployeeFeedbackForm(CandourModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["others_id"] = CandourMultiSelectField(
+        self.fields["others_id"] = HorillaMultiSelectField(
             queryset=Employee.objects.filter(employee_work_info__isnull=False),
-            widget=CandourMultiSelectWidget(
+            widget=HorillaMultiSelectWidget(
                 filter_route_name="employee-widget-filter",
                 filter_class=EmployeeFilter,
                 filter_instance_context_name="f",
@@ -1300,7 +1300,7 @@ class EmployeeFeedbackForm(CandourModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        if isinstance(self.fields["others_id"], CandourMultiSelectField):
+        if isinstance(self.fields["others_id"], HorillaMultiSelectField):
             self.errors.pop("others_id", None)
 
             employee_data = self.fields["others_id"].queryset.filter(
@@ -1312,7 +1312,7 @@ class EmployeeFeedbackForm(CandourModelForm):
         return cleaned_data
 
 
-class BulkFeedbackForm(CandourModelForm):
+class BulkFeedbackForm(HorillaModelForm):
     """Form for creating feedback in bulk"""
 
     title = forms.CharField(required=True, label=_("Title"))
@@ -1382,9 +1382,9 @@ class BulkFeedbackForm(CandourModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["employee_ids"] = CandourMultiSelectField(
+        self.fields["employee_ids"] = HorillaMultiSelectField(
             queryset=Employee.objects.filter(employee_work_info__isnull=False),
-            widget=CandourMultiSelectWidget(
+            widget=HorillaMultiSelectWidget(
                 filter_route_name="employee-widget-filter",
                 filter_class=EmployeeFilter,
                 filter_instance_context_name="f",
@@ -1401,7 +1401,7 @@ class BulkFeedbackForm(CandourModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        if isinstance(self.fields["employee_ids"], CandourMultiSelectField):
+        if isinstance(self.fields["employee_ids"], HorillaMultiSelectField):
             self.errors.pop("employee_ids", None)
 
             employee_data = self.fields["employee_ids"].queryset.filter(

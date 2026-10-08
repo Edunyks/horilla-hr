@@ -1,6 +1,6 @@
 from django.shortcuts import redirect
 
-from candour.decorators import login_required
+from horilla.decorators import login_required
 
 
 @login_required

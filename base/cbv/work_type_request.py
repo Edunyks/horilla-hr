@@ -25,16 +25,16 @@ from base.methods import (
 from base.models import WorkType, WorkTypeRequest
 from base.views import include_employee_instance
 from employee.models import Employee
-from candour_views.cbv_methods import (
+from horilla_views.cbv_methods import (
     hx_request_required,
     login_required,
     permission_required,
 )
-from candour_views.generic.cbv.views import (
-    CandourDetailedView,
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
+from horilla_views.generic.cbv.views import (
+    HorillaDetailedView,
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
     TemplateView,
 )
 from notifications.signals import notify
@@ -50,7 +50,7 @@ class WorkRequestView(TemplateView):
 
 
 @method_decorator(login_required, name="dispatch")
-class WorkRequestListView(CandourListView):
+class WorkRequestListView(HorillaListView):
     """
     list view of the work request page
     """
@@ -162,7 +162,7 @@ class WorkRequestListView(CandourListView):
 
 
 @method_decorator(login_required, name="dispatch")
-class WorkRequestNavView(CandourNavView):
+class WorkRequestNavView(HorillaNavView):
     """
     nav view of the page
     """
@@ -241,7 +241,7 @@ class WorkRequestNavView(CandourNavView):
     filter_form_context_name = "form"
     search_swap_target = "#listContainer"
     # Modern slide-over filter panel (generic/inline_nav.html's own
-    # {% if modern_filter %} branch, mirroring candour_nav.html's
+    # {% if modern_filter %} branch, mirroring horilla_nav.html's
     # .oh-filter-modern styles) -- same treatment as every other panel
     # this session. WorkTypeRequestFilter.ajax_fields carries the
     # AJAX-loaded comboboxes this needs.
@@ -262,7 +262,7 @@ class WorkRequestNavView(CandourNavView):
 
 
 @method_decorator(login_required, name="dispatch")
-class WorkTypeDetailView(CandourDetailedView):
+class WorkTypeDetailView(HorillaDetailedView):
     """
     Detail view of page
     """
@@ -320,7 +320,7 @@ class WorkExportCandidate(TemplateView):
 
 
 @method_decorator(login_required, name="dispatch")
-class DynamicWorkTypeCreateForm(CandourFormView):
+class DynamicWorkTypeCreateForm(HorillaFormView):
     """
     form view for creating dynamic work types
     """
@@ -378,7 +378,7 @@ class WorkTypesCreateForm(DynamicWorkTypeCreateForm):
 
 
 @method_decorator(login_required, name="dispatch")
-class WorkTypeFormView(CandourFormView):
+class WorkTypeFormView(HorillaFormView):
     """
     form view for creating work types in app
     """
@@ -453,7 +453,7 @@ class WorkTypeFormView(CandourFormView):
 
 
 @method_decorator(login_required, name="dispatch")
-class WorkTypeDuplicateForm(CandourFormView):
+class WorkTypeDuplicateForm(HorillaFormView):
     """
     duplicate form
     """

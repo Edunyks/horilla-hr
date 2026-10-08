@@ -14,8 +14,8 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 
 from employee.models import Employee
-from candour.config import logger
-from candour.methods import handle_no_permission
+from horilla.config import logger
+from horilla.methods import handle_no_permission
 from recruitment.models import Recruitment, Stage
 
 

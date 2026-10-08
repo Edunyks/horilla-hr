@@ -14,12 +14,12 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import gettext_noop
 
-from candour_views.cbv_methods import login_required
-from candour_views.generic.cbv.views import (
-    CandourDetailedView,
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
+from horilla_views.cbv_methods import login_required
+from horilla_views.generic.cbv.views import (
+    HorillaDetailedView,
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
     TemplateView,
 )
 from notifications.signals import notify
@@ -38,7 +38,7 @@ class MeetingsView(TemplateView):
 
 
 @method_decorator(login_required, name="dispatch")
-class MeetingsList(CandourListView):
+class MeetingsList(HorillaListView):
     """
     List view of the page
     """
@@ -119,7 +119,7 @@ class MeetingsList(CandourListView):
 
 
 @method_decorator(login_required, name="dispatch")
-class MeetingsNav(CandourNavView):
+class MeetingsNav(HorillaNavView):
     """
     Nav bar
     """
@@ -140,7 +140,7 @@ class MeetingsNav(CandourNavView):
     filter_body_template = "cbv/meetings/filter.html"
     filter_form_context_name = "filter_form"
     search_swap_target = "#listContainer"
-    # Modern slide-over filter panel (generic/candour_nav.html's own
+    # Modern slide-over filter panel (generic/horilla_nav.html's own
     # {% if modern_filter %} branch) -- same treatment as every other
     # panel this session. MeetingsFilter.ajax_fields carries the
     # AJAX-loaded comboboxes this needs.
@@ -156,7 +156,7 @@ class MeetingsNav(CandourNavView):
 
 
 @method_decorator(login_required, name="dispatch")
-class MeetingsDetailedView(CandourDetailedView):
+class MeetingsDetailedView(HorillaDetailedView):
     """
     detail view of page
     """
@@ -191,7 +191,7 @@ class MeetingsDetailedView(CandourDetailedView):
 
 
 @method_decorator(login_required, name="dispatch")
-class MeetingsFormView(CandourFormView):
+class MeetingsFormView(HorillaFormView):
     """
     Form View
     """
@@ -279,7 +279,7 @@ class MeetingsFormView(CandourFormView):
 
 
 @method_decorator(login_required, name="dispatch")
-class MeetingResponseFormView(CandourFormView):
+class MeetingResponseFormView(HorillaFormView):
     """
     Form View
     """

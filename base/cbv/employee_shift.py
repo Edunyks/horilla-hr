@@ -10,17 +10,17 @@ from django.utils.translation import gettext_lazy as _
 
 from base.filters import EmployeeShiftFilter
 from base.models import EmployeeShift
-from candour_views.cbv_methods import login_required, permission_required
-from candour_views.generic.cbv.views import (
-    CandourDetailedView,
-    CandourListView,
-    CandourNavView,
+from horilla_views.cbv_methods import login_required, permission_required
+from horilla_views.generic.cbv.views import (
+    HorillaDetailedView,
+    HorillaListView,
+    HorillaNavView,
 )
 
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="base.view_employeeshift"), name="dispatch")
-class EmployeeShiftListView(CandourListView):
+class EmployeeShiftListView(HorillaListView):
     """
     List view of the employee shift page
     """
@@ -82,7 +82,7 @@ class EmployeeShiftListView(CandourListView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="base.view_employeeshift"), name="dispatch")
-class EmployeeShiftDetailView(CandourDetailedView):
+class EmployeeShiftDetailView(HorillaDetailedView):
     """
     detail view for employee shift, also registered as the related-object-link
     target for EmployeeShift via detail_view_url_name
@@ -108,7 +108,7 @@ class EmployeeShiftDetailView(CandourDetailedView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="base.view_employeeshift"), name="dispatch")
-class EmployeeShiftNav(CandourNavView):
+class EmployeeShiftNav(HorillaNavView):
     """
     Nav bar
     """

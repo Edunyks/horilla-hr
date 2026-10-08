@@ -8,11 +8,11 @@ from django.test import TestCase, override_settings
 
 class LeaveLedgerBuildTests(TestCase):
     def setUp(self):
-        from candour.testkit import make_company, make_employee
+        from horilla.testkit import make_company, make_employee
         from leave.models import AvailableLeave, LeaveType
 
         company = make_company("Ledger Co")
-        self.employee = make_employee(company=company, email="ledger@test.candour")
+        self.employee = make_employee(company=company, email="ledger@test.horilla")
         self.LeaveType = LeaveType
         self.AvailableLeave = AvailableLeave
 
@@ -352,11 +352,11 @@ class LeaveLedgerBuildTests(TestCase):
 
 class ForecastNextResetTests(TestCase):
     def setUp(self):
-        from candour.testkit import make_company, make_employee
+        from horilla.testkit import make_company, make_employee
         from leave.models import AvailableLeave, LeaveType
 
         company = make_company("Forecast Co")
-        self.employee = make_employee(company=company, email="forecast@test.candour")
+        self.employee = make_employee(company=company, email="forecast@test.horilla")
         self.LeaveType = LeaveType
         self.AvailableLeave = AvailableLeave
 
@@ -442,13 +442,13 @@ class ForecastNextResetTests(TestCase):
 
 class LeaveLedgerViewTests(TestCase):
     def setUp(self):
-        from candour.testkit import make_company, make_employee, make_user
+        from horilla.testkit import make_company, make_employee, make_user
         from leave.models import AvailableLeave, LeaveType
 
         company = make_company("Ledger View Co")
         user = make_user("ledger_view_user", is_superuser=True)
         self.employee = make_employee(
-            company=company, email="ledgerview@test.candour", user=user
+            company=company, email="ledgerview@test.horilla", user=user
         )
         lt = LeaveType.objects.create(
             name="Ledger View Type",

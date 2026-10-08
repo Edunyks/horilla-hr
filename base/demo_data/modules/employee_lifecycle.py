@@ -34,15 +34,15 @@ EXIT_COUNT = 7
 # employees are load-bearing for the Roles & Permissions demo and must stay
 # untouched (still active, still with their original join date).
 _PROTECTED_EMAILS = {
-    "alexander.smith@candoursystems.com",
-    "michael.brown@candoursystems.com",
-    "sarah.anderson@candoursystems.com",
-    "emily.clark@candoursystems.com",
-    "jessica.evans@candoursystems.com",
-    "benjamin.parker@candoursystems.com",
-    "lily.campbell@candoursystems.com",
-    "matthew.harris@candoursystems.com",
-    "david.king@candoursystems.com",
+    "alexander.smith@horilla.com",
+    "michael.brown@horilla.com",
+    "sarah.anderson@horilla.com",
+    "emily.clark@horilla.com",
+    "jessica.evans@horilla.com",
+    "benjamin.parker@horilla.com",
+    "lily.campbell@horilla.com",
+    "matthew.harris@horilla.com",
+    "david.king@horilla.com",
 }
 
 

@@ -12,7 +12,7 @@ from django.test import TestCase, override_settings
 
 from base.email_redaction import REDACTED, redact_credential_body
 from base.models import Company, EmailLog
-from candour.candour_middlewares import set_selected_company
+from horilla.horilla_middlewares import set_selected_company
 
 
 class RedactionTests(TestCase):
@@ -27,7 +27,7 @@ class RedactionTests(TestCase):
     def test_password_reset_subject_drops_the_body(self):
         self.assertEqual(
             redact_credential_body(
-                "Password reset on Candour", "Follow this link: /reset/abc/def/"
+                "Password reset on Horilla", "Follow this link: /reset/abc/def/"
             ),
             REDACTED,
         )
@@ -92,7 +92,7 @@ class LegacyNullCompanyRowsTests(TestCase):
     """
     Rows written before company_id was populated are NULL.
 
-    CandourCompanyManager treats a NULL company as visible to everyone
+    HorillaCompanyManager treats a NULL company as visible to everyone
     (Q(path__isnull=True)), which is deliberate for shared configuration but
     means historical mail-log rows stay cross-tenant readable. Asserted here so
     the behaviour is a documented decision rather than a surprise, and so a

@@ -13,17 +13,17 @@ from django.utils.translation import gettext_lazy as _
 from base.filters import EmployeeTypeFilter
 from base.forms import EmployeeTypeForm
 from base.models import EmployeeType
-from candour_views.cbv_methods import login_required, permission_required
-from candour_views.generic.cbv.views import (
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
+from horilla_views.cbv_methods import login_required, permission_required
+from horilla_views.generic.cbv.views import (
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
 )
 
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="base.view_employeetype"), name="dispatch")
-class EmployeeTypeListView(CandourListView):
+class EmployeeTypeListView(HorillaListView):
     """
     List view of the resticted days page
     """
@@ -76,7 +76,7 @@ class EmployeeTypeListView(CandourListView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="base.view_employeetype"), name="dispatch")
-class EmployeeTypeNav(CandourNavView):
+class EmployeeTypeNav(HorillaNavView):
     """
     Nav bar
     """
@@ -102,7 +102,7 @@ class EmployeeTypeNav(CandourNavView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="base.add_employeetype"), name="dispatch")
-class EmployeeTypeFormView(CandourFormView):
+class EmployeeTypeFormView(HorillaFormView):
     """
     Create and edit form
     """

@@ -30,16 +30,16 @@ from attendance.methods.utils import (
     validate_time_format,
     validate_time_in_minutes,
 )
-from base.candour_company_manager import CandourCompanyManager
+from base.horilla_company_manager import HorillaCompanyManager
 from base.methods import is_company_leave, is_holiday
 from base.models import Company, EmployeeShift, EmployeeShiftDay, WorkType
 from employee.models import Employee
 
 # Create your models here.
-from candour.methods import get_candour_model_class
-from candour.models import CandourModel, upload_path
-from candour_audit.models import CandourAuditInfo, CandourAuditLog
-from candour_views.cbv_methods import render_template
+from horilla.methods import get_horilla_model_class
+from horilla.models import HorillaModel, upload_path
+from horilla_audit.models import HorillaAuditInfo, HorillaAuditLog
+from horilla_views.cbv_methods import render_template
 
 # to skip the migration issue with the old migrations
 _validate_time_in_minutes = validate_time_in_minutes
@@ -48,7 +48,7 @@ _validate_time_in_minutes = validate_time_in_minutes
 # Create your models here.
 
 
-class AttendanceActivity(CandourModel):
+class AttendanceActivity(HorillaModel):
     """
     AttendanceActivity model
     """
@@ -76,13 +76,13 @@ class AttendanceActivity(CandourModel):
     clock_out_date = models.DateField(null=True, verbose_name=_("Out Date"))
     out_datetime = models.DateTimeField(null=True)
     clock_out = models.TimeField(null=True, verbose_name=_("Check Out"))
-    objects = CandourCompanyManager(
+    objects = HorillaCompanyManager(
         related_company_field="employee_id__employee_work_info__company_id"
     )
-    history = CandourAuditLog(
+    history = HorillaAuditLog(
         related_name="history_set",
         bases=[
-            CandourAuditInfo,
+            HorillaAuditInfo,
         ],
     )
 
@@ -186,7 +186,7 @@ class AttendanceActivity(CandourModel):
         return f"{self.employee_id} - {self.attendance_date} - {self.clock_in} - {self.clock_out}"
 
 
-class BatchAttendance(CandourModel):
+class BatchAttendance(HorillaModel):
     """
     Batch attendance model
     """
@@ -197,7 +197,7 @@ class BatchAttendance(CandourModel):
         return f"{self.title}-{self.id}"
 
 
-class Attendance(CandourModel):
+class Attendance(HorillaModel):
     """
     Attendance model
     """
@@ -311,13 +311,13 @@ class Attendance(CandourModel):
         verbose_name=_("Approved By"),
         editable=False,
     )
-    objects = CandourCompanyManager(
+    objects = HorillaCompanyManager(
         related_company_field="employee_id__employee_work_info__company_id"
     )
-    history = CandourAuditLog(
+    history = HorillaAuditLog(
         related_name="history_set",
         bases=[
-            CandourAuditInfo,
+            HorillaAuditInfo,
         ],
     )
 
@@ -329,7 +329,7 @@ class Attendance(CandourModel):
             return 'style="background-color: #FFE4B3"'
 
     # Per-column CSS classes for the "Requested Attendances" list. Consumed by
-    # CandourListView.cell_class_method, which looks the rendered column's
+    # HorillaListView.cell_class_method, which looks the rendered column's
     # attribute name up in this dict. Kept here (rather than as per-column
     # {% if %} branches in a forked list template) so the tab renders through
     # the shared generic table and cannot drift from it again.
@@ -1076,11 +1076,11 @@ class Attendance(CandourModel):
                 )
 
 
-class AttendanceRequestFile(CandourModel):
+class AttendanceRequestFile(HorillaModel):
     file = models.FileField(upload_to=upload_path)
 
 
-class AttendanceRequestComment(CandourModel):
+class AttendanceRequestComment(HorillaModel):
     """
     AttendanceRequestComment Model
     """
@@ -1094,7 +1094,7 @@ class AttendanceRequestComment(CandourModel):
         return f"{self.comment}"
 
 
-class AttendanceOverTime(CandourModel):
+class AttendanceOverTime(HorillaModel):
     """
     AttendanceOverTime model
     """
@@ -1151,7 +1151,7 @@ class AttendanceOverTime(CandourModel):
         null=True,
         verbose_name=_("Overtime Seconds"),
     )
-    objects = CandourCompanyManager(
+    objects = HorillaCompanyManager(
         related_company_field="employee_id__employee_work_info__company_id"
     )
 
@@ -1357,7 +1357,7 @@ class AttendanceOverTime(CandourModel):
         super().save(*args, **kwargs)
 
 
-class AttendanceLateComeEarlyOut(CandourModel):
+class AttendanceLateComeEarlyOut(HorillaModel):
     """
     AttendanceLateComeEarlyOut model
     """
@@ -1382,7 +1382,7 @@ class AttendanceLateComeEarlyOut(CandourModel):
         editable=False,
     )
     type = models.CharField(max_length=20, choices=choices, verbose_name=_("Type"))
-    objects = CandourCompanyManager(
+    objects = HorillaCompanyManager(
         related_company_field="employee_id__employee_work_info__company_id"
     )
     created_at = models.DateTimeField(auto_now_add=True, null=True)
@@ -1476,7 +1476,7 @@ class AttendanceLateComeEarlyOut(CandourModel):
             {self.attendance_id.employee_id.employee_last_name} - {self.type}"
 
 
-class AttendanceValidationCondition(CandourModel):
+class AttendanceValidationCondition(HorillaModel):
     """
     AttendanceValidationCondition model
     """
@@ -1496,7 +1496,7 @@ class AttendanceValidationCondition(CandourModel):
         default=False, verbose_name=_("Auto Approve OT")
     )
     company_id = models.ManyToManyField(Company, blank=True, verbose_name=_("Company"))
-    objects = CandourCompanyManager()
+    objects = HorillaCompanyManager()
 
     def clean(self):
         """
@@ -1518,7 +1518,7 @@ class AttendanceValidationCondition(CandourModel):
         )
 
 
-class GraceTime(CandourModel):
+class GraceTime(HorillaModel):
     """
     Model for saving Grace time
     """
@@ -1543,7 +1543,7 @@ class GraceTime(CandourModel):
     is_default = models.BooleanField(default=False)
 
     company_id = models.ManyToManyField(Company, blank=True, verbose_name=_("Company"))
-    objects = CandourCompanyManager()
+    objects = HorillaCompanyManager()
 
     def __str__(self) -> str:
         return str(f"{self.allowed_time} - Hours")
@@ -1659,7 +1659,7 @@ class GraceTime(CandourModel):
         super().save(*args, **kwargs)
 
 
-class AttendanceGeneralSetting(CandourModel):
+class AttendanceGeneralSetting(HorillaModel):
     """
     AttendanceGeneralSettings
     """
@@ -1673,7 +1673,7 @@ class AttendanceGeneralSetting(CandourModel):
         ),
     )
     company_id = models.ForeignKey(Company, on_delete=models.CASCADE, null=True)
-    objects = CandourCompanyManager()
+    objects = HorillaCompanyManager()
 
     def company_col(self):
         if self.company_id:
@@ -1751,7 +1751,7 @@ class WorkRecords(models.Model):
     )
     day_percentage = models.FloatField(default=0)
     last_update = models.DateTimeField(null=True, blank=True)
-    objects = CandourCompanyManager("employee_id__employee_work_info__company_id")
+    objects = HorillaCompanyManager("employee_id__employee_work_info__company_id")
 
     def title_message(self):
         title_message = self.message
@@ -1788,7 +1788,7 @@ class WorkRecords(models.Model):
         ]
 
 
-class AttendanceConflictResolution(CandourModel):
+class AttendanceConflictResolution(HorillaModel):
     """
     HR decision for days where an attendance record overlaps a leave/holiday/week-off.
     resolution="attendance" → the day counts as attendance (leave/holiday ignored in summary).
@@ -1825,7 +1825,7 @@ class AttendanceConflictResolution(CandourModel):
         default="",
         verbose_name=_("Conflict Type"),
     )
-    objects = CandourCompanyManager("employee_id__employee_work_info__company_id")
+    objects = HorillaCompanyManager("employee_id__employee_work_info__company_id")
 
     class Meta:
         unique_together = [["employee_id", "date"]]
@@ -1836,7 +1836,7 @@ class AttendanceConflictResolution(CandourModel):
         return f"{self.employee_id} — {self.date} → {self.resolution}"
 
 
-class AttendanceSummaryHours(CandourModel):
+class AttendanceSummaryHours(HorillaModel):
     """
     Stores computed (or HR-overridden) total worked seconds for an employee
     over a specific date range.  Created/updated on every summary load;
@@ -1860,7 +1860,7 @@ class AttendanceSummaryHours(CandourModel):
         verbose_name=_("Manually Edited"),
     )
 
-    objects = CandourCompanyManager("employee_id__employee_work_info__company_id")
+    objects = HorillaCompanyManager("employee_id__employee_work_info__company_id")
 
     class Meta:
         unique_together = [["employee_id", "from_date", "to_date"]]
@@ -1872,7 +1872,7 @@ class AttendanceSummaryHours(CandourModel):
         return f"{self.employee_id} {self.from_date}–{self.to_date}: {h}h{m:02d}m"
 
 
-class AttendanceDailyHours(CandourModel):
+class AttendanceDailyHours(HorillaModel):
     """
     Per-employee per-date worked hours, editable inside the calendar modal.
     Created when a manager manually edits a single day's hours.
@@ -1894,7 +1894,7 @@ class AttendanceDailyHours(CandourModel):
     )
     modified_at = models.DateTimeField(auto_now=True, verbose_name=_("Modified At"))
 
-    objects = CandourCompanyManager("employee_id__employee_work_info__company_id")
+    objects = HorillaCompanyManager("employee_id__employee_work_info__company_id")
 
     class Meta:
         unique_together = [["employee_id", "date"]]

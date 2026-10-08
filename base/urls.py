@@ -49,7 +49,7 @@ from base.models import (
     EmployeeShiftSchedule,
     EmployeeType,
     Holidays,
-    CandourMailTemplate,
+    HorillaMailTemplate,
     JobPosition,
     JobRole,
     RotatingShift,
@@ -61,8 +61,8 @@ from base.models import (
     WorkType,
     WorkTypeRequest,
 )
-from candour_audit.cbv import audit
-from candour_audit.models import AuditTag
+from horilla_audit.cbv import audit
+from horilla_audit.models import AuditTag
 
 urlpatterns = [
     path("", views.home, name="home-page"),
@@ -384,7 +384,7 @@ urlpatterns = [
     path("login/", views.login_user, name="login"),
     path(
         "forgot-password/",
-        views.CandourPasswordResetView.as_view(),
+        views.HorillaPasswordResetView.as_view(),
         name="forgot-password",
     ),
     path(
@@ -530,7 +530,7 @@ urlpatterns = [
         views.object_duplicate,
         name="duplicate-mail-template",
         kwargs={
-            "model": CandourMailTemplate,
+            "model": HorillaMailTemplate,
             "form": MailTemplateForm,
             "template": "mail/htmx/form.html",
         },
@@ -1871,9 +1871,9 @@ urlpatterns = [
         name="detail-view-multiple-approval-condition",
     ),
     path(
-        "get-candour-installed-apps/",
-        views.get_candour_installed_apps,
-        name="get-candour-installed-apps",
+        "get-horilla-installed-apps/",
+        views.get_horilla_installed_apps,
+        name="get-horilla-installed-apps",
     ),
     # path("configuration/holiday-view", views.holiday_view, name="holiday-view"),
     path(

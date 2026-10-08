@@ -366,9 +366,9 @@ def document_expiry_aging(filters: ReportFilters) -> dict:
             return "31–60"
         return "61–90"
 
-    if apps.is_installed("candour_documents"):
+    if apps.is_installed("horilla_documents"):
         try:
-            Document = apps.get_model("candour_documents", "Document")
+            Document = apps.get_model("horilla_documents", "Document")
             qs = Document.objects.filter(
                 expiry_date__lte=horizon,
                 expiry_date__isnull=False,
@@ -396,7 +396,7 @@ def document_expiry_aging(filters: ReportFilters) -> dict:
                 emp = getattr(obj, "employee_id", None)
                 rows.append(
                     {
-                        "source": "candour_documents.Document",
+                        "source": "horilla_documents.Document",
                         "title": str(obj),
                         "employee": emp.get_full_name() if emp else "",
                         "expiry": exp.isoformat(),

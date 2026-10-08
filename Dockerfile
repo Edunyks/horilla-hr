@@ -124,20 +124,20 @@ RUN mkdir -p staticfiles media \
 
 USER appuser
 
-# Build metadata. VERSION should match candour/__version__.py and the release
+# Build metadata. VERSION should match horilla/__version__.py and the release
 # tag; the publish workflow passes all three and fails if they disagree.
 ARG VERSION=dev
 ARG VCS_REF=unknown
 ARG BUILD_DATE=unknown
-LABEL org.opencontainers.image.title="Candour HR" \
+LABEL org.opencontainers.image.title="Horilla HR" \
       org.opencontainers.image.description="Free and open source HR software" \
       org.opencontainers.image.version="${VERSION}" \
       org.opencontainers.image.revision="${VCS_REF}" \
       org.opencontainers.image.created="${BUILD_DATE}" \
-      org.opencontainers.image.source="https://github.com/candour/candour-hr" \
-      org.opencontainers.image.url="https://www.candoursystems.com" \
-      org.opencontainers.image.documentation="https://docs.candoursystems.com" \
-      org.opencontainers.image.vendor="Candour" \
+      org.opencontainers.image.source="https://github.com/horilla/horilla-hr" \
+      org.opencontainers.image.url="https://www.horilla.com" \
+      org.opencontainers.image.documentation="https://docs.horilla.com" \
+      org.opencontainers.image.vendor="Horilla" \
       org.opencontainers.image.licenses="LGPL-2.1"
 
 EXPOSE 8000
@@ -146,4 +146,4 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=60s --retries=3 \
     CMD curl -f http://localhost:8000/health/ || exit 1
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["gunicorn", "candour.wsgi:application", "--config", "docker/gunicorn.conf.py"]
+CMD ["gunicorn", "horilla.wsgi:application", "--config", "docker/gunicorn.conf.py"]

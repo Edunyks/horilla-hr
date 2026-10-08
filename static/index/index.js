@@ -30,7 +30,7 @@ if (typeof i18nMessages === 'undefined') {
 }
 
 // Blanket safety net for every htmx request on the page, including
-// programmatic htmx.ajax() calls (e.g. CandourTabView's tab-content loads)
+// programmatic htmx.ajax() calls (e.g. HorillaTabView's tab-content loads)
 // that don't set their own hx-timeout. htmx's own default (0) never times
 // out a hung request, so without this a stalled server response leaves
 // the swap target empty indefinitely with no error ever surfacing.
@@ -185,7 +185,7 @@ function clearSelection(storeKey) {
 }
 
 /**
- * Clear list-row selections when switching Candour tabs. Lists may use a
+ * Clear list-row selections when switching Horilla tabs. Lists may use a
  * custom store (#selectedTickets, etc.) instead of #selectedInstances — the
  * generic tab onclick used to only clear selectedInstances, so selections
  * from one tab (e.g. My Tickets) leaked into another (Suggested Tickets).
@@ -409,11 +409,11 @@ function syncBulkSelectAllCheckbox(viewId) {
 // The preference is still persisted server-side via the existing hx-get
 // (unchanged), but the visual change now applies instantly client-side, and
 // the reload that follows is skipped (see window.__skipNextToggleReload,
-// checked in candour_list_table.html / group_by_table.html's
+// checked in horilla_list_table.html / group_by_table.html's
 // hx-on::after-request). Column *reordering* (drag-and-drop) still reloads
 // normally, since re-ordering actual table cells isn't a simple show/hide.
 function toggleColumnVisibility(checkboxEl, fieldName, visible) {
-    // Scope to this list only. CandourTabView keeps visited tabs in the DOM,
+    // Scope to this list only. HorillaTabView keeps visited tabs in the DOM,
     // so a global th[id$=...] lookup can match History (or any column) from
     // another tab and wrongly skip the reload this list needs.
     // Group-by tables also use .hlv-container; fall back to [data-list-path]
@@ -935,7 +935,7 @@ function htmxLoadIndicator(e) {}
 
 /**
  * Shared failure fallback for any lazy-loaded swap target (the nav filter
- * form's hx-get for list/card views, and CandourTabView's own tab-content
+ * form's hx-get for list/card views, and HorillaTabView's own tab-content
  * htmx.ajax() loads). Without this, a non-2xx response, a network failure,
  * or a hung request leaves the swap target exactly as it was (empty, on
  * first load) with no indication anything went wrong, indistinguishable

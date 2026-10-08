@@ -14,14 +14,14 @@ from django.utils.html import format_html
 from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 
-from base.candour_company_manager import CandourCompanyManager
+from base.horilla_company_manager import HorillaCompanyManager
 from base.models import Company
 from employee.models import Employee
-from candour.models import CandourModel, upload_path
-from candour_views.cbv_methods import render_template
+from horilla.models import HorillaModel, upload_path
+from horilla_views.cbv_methods import render_template
 
 
-class AssetCategory(CandourModel):
+class AssetCategory(HorillaModel):
     """
     Represents a category for different types of assets.
     """
@@ -34,7 +34,7 @@ class AssetCategory(CandourModel):
     )
     objects = models.Manager()
     company_id = models.ManyToManyField(Company, blank=True, verbose_name=_("Company"))
-    objects = CandourCompanyManager("company_id")
+    objects = HorillaCompanyManager("company_id")
 
     class Meta:
         """
@@ -48,7 +48,7 @@ class AssetCategory(CandourModel):
         return f"{self.asset_category_name}"
 
 
-class AssetGeneralSetting(CandourModel):
+class AssetGeneralSetting(HorillaModel):
     """
     Company-scoped general settings for the asset app.
     """
@@ -63,7 +63,7 @@ class AssetGeneralSetting(CandourModel):
     company_id = models.ForeignKey(
         Company, on_delete=models.CASCADE, null=True, blank=True
     )
-    objects = CandourCompanyManager()
+    objects = HorillaCompanyManager()
 
     def company_col(self):
         if self.company_id:
@@ -71,7 +71,7 @@ class AssetGeneralSetting(CandourModel):
         return "All Company"
 
 
-class AssetLot(CandourModel):
+class AssetLot(HorillaModel):
     """
     Represents a lot associated with a collection of assets.
     """
@@ -87,7 +87,7 @@ class AssetLot(CandourModel):
         null=True, blank=True, verbose_name=_("Description")
     )
     company_id = models.ManyToManyField(Company, blank=True, verbose_name=_("Company"))
-    objects = CandourCompanyManager()
+    objects = HorillaCompanyManager()
 
     class Meta:
         """
@@ -151,7 +151,7 @@ class AssetLot(CandourModel):
         return url
 
 
-class Asset(CandourModel):
+class Asset(HorillaModel):
     """
     Represents a asset with various attributes.
     """
@@ -202,7 +202,7 @@ class Asset(CandourModel):
     notify_before = models.IntegerField(
         default=1, null=True, verbose_name=_("Notify Before (days)")
     )
-    objects = CandourCompanyManager("asset_category_id__company_id")
+    objects = HorillaCompanyManager("asset_category_id__company_id")
 
     @classmethod
     def available_assets(cls):
@@ -381,7 +381,7 @@ class Asset(CandourModel):
         return super().clean()
 
 
-class AssetItem(CandourModel):
+class AssetItem(HorillaModel):
     """
     Represents a single physical unit belonging to an Asset.
     """
@@ -408,7 +408,7 @@ class AssetItem(CandourModel):
         max_length=20,
         verbose_name=_("Status"),
     )
-    objects = CandourCompanyManager("asset_id__asset_category_id__company_id")
+    objects = HorillaCompanyManager("asset_id__asset_category_id__company_id")
 
     class Meta:
         """
@@ -432,7 +432,7 @@ class AssetItem(CandourModel):
         asset.update_status_from_items()
 
 
-class AssetReport(CandourModel):
+class AssetReport(HorillaModel):
     """
     Model representing a report for an asset.
 
@@ -459,7 +459,7 @@ class AssetReport(CandourModel):
         )
 
 
-class AssetDocuments(CandourModel):
+class AssetDocuments(HorillaModel):
     """
     Model representing documents associated with an asset report.
 
@@ -483,7 +483,7 @@ class AssetDocuments(CandourModel):
         return f"document for {self.asset_report}"
 
 
-class ReturnImages(CandourModel):
+class ReturnImages(HorillaModel):
     """
     Model representing images associated with a returned asset.
 
@@ -494,7 +494,7 @@ class ReturnImages(CandourModel):
     image = models.FileField(upload_to=upload_path, blank=True, null=True)
 
 
-class AssetAssignment(CandourModel):
+class AssetAssignment(HorillaModel):
     """
     Represents the allocation and return of assets to and from employees.
     """
@@ -539,7 +539,7 @@ class AssetAssignment(CandourModel):
         verbose_name=_("Return Status"),
     )
     return_request = models.BooleanField(default=False)
-    objects = CandourCompanyManager("asset_id__asset_lot_number_id__company_id")
+    objects = HorillaCompanyManager("asset_id__asset_lot_number_id__company_id")
     return_images = models.ManyToManyField(
         ReturnImages, blank=True, related_name="return_images"
     )
@@ -549,7 +549,7 @@ class AssetAssignment(CandourModel):
         related_name="assign_images",
         verbose_name=_("Assign Condition Images"),
     )
-    objects = CandourCompanyManager(
+    objects = HorillaCompanyManager(
         "assigned_to_employee_id__employee_work_info__company_id"
     )
 
@@ -816,7 +816,7 @@ class AssetAssignment(CandourModel):
         )
 
 
-class AssetRequest(CandourModel):
+class AssetRequest(HorillaModel):
     """
     Represents a request for assets made by employees.
     """
@@ -844,7 +844,7 @@ class AssetRequest(CandourModel):
     asset_request_status = models.CharField(
         max_length=30, choices=STATUS, default="Requested", null=True, blank=True
     )
-    objects = CandourCompanyManager(
+    objects = HorillaCompanyManager(
         "requested_employee_id__employee_work_info__company_id"
     )
 
@@ -909,7 +909,7 @@ class AssetRequest(CandourModel):
         return url
 
 
-class AssetRequestComment(CandourModel):
+class AssetRequestComment(HorillaModel):
     """
     A reason left on an asset request, currently only written on reject --
     the request had no way to record why, unlike leave and shift requests.
@@ -944,7 +944,7 @@ class AssetRequestComment(CandourModel):
         }
 
 
-class AssetServiceRequest(CandourModel):
+class AssetServiceRequest(HorillaModel):
     """
     A service complaint an employee raises against an asset allocation.
     """
@@ -989,7 +989,7 @@ class AssetServiceRequest(CandourModel):
     resolved_date = models.DateField(
         null=True, blank=True, verbose_name=_("Resolved Date")
     )
-    objects = CandourCompanyManager(
+    objects = HorillaCompanyManager(
         "requested_employee_id__employee_work_info__company_id"
     )
 
@@ -1084,7 +1084,7 @@ class AssetServiceRequest(CandourModel):
         )
 
 
-class AssetServiceRequestNote(CandourModel):
+class AssetServiceRequestNote(HorillaModel):
     """
     A note left on a service request. There can be several over its
     lifetime -- e.g. one added while In Progress, another on Completed.

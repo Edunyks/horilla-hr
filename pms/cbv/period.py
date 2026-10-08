@@ -12,12 +12,12 @@ from django.utils.translation import gettext_lazy as _
 
 from base.decorators import manager_can_enter
 from base.methods import is_reportingmanager
-from candour_views.cbv_methods import login_required
-from candour_views.generic.cbv.views import (
-    CandourDetailedView,
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
+from horilla_views.cbv_methods import login_required
+from horilla_views.generic.cbv.views import (
+    HorillaDetailedView,
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
     TemplateView,
 )
 from pms.filters import PeriodFilter
@@ -37,7 +37,7 @@ class PeriodView(TemplateView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(manager_can_enter("pms.view_period"), name="dispatch")
-class PeriodList(CandourListView):
+class PeriodList(HorillaListView):
     """
     List view of the question template page
     """
@@ -82,7 +82,7 @@ class PeriodList(CandourListView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(manager_can_enter("pms.view_period"), name="dispatch")
-class PeriodNav(CandourNavView):
+class PeriodNav(HorillaNavView):
     """
     Nav bar
     """
@@ -108,7 +108,7 @@ class PeriodNav(CandourNavView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(manager_can_enter("pms.view_period"), name="dispatch")
-class PeriodDetailView(CandourDetailedView):
+class PeriodDetailView(HorillaDetailedView):
     """
     detail view of page
     """
@@ -129,7 +129,7 @@ class PeriodDetailView(CandourDetailedView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(manager_can_enter("pms.add_period"), name="dispatch")
-class PeriodFormView(CandourFormView):
+class PeriodFormView(HorillaFormView):
     """
     Create and edit form
     """

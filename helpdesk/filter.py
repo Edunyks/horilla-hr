@@ -15,7 +15,7 @@ from django_filters import CharFilter, DateFilter
 from base.models import Tags
 from employee.models import Employee
 from helpdesk.models import FAQ, DepartmentManager, FAQCategory, Ticket, TicketType
-from candour.filters import FilterSet, CandourFilterSet
+from horilla.filters import FilterSet, HorillaFilterSet
 
 
 class FAQFilter(FilterSet):
@@ -61,7 +61,7 @@ class FAQCategoryFilter(FilterSet):
         ]
 
 
-class TicketFilter(CandourFilterSet):
+class TicketFilter(HorillaFilterSet):
     """
     Filter set class for Ticket model
 
@@ -107,7 +107,7 @@ class TicketFilter(CandourFilterSet):
         field_name="employee_id__employee_work_info__department_id",
     )
 
-    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
+    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
     # -- Owner, Ticket Type, Assigned To, and Tags opt into AJAX-searched
     # comboboxes instead of pre-rendering their whole queryset as
     # <option> tags. No dedicated "Name or Badge ID" field is added:
@@ -148,7 +148,7 @@ class TicketFilter(CandourFilterSet):
     def _build_custom_filter_fields(self):
         """
         Registry backing the Advanced section's "+ Add filter" builder
-        (see CandourFilterSet._build_custom_filter_fields's docstring
+        (see HorillaFilterSet._build_custom_filter_fields's docstring
         for the two supported entry shapes) -- same "choose field, then
         lookup, then value" pattern used by AttendanceFilters/
         EmployeeFilter/PMS FeedbackFilter/AssetFilter. Deadline, Created
@@ -182,7 +182,7 @@ class TicketFilter(CandourFilterSet):
 
     def filter_queryset(self, queryset):
         """
-        CandourFilterSet._apply_custom_filters isn't wired into the base
+        HorillaFilterSet._apply_custom_filters isn't wired into the base
         filter_queryset automatically -- this is the minimal "call it at
         the end" hookup, same as AttendanceFilters/FeedbackFilter/
         AssetFilter.
@@ -303,7 +303,7 @@ class TagsFilter(FilterSet):
         ]
 
 
-class DepartmentManagerFilter(CandourFilterSet):
+class DepartmentManagerFilter(HorillaFilterSet):
 
     search = django_filters.CharFilter(method="search_method")
     search_field = django_filters.CharFilter(method="search_in")

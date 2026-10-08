@@ -16,14 +16,14 @@ from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
-from base.candour_company_manager import CandourCompanyManager
-from candour import candour_middlewares
-from candour.candour_middlewares import _thread_locals
-from candour.methods import get_candour_model_class
-from candour.models import CandourModel, NoPermissionModel, upload_path
-from candour_audit.models import CandourAuditInfo, CandourAuditLog
-from candour_auth.models import CandourUser
-from candour_views.cbv_methods import render_template
+from base.horilla_company_manager import HorillaCompanyManager
+from horilla import horilla_middlewares
+from horilla.horilla_middlewares import _thread_locals
+from horilla.methods import get_horilla_model_class
+from horilla.models import HorillaModel, NoPermissionModel, upload_path
+from horilla_audit.models import HorillaAuditInfo, HorillaAuditLog
+from horilla_auth.models import HorillaUser
+from horilla_views.cbv_methods import render_template
 
 # Create your models here.
 WEEKS = [
@@ -89,7 +89,7 @@ def clear_messages(request):
         pass
 
 
-class Company(CandourModel):
+class Company(HorillaModel):
     """
     Company model
     """
@@ -152,7 +152,7 @@ class Company(CandourModel):
         return self.pk
 
 
-class CompanyGroupAssignment(CandourModel):
+class CompanyGroupAssignment(HorillaModel):
     """
     Company-scoped membership of a user in an auth Group.
 
@@ -164,7 +164,7 @@ class CompanyGroupAssignment(CandourModel):
     """
 
     user = models.ForeignKey(
-        CandourUser,
+        HorillaUser,
         on_delete=models.CASCADE,
         related_name="company_group_assignments",
         verbose_name=_("User"),
@@ -207,7 +207,7 @@ class CompanyGroupAssignment(CandourModel):
             user.groups.remove(group)
 
 
-class Department(CandourModel):
+class Department(HorillaModel):
     """
     Department model
     """
@@ -217,7 +217,7 @@ class Department(CandourModel):
     )
     company_id = models.ManyToManyField(Company, blank=True, verbose_name=_("Company"))
 
-    objects = CandourCompanyManager()
+    objects = HorillaCompanyManager()
 
     class Meta:
         """
@@ -298,7 +298,7 @@ class Department(CandourModel):
         return str(self.department)
 
 
-class JobPosition(CandourModel):
+class JobPosition(HorillaModel):
     """
     JobPosition model
     """
@@ -314,7 +314,7 @@ class JobPosition(CandourModel):
     )
     company_id = models.ManyToManyField(Company, blank=True, verbose_name=_("Company"))
 
-    objects = CandourCompanyManager("department_id__company_id")
+    objects = HorillaCompanyManager("department_id__company_id")
 
     class Meta:
         """
@@ -351,7 +351,7 @@ class JobPosition(CandourModel):
         )
 
 
-class JobRole(CandourModel):
+class JobRole(HorillaModel):
     """JobRole model"""
 
     job_position_id = models.ForeignKey(
@@ -362,7 +362,7 @@ class JobRole(CandourModel):
     )
     company_id = models.ManyToManyField(Company, blank=True, verbose_name=_("Company"))
 
-    objects = CandourCompanyManager("job_position_id__department_id__company_id")
+    objects = HorillaCompanyManager("job_position_id__department_id__company_id")
 
     class Meta:
         """
@@ -377,7 +377,7 @@ class JobRole(CandourModel):
         return f"{self.job_role} - {self.job_position_id.job_position}"
 
 
-class WorkType(CandourModel):
+class WorkType(HorillaModel):
     """
     WorkType model
     """
@@ -385,7 +385,7 @@ class WorkType(CandourModel):
     work_type = models.CharField(max_length=50, verbose_name=_("Work Type"))
     company_id = models.ManyToManyField(Company, blank=True, verbose_name=_("Company"))
 
-    objects = CandourCompanyManager()
+    objects = HorillaCompanyManager()
 
     class Meta:
         """
@@ -451,7 +451,7 @@ class WorkType(CandourModel):
         return self
 
 
-class RotatingWorkType(CandourModel):
+class RotatingWorkType(HorillaModel):
     """
     RotatingWorkType model
     """
@@ -479,7 +479,7 @@ class RotatingWorkType(CandourModel):
         blank=True,
         null=True,
     )
-    objects = CandourCompanyManager("employee_id__employee_work_info__company_id")
+    objects = HorillaCompanyManager("employee_id__employee_work_info__company_id")
 
     class Meta:
         """
@@ -573,7 +573,7 @@ class RotatingWorkType(CandourModel):
         return additional_work_types
 
 
-class RotatingWorkTypeAssign(CandourModel):
+class RotatingWorkTypeAssign(HorillaModel):
     """
     RotatingWorkTypeAssign model
     """
@@ -632,13 +632,13 @@ class RotatingWorkTypeAssign(CandourModel):
         blank=True,
         null=True,
     )
-    history = CandourAuditLog(
+    history = HorillaAuditLog(
         related_name="history_set",
         bases=[
-            CandourAuditInfo,
+            HorillaAuditInfo,
         ],
     )
-    objects = CandourCompanyManager("employee_id__employee_work_info__company_id")
+    objects = HorillaCompanyManager("employee_id__employee_work_info__company_id")
 
     class Meta:
         """
@@ -729,7 +729,7 @@ class RotatingWorkTypeAssign(CandourModel):
         )
 
 
-class EmployeeType(CandourModel):
+class EmployeeType(HorillaModel):
     """
     EmployeeType model
     """
@@ -737,7 +737,7 @@ class EmployeeType(CandourModel):
     employee_type = models.CharField(max_length=50, verbose_name=_("Employee Type"))
     company_id = models.ManyToManyField(Company, blank=True, verbose_name=_("Company"))
 
-    objects = CandourCompanyManager()
+    objects = HorillaCompanyManager()
 
     class Meta:
         """
@@ -799,7 +799,7 @@ class EmployeeShiftDay(models.Model):
     day = models.CharField(max_length=20, choices=DAY)
     company_id = models.ManyToManyField(Company, blank=True, verbose_name=_("Company"))
 
-    objects = CandourCompanyManager()
+    objects = HorillaCompanyManager()
 
     class Meta:
         """
@@ -813,7 +813,7 @@ class EmployeeShiftDay(models.Model):
         return str(_(self.day).capitalize())
 
 
-class EmployeeShift(CandourModel):
+class EmployeeShift(HorillaModel):
     """
     EmployeeShift model
     """
@@ -846,7 +846,7 @@ class EmployeeShift(CandourModel):
             verbose_name=_("Grace Time"),
         )
 
-    objects = CandourCompanyManager()
+    objects = HorillaCompanyManager()
 
     class Meta:
         """
@@ -906,7 +906,7 @@ class EmployeeShift(CandourModel):
         return self
 
 
-class EmployeeShiftSchedule(CandourModel):
+class EmployeeShiftSchedule(HorillaModel):
     """
     EmployeeShiftSchedule model
     """
@@ -936,13 +936,13 @@ class EmployeeShiftSchedule(CandourModel):
         blank=True,
         verbose_name=_("Automatic Check Out Time"),
         help_text=_(
-            "Time at which the candour will automatically check out the employee attendance if they forget."
+            "Time at which the horilla will automatically check out the employee attendance if they forget."
         ),
     )
 
     company_id = models.ManyToManyField(Company, blank=True, verbose_name=_("Company"))
 
-    objects = CandourCompanyManager()
+    objects = HorillaCompanyManager()
 
     class Meta:
         """
@@ -1030,7 +1030,7 @@ class EmployeeShiftSchedule(CandourModel):
         return dict(DAY).get(self.day.day)
 
 
-class RotatingShift(CandourModel):
+class RotatingShift(HorillaModel):
     """
     RotatingShift model
     """
@@ -1060,7 +1060,7 @@ class RotatingShift(CandourModel):
         blank=True,
         null=True,
     )
-    objects = CandourCompanyManager("employee_id__employee_work_info__company_id")
+    objects = HorillaCompanyManager("employee_id__employee_work_info__company_id")
 
     class Meta:
         """
@@ -1155,7 +1155,7 @@ class RotatingShift(CandourModel):
         return total_shifts
 
 
-class RotatingShiftAssign(CandourModel):
+class RotatingShiftAssign(HorillaModel):
     """
     RotatingShiftAssign model
     """
@@ -1213,13 +1213,13 @@ class RotatingShiftAssign(CandourModel):
         blank=True,
         null=True,
     )
-    history = CandourAuditLog(
+    history = HorillaAuditLog(
         related_name="history_set",
         bases=[
-            CandourAuditInfo,
+            HorillaAuditInfo,
         ],
     )
-    objects = CandourCompanyManager("employee_id__employee_work_info__company_id")
+    objects = HorillaCompanyManager("employee_id__employee_work_info__company_id")
 
     def rotating_column(self):
         """
@@ -1337,7 +1337,7 @@ class RotatingShiftAssign(CandourModel):
 # ---------------------------------------------------------------------------
 
 
-class Roster(CandourModel):
+class Roster(HorillaModel):
     """
     Forward-planning shift roster entry: one employee, one date, one shift.
     Planners assign shifts in advance; employees see published entries via My Roster.
@@ -1388,7 +1388,7 @@ class Roster(CandourModel):
         verbose_name=_("Created By"),
     )
 
-    objects = CandourCompanyManager("employee__employee_work_info__company_id")
+    objects = HorillaCompanyManager("employee__employee_work_info__company_id")
 
     class Meta:
         verbose_name = _("Roster Entry")
@@ -1445,7 +1445,7 @@ class BaserequestFile(models.Model):
     objects = models.Manager()
 
 
-class WorkTypeRequest(CandourModel):
+class WorkTypeRequest(HorillaModel):
     """
     WorkTypeRequest model
     """
@@ -1484,13 +1484,13 @@ class WorkTypeRequest(CandourModel):
     approved = models.BooleanField(default=False, verbose_name=_("Approved"))
     canceled = models.BooleanField(default=False, verbose_name=_("Canceled"))
     work_type_changed = models.BooleanField(default=False)
-    history = CandourAuditLog(
+    history = HorillaAuditLog(
         related_name="history_set",
         bases=[
-            CandourAuditInfo,
+            HorillaAuditInfo,
         ],
     )
-    objects = CandourCompanyManager("employee_id__employee_work_info__company_id")
+    objects = HorillaCompanyManager("employee_id__employee_work_info__company_id")
 
     class Meta:
         """
@@ -1626,7 +1626,7 @@ class WorkTypeRequest(CandourModel):
         return False
 
     def clean(self):
-        request = getattr(candour_middlewares._thread_locals, "request", None)
+        request = getattr(horilla_middlewares._thread_locals, "request", None)
         if not request.user.is_superuser:
             if self.requested_date < timezone.now().date():
                 raise ValidationError(_("Date must be greater than or equal to today"))
@@ -1654,7 +1654,7 @@ class WorkTypeRequest(CandourModel):
             {self.employee_id.employee_last_name} - {self.requested_date}"
 
 
-class WorkTypeRequestComment(CandourModel):
+class WorkTypeRequestComment(HorillaModel):
     """
     WorkTypeRequestComment Model
     """
@@ -1671,7 +1671,7 @@ class WorkTypeRequestComment(CandourModel):
         return f"{self.comment}"
 
 
-class ShiftRequest(CandourModel):
+class ShiftRequest(HorillaModel):
     """
     ShiftRequest model
     """
@@ -1720,13 +1720,13 @@ class ShiftRequest(CandourModel):
     approved = models.BooleanField(default=False, verbose_name=_("Approved"))
     canceled = models.BooleanField(default=False, verbose_name=_("Canceled"))
     shift_changed = models.BooleanField(default=False)
-    history = CandourAuditLog(
+    history = HorillaAuditLog(
         related_name="history_set",
         bases=[
-            CandourAuditInfo,
+            HorillaAuditInfo,
         ],
     )
-    objects = CandourCompanyManager("employee_id__employee_work_info__company_id")
+    objects = HorillaCompanyManager("employee_id__employee_work_info__company_id")
 
     class Meta:
         """
@@ -1787,7 +1787,7 @@ class ShiftRequest(CandourModel):
 
     def user_availability(self):
         """
-        This method for get custom column for CandourUser availability.
+        This method for get custom column for HorillaUser availability.
         """
 
         return render_template(
@@ -1894,7 +1894,7 @@ class ShiftRequest(CandourModel):
 
     def clean(self):
 
-        request = getattr(candour_middlewares._thread_locals, "request", None)
+        request = getattr(horilla_middlewares._thread_locals, "request", None)
         if not request.user.is_superuser:
             if not self.pk and self.requested_date < timezone.now().date():
                 raise ValidationError(_("Date must be greater than or equal to today"))
@@ -1966,7 +1966,7 @@ class ShiftRequest(CandourModel):
             {self.employee_id.employee_last_name} - {self.requested_date}"
 
 
-class ShiftRequestComment(CandourModel):
+class ShiftRequestComment(HorillaModel):
     """
     ShiftRequestComment Model
     """
@@ -1983,13 +1983,13 @@ class ShiftRequestComment(CandourModel):
         return f"{self.comment}"
 
 
-class Tags(CandourModel):
+class Tags(HorillaModel):
     title = models.CharField(max_length=30)
     color = models.CharField(max_length=30)
     company_id = models.ForeignKey(
         Company, null=True, editable=False, on_delete=models.PROTECT
     )
-    objects = CandourCompanyManager(related_company_field="company_id")
+    objects = HorillaCompanyManager(related_company_field="company_id")
 
     class Meta:
         verbose_name = _("Tag")
@@ -2040,7 +2040,7 @@ class Tags(CandourModel):
         return url
 
 
-class CandourMailTemplate(CandourModel):
+class HorillaMailTemplate(HorillaModel):
     title = models.CharField(max_length=100, unique=True)
     body = models.TextField()
     company_id = models.ForeignKey(
@@ -2050,13 +2050,13 @@ class CandourMailTemplate(CandourModel):
         on_delete=models.CASCADE,
         verbose_name=_("Company"),
     )
-    objects = CandourCompanyManager(related_company_field="company_id")
+    objects = HorillaCompanyManager(related_company_field="company_id")
 
     def __str__(self) -> str:
         return f"{self.title}"
 
 
-class DynamicEmailConfiguration(CandourModel):
+class DynamicEmailConfiguration(HorillaModel):
     """
     SingletonModel to keep the mail server configurations
     """
@@ -2179,7 +2179,7 @@ CONDITION_CHOICE = [
 ]
 
 
-class MultipleApprovalCondition(CandourModel):
+class MultipleApprovalCondition(HorillaModel):
     """
     Multiple approve conditions
     """
@@ -2222,7 +2222,7 @@ class MultipleApprovalCondition(CandourModel):
         on_delete=models.CASCADE,
         verbose_name=_("Company"),
     )
-    objects = CandourCompanyManager()
+    objects = HorillaCompanyManager()
 
     def __str__(self) -> str:
         return f"{self.condition_field} {self.condition_operator}"
@@ -2416,7 +2416,7 @@ class MultipleApprovalManagers(models.Model):
     sequence = models.IntegerField(null=False, blank=False)
     employee_id = models.IntegerField(null=True, blank=True)
     reporting_manager = models.CharField(max_length=100, null=True, blank=True)
-    objects = CandourCompanyManager(related_company_field="condition_id__company_id")
+    objects = HorillaCompanyManager(related_company_field="condition_id__company_id")
 
     class Meta:
         verbose_name = _("Multiple Approval Managers")
@@ -2436,7 +2436,7 @@ class DynamicPagination(models.Model):
     """
 
     user_id = models.ForeignKey(
-        CandourUser,
+        HorillaUser,
         on_delete=models.CASCADE,
         blank=True,
         null=True,
@@ -2445,7 +2445,7 @@ class DynamicPagination(models.Model):
     )
     company_id = models.ForeignKey("base.Company", on_delete=models.CASCADE, null=True)
     pagination = models.IntegerField(default=50, validators=[MinValueValidator(1)])
-    objects = CandourCompanyManager()
+    objects = HorillaCompanyManager()
 
     def save(self, *args, **kwargs):
         request = getattr(_thread_locals, "request", None)
@@ -2479,7 +2479,7 @@ class AnnouncementExpire(models.Model):
 
     days = models.IntegerField(null=True, blank=True, default=30)
     company_id = models.ForeignKey("base.Company", on_delete=models.CASCADE, null=True)
-    objects = CandourCompanyManager()
+    objects = HorillaCompanyManager()
 
     def company_col(self):
         return self.company_id.company if self.company_id else "All Company"
@@ -2490,7 +2490,7 @@ class AnnouncementExpire(models.Model):
         )
 
 
-class Announcement(CandourModel):
+class Announcement(HorillaModel):
     """
     Announcement Model for storing all announcements.
     """
@@ -2532,7 +2532,7 @@ class Announcement(CandourModel):
     filtered_employees = models.ManyToManyField(
         Employee, related_name="announcement_filtered_employees", editable=False
     )
-    objects = CandourCompanyManager(related_company_field="company_id")
+    objects = HorillaCompanyManager(related_company_field="company_id")
 
     class Meta:
         verbose_name = _("Announcement")
@@ -2581,7 +2581,7 @@ class Announcement(CandourModel):
         )
 
 
-class AnnouncementComment(CandourModel):
+class AnnouncementComment(HorillaModel):
     """
     AnnouncementComment Model
     """
@@ -2599,7 +2599,7 @@ class AnnouncementView(models.Model):
     Announcement View Model
     """
 
-    user = models.ForeignKey(CandourUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(HorillaUser, on_delete=models.CASCADE)
     announcement = models.ForeignKey(Announcement, on_delete=models.CASCADE)
     viewed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
@@ -2638,7 +2638,7 @@ class EmailLog(models.Model):
     # the mail-log views -- which match only on recipient address -- could show
     # one tenant's mail to another. Bodies are redacted on write; see
     # base/email_redaction.py.
-    objects = CandourCompanyManager()
+    objects = HorillaCompanyManager()
 
     def __str__(self) -> str:
         return f"{self.subject} {self.to}"
@@ -2678,7 +2678,7 @@ class DriverViewed(models.Model):
         ("pipeline", "pipeline"),
         ("settings", "settings"),
     ]
-    user = models.ForeignKey(CandourUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(HorillaUser, on_delete=models.CASCADE)
     viewed = models.CharField(max_length=10, choices=choices)
 
     def user_viewed(self):
@@ -2688,7 +2688,7 @@ class DriverViewed(models.Model):
         return self.user.driverviewed_set.values_list("viewed", flat=True)
 
 
-class DashboardEmployeeCharts(CandourModel):
+class DashboardEmployeeCharts(HorillaModel):
     """
     dashboard employee chart
     """
@@ -2722,7 +2722,7 @@ class BiometricAttendance(models.Model):
         related_name="biometric_enabled_company",
         verbose_name=_("Company"),
     )
-    objects = CandourCompanyManager()
+    objects = HorillaCompanyManager()
 
     def __str__(self):
         return f"{self.is_installed}"
@@ -2760,7 +2760,7 @@ class AttendanceAllowedIP(models.Model):
     additional_data = models.JSONField(
         null=True, blank=True, default=default_additional_data
     )
-    objects = CandourCompanyManager(related_company_field="company_id")
+    objects = HorillaCompanyManager(related_company_field="company_id")
 
     def clean(self):
         """
@@ -2778,7 +2778,7 @@ class AttendanceAllowedIP(models.Model):
         return f"AttendanceAllowedIP ({company}) - {'enabled' if self.is_enabled else 'disabled'}"
 
 
-class TrackLateComeEarlyOut(CandourModel):
+class TrackLateComeEarlyOut(HorillaModel):
     is_enable = models.BooleanField(
         default=True,
         verbose_name=_("Enable"),
@@ -2792,7 +2792,7 @@ class TrackLateComeEarlyOut(CandourModel):
         on_delete=models.CASCADE,
         verbose_name=_("Company"),
     )
-    objects = CandourCompanyManager()
+    objects = HorillaCompanyManager()
 
     class Meta:
         verbose_name = _("Track Late Arrival & Early Departure")
@@ -2815,7 +2815,7 @@ class TrackLateComeEarlyOut(CandourModel):
         return super().save(*args, **kwargs)
 
 
-class Holidays(CandourModel):
+class Holidays(HorillaModel):
     ASSIGNING_TYPE = [
         ("department", _("Department")),
         ("job_position", _("Job Position")),
@@ -2852,7 +2852,7 @@ class Holidays(CandourModel):
         on_delete=models.PROTECT,
         verbose_name=_("Company"),
     )
-    objects = CandourCompanyManager(related_company_field="company_id")
+    objects = HorillaCompanyManager(related_company_field="company_id")
 
     class Meta:
         verbose_name = _("Holiday")
@@ -2951,7 +2951,7 @@ class Holidays(CandourModel):
         return qs
 
 
-class CompanyLeaves(CandourModel):
+class CompanyLeaves(HorillaModel):
     based_on_week = models.CharField(
         max_length=100,
         choices=WEEKS,
@@ -2963,7 +2963,7 @@ class CompanyLeaves(CandourModel):
         max_length=100, choices=WEEK_DAYS, verbose_name=_("Based On Week Day")
     )
     company_id = models.ManyToManyField(Company, blank=True, verbose_name=_("Company"))
-    objects = CandourCompanyManager()
+    objects = HorillaCompanyManager()
 
     class Meta:
         unique_together = ("based_on_week", "based_on_week_day")
@@ -3046,7 +3046,7 @@ class CompanyLeaves(CandourModel):
         return url
 
 
-class PenaltyAccounts(CandourModel):
+class PenaltyAccounts(HorillaModel):
     """
     LateComeEarlyOutPenaltyAccount
     """
@@ -3162,7 +3162,7 @@ class NotificationSound(models.Model):
     sound_enabled = models.BooleanField(default=False)
 
 
-class IntegrationApps(CandourModel, NoPermissionModel):
+class IntegrationApps(HorillaModel, NoPermissionModel):
     app_label = models.CharField(max_length=255)
     company = models.ForeignKey(
         "base.Company",
@@ -3184,7 +3184,7 @@ class SetupChecklistDismissal(models.Model):
     """
 
     user = models.ForeignKey(
-        CandourUser,
+        HorillaUser,
         on_delete=models.CASCADE,
         related_name="setup_checklist_dismissals",
     )
@@ -3207,7 +3207,7 @@ class SetupChecklistDismissal(models.Model):
         return f"{self.user} — {self.company or 'global'}"
 
 
-class DefaultExportPermission(CandourModel):
+class DefaultExportPermission(HorillaModel):
     """
     Per-company toggle for the "Default Export Access" setting. When
     enabled for a company, every user of that company may export data
@@ -3258,7 +3258,7 @@ class DefaultExportPermission(CandourModel):
         return f"Default Export Access for {self.company_id} is {'enabled' if self.is_enabled else 'disabled'}"
 
 
-class CompanyLanguageSetting(CandourModel):
+class CompanyLanguageSetting(HorillaModel):
     """
     Per-company list of enabled languages for the navbar language switcher.
     When a company has one or more languages configured here, only those

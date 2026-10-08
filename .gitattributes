@@ -41,7 +41,7 @@
 # Third-party assets are excluded: they are vendored verbatim, so rewriting
 # them creates a permanent diff against upstream and would break any
 # integrity check that hashes them.
-candour_theme/static/cdn/** -text
+horilla_theme/static/cdn/** -text
 
 # Genuinely binary: never let git rewrite these.
 *.png binary

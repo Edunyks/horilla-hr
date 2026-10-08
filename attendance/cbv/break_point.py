@@ -14,12 +14,12 @@ from django.utils.translation import gettext_lazy as _
 from attendance.filters import AttendanceBreakpointFilter
 from attendance.forms import AttendanceValidationConditionForm
 from attendance.models import AttendanceValidationCondition
-from candour.decorators import permission_required
-from candour_views.cbv_methods import login_required
-from candour_views.generic.cbv.views import (
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
+from horilla.decorators import permission_required
+from horilla_views.cbv_methods import login_required
+from horilla_views.generic.cbv.views import (
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
 )
 
 
@@ -28,7 +28,7 @@ from candour_views.generic.cbv.views import (
     permission_required("attendance.view_attendancevalidationcondition"),
     name="dispatch",
 )
-class BreakPointList(CandourListView):
+class BreakPointList(HorillaListView):
     """
     list view of the Break point conditions in settings
     """
@@ -55,7 +55,7 @@ class BreakPointList(CandourListView):
     permission_required("attendance.view_attendancevalidationcondition"),
     name="dispatch",
 )
-class BreakPointNavView(CandourNavView):
+class BreakPointNavView(HorillaNavView):
     """
     navbar of attendance breakpoint view
     """
@@ -86,7 +86,7 @@ class BreakPointNavView(CandourNavView):
     permission_required("attendance.view_attendancevalidationcondition"),
     name="dispatch",
 )
-class BreakPointCreateForm(CandourFormView):
+class BreakPointCreateForm(HorillaFormView):
     """
     form view for create and edit Break Point in settings
     """

@@ -31,18 +31,18 @@ from base.methods import (
 from base.models import EmployeeShift, ShiftRequest
 from base.views import include_employee_instance
 from employee.models import Employee
-from candour.http.response import CandourRedirect
-from candour_views.cbv_methods import (
+from horilla.http.response import HorillaRedirect
+from horilla_views.cbv_methods import (
     hx_request_required,
     login_required,
     permission_required,
 )
-from candour_views.generic.cbv.views import (
-    CandourDetailedView,
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
-    CandourTabView,
+from horilla_views.generic.cbv.views import (
+    HorillaDetailedView,
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
+    HorillaTabView,
     TemplateView,
 )
 from notifications.signals import notify
@@ -58,7 +58,7 @@ class ShiftRequestView(TemplateView):
 
 
 @method_decorator(login_required, name="dispatch")
-class ShiftList(CandourListView):
+class ShiftList(HorillaListView):
     """
     List view
     """
@@ -248,7 +248,7 @@ class AllocatedShift(ShiftList):
 
 
 @method_decorator(login_required, name="dispatch")
-class ShitRequestNav(CandourNavView):
+class ShitRequestNav(HorillaNavView):
     """
     Nav bar
     """
@@ -336,7 +336,7 @@ class ShitRequestNav(CandourNavView):
 
 
 @method_decorator(login_required, name="dispatch")
-class ShiftRequestTab(CandourTabView):
+class ShiftRequestTab(HorillaTabView):
     """
     Tab View
     """
@@ -376,7 +376,7 @@ class ExportView(TemplateView):
 
 
 @method_decorator(login_required, name="dispatch")
-class ShiftRequestDetailview(CandourDetailedView):
+class ShiftRequestDetailview(HorillaDetailedView):
     """
     Detail View
     """
@@ -436,7 +436,7 @@ class AllocatedShiftDetailView(ShiftRequestDetailview):
         self.action_method = "allocated_detail_confirm_action"
 
 
-class ShiftTypeFormView(CandourFormView):
+class ShiftTypeFormView(HorillaFormView):
     """
     form view
     """
@@ -451,7 +451,7 @@ class ShiftTypeFormView(CandourFormView):
             form.save()
             message = _("Shift Created")
             messages.success(self.request, message)
-            return CandourRedirect(self.request)
+            return HorillaRedirect(self.request)
 
         return super().form_valid(form)
 
@@ -483,7 +483,7 @@ class ShiftTypeCreateFormView(ShiftTypeFormView):
 
 
 @method_decorator(login_required, name="dispatch")
-class ShiftRequestFormView(CandourFormView):
+class ShiftRequestFormView(HorillaFormView):
     """
     Form View
     """
@@ -551,7 +551,7 @@ class ShiftRequestFormView(CandourFormView):
 
 
 @method_decorator(login_required, name="dispatch")
-class ShiftRequestFormDuplicate(CandourFormView):
+class ShiftRequestFormDuplicate(HorillaFormView):
     """
     Duplicate form view
     """
@@ -603,13 +603,13 @@ class ShiftRequestFormDuplicate(CandourFormView):
             form.save()
             message = _("Shift request added Successfully")
             messages.success(self.request, message)
-            return CandourRedirect(self.request)
+            return HorillaRedirect(self.request)
 
         return super().form_valid(form)
 
 
 @method_decorator(login_required, name="dispatch")
-class ShiftAllocationFormView(CandourFormView):
+class ShiftAllocationFormView(HorillaFormView):
     """
     Form View
     """
@@ -683,6 +683,6 @@ class ShiftAllocationFormView(CandourFormView):
                         redirect=reverse("shift-request-view") + f"?id={instance.id}",
                     )
             messages.success(self.request, message)
-            return CandourRedirect(self.request)
+            return HorillaRedirect(self.request)
 
         return super().form_valid(form)

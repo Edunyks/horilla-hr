@@ -16,7 +16,7 @@ from django.utils.translation import gettext_lazy as _
 
 from base.backends import ConfiguredEmailBackend
 from base.context_processors import AllCompany, AllMyCompanies
-from base.candour_company_manager import CandourCompanyManager
+from base.horilla_company_manager import HorillaCompanyManager
 from base.models import Company, ShiftRequest, WorkTypeRequest
 from employee.models import (
     DisciplinaryAction,
@@ -24,11 +24,11 @@ from employee.models import (
     EmployeeBankDetails,
     EmployeeWorkInformation,
 )
-from candour.candour_middlewares import _thread_locals, set_selected_company
-from candour.methods import get_candour_model_class
-from candour_documents.models import DocumentRequest
+from horilla.horilla_middlewares import _thread_locals, set_selected_company
+from horilla.methods import get_horilla_model_class
+from horilla_documents.models import DocumentRequest
 
-CACHE_KEY = "candour_company_models_cache_key"
+CACHE_KEY = "horilla_company_models_cache_key"
 
 
 # class CompanyMiddleware:
@@ -112,13 +112,13 @@ CACHE_KEY = "candour_company_models_cache_key"
 #         """
 #         is_company_model = model in self._get_company_models()
 #         company_field = getattr(model, "company_id", None)
-#         is_candour_manager = isinstance(model.objects, CandourCompanyManager)
+#         is_horilla_manager = isinstance(model.objects, HorillaCompanyManager)
 #         related_company_field = getattr(model.objects, "related_company_field", None)
 
 #         if is_company_model:
 #             if company_field:
 #                 model.add_to_class("company_filter", Q(company_id=company_id))
-#             elif is_candour_manager and related_company_field:
+#             elif is_horilla_manager and related_company_field:
 #                 model.add_to_class(
 #                     "company_filter", Q(**{related_company_field: company_id})
 #                 )
@@ -128,7 +128,7 @@ CACHE_KEY = "candour_company_models_cache_key"
 #                     "company_filter",
 #                     Q(company_id=company_id) | Q(company_id__isnull=True),
 #                 )
-#             elif is_candour_manager and related_company_field:
+#             elif is_horilla_manager and related_company_field:
 #                 model.add_to_class(
 #                     "company_filter",
 #                     Q(**{related_company_field: company_id})
@@ -182,7 +182,7 @@ CACHE_KEY = "candour_company_models_cache_key"
 #             for app_label, models in app_model_mappings.items():
 #                 if apps.is_installed(app_label):
 #                     company_models.extend(
-#                         [get_candour_model_class(app_label, model) for model in models]
+#                         [get_horilla_model_class(app_label, model) for model in models]
 #                     )
 
 #             cache.set(CACHE_KEY, company_models)
@@ -344,11 +344,11 @@ class CompanyMiddleware:
             return self._handle(request)
         finally:
             # Threads are reused across requests and across tests, so a request
-            # left here outlives its own lifecycle. CandourModel.save() reads it
+            # left here outlives its own lifecycle. HorillaModel.save() reads it
             # to stamp created_by/modified_by, which then point at a stale user.
             _thread_locals.request = None
             # Same lifetime problem for the company ContextVar _handle() sets:
-            # CandourCompanyManager.get_queryset() reads it on every query, so a
+            # HorillaCompanyManager.get_queryset() reads it on every query, so a
             # value left behind scopes whatever runs next on this thread to the
             # previous request's company. Anonymous requests happen to reset it
             # (see _handle), but nothing guarantees one runs in between.

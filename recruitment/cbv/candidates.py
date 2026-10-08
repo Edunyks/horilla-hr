@@ -27,24 +27,24 @@ from xhtml2pdf import pisa
 
 from base.methods import has_export_access
 from employee.forms import BulkUpdateFieldForm
-from candour.candour_middlewares import _thread_locals
-from candour.http.response import CandourRedirect
-from candour_views.cbv_methods import (
+from horilla.horilla_middlewares import _thread_locals
+from horilla.http.response import HorillaRedirect
+from horilla_views.cbv_methods import (
     export_xlsx,
     hx_request_required,
     login_required,
     permission_required,
 )
-from candour_views.forms import DynamicBulkUpdateForm
-from candour_views.generic.cbv.views import (
-    CandourCardView,
-    CandourDetailedView,
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
+from horilla_views.forms import DynamicBulkUpdateForm
+from horilla_views.generic.cbv.views import (
+    HorillaCardView,
+    HorillaDetailedView,
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
     TemplateView,
 )
-from candour_views.templatetags.generic_template_filters import getattribute
+from horilla_views.templatetags.generic_template_filters import getattribute
 from recruitment.cbv.candidate_reject_reason import DynamicRejectReasonFormView
 from recruitment.cbv_decorators import all_manager_can_enter, manager_can_enter
 from recruitment.filters import CandidateFilter
@@ -94,7 +94,7 @@ class CandidatesView(TemplateView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(manager_can_enter(perm="recruitment.view_candidate"), name="dispatch")
-class ListCandidates(CandourListView):
+class ListCandidates(HorillaListView):
     """
     List view of candidates
     """
@@ -287,7 +287,7 @@ class ListCandidates(CandourListView):
 
         _model = self.model
 
-        class CandourListViewResorce(resources.ModelResource):
+        class HorillaListViewResorce(resources.ModelResource):
             """
             Instant Resource class
             """
@@ -396,7 +396,7 @@ class ListCandidates(CandourListView):
                 cleaned_text = "\n".join(non_blank_lines)
                 return cleaned_text
 
-        book_resource = CandourListViewResorce()
+        book_resource = HorillaListViewResorce()
 
         # Export the data using the resource
         dataset = book_resource.export(queryset)
@@ -521,7 +521,7 @@ class ListCandidates(CandourListView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(manager_can_enter(perm="recruitment.view_candidate"), name="dispatch")
-class CardCandidates(CandourCardView):
+class CardCandidates(HorillaCardView):
     """
     For card view
     """
@@ -681,7 +681,7 @@ class CardCandidates(CandourCardView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(manager_can_enter(perm="recruitment.view_candidate"), name="dispatch")
-class CandidateNav(CandourNavView):
+class CandidateNav(HorillaNavView):
     """
     For nav bar
     """
@@ -780,7 +780,7 @@ class CandidateNav(CandourNavView):
     filter_body_template = "cbv/candidates/filter.html"
     filter_form_context_name = "form"
     search_swap_target = "#listContainer"
-    # Modern slide-over filter panel (generic/candour_nav.html's own
+    # Modern slide-over filter panel (generic/horilla_nav.html's own
     # {% if modern_filter %} branch) -- same treatment as every other
     # panel this session. CandidateFilter.ajax_fields carries the
     # AJAX-loaded comboboxes this needs.
@@ -880,7 +880,7 @@ class AddToRejectedCandidatesView(View):
         if form.is_valid():
             form.save()
             messages.success(request, _("Candidate reject reason saved"))
-            return CandourRedirect(request)
+            return HorillaRedirect(request)
         return render(request, self.template_name, {"form": form})
 
 
@@ -888,7 +888,7 @@ class AddToRejectedCandidatesView(View):
 @method_decorator(
     all_manager_can_enter(perm="recruitment.view_candidate"), name="dispatch"
 )
-class CandidateDetail(CandourDetailedView):
+class CandidateDetail(HorillaDetailedView):
     """
     Candidate detail
     """
@@ -923,7 +923,7 @@ class CandidateDetail(CandourDetailedView):
 @method_decorator(
     all_manager_can_enter(perm="recruitment.change_candidate"), name="dispatch"
 )
-class ToSkillZoneFormView(CandourFormView):
+class ToSkillZoneFormView(HorillaFormView):
     """
     Form View
     """
@@ -1002,7 +1002,7 @@ class ToSkillZoneFormView(CandourFormView):
 @method_decorator(
     all_manager_can_enter(perm="recruitment.change_candidate"), name="dispatch"
 )
-class RejectReasonFormView(CandourFormView):
+class RejectReasonFormView(HorillaFormView):
     """
     Form View
     """

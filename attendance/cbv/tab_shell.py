@@ -11,9 +11,9 @@ from typing import Any
 
 from django.utils.decorators import method_decorator
 
-from candour.decorators import hx_request_required
-from candour_views.cbv_methods import login_required
-from candour_views.generic.cbv.views import TemplateView
+from horilla.decorators import hx_request_required
+from horilla_views.cbv_methods import login_required
+from horilla_views.generic.cbv.views import TemplateView
 
 
 @method_decorator(login_required, name="dispatch")

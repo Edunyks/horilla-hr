@@ -9,8 +9,8 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 
-from candour_views.cbv_methods import hx_request_required, login_required
-from candour_views.generic.cbv.views import CandourTabView, TemplateView
+from horilla_views.cbv_methods import hx_request_required, login_required
+from horilla_views.generic.cbv.views import HorillaTabView, TemplateView
 from pms.cbv.period import PeriodList, PeriodNav
 from pms.cbv.question_template import QuestionTemplateList, QuestionTemplateNav
 from pms.filters import BonusPointSettingFilter, PeriodFilter, QuestionTemplateFilter
@@ -28,7 +28,7 @@ class PerformanceSettingsView(TemplateView):
 
 
 @method_decorator(login_required, name="dispatch")
-class PerformanceSettingsTabView(CandourTabView):
+class PerformanceSettingsTabView(HorillaTabView):
     """
     tab view for performance settings
     """
@@ -105,7 +105,7 @@ class PerformanceSettingsPeriodTab(TemplateView):
 # The nav/list pairs below reuse the existing Question Template / Period
 # nav bars and list views as-is, only overriding the ids
 # they render (list container, bulk-select store, view id) to be unique to
-# this settings tab. This is necessary because CandourTabView keeps every
+# this settings tab. This is necessary because HorillaTabView keeps every
 # visited tab's content in the DOM at once (hidden via CSS, not destroyed),
 # so the originals' shared "#listContainer" / "#selectedInstances" ids would
 # silently collide across tabs the moment more than one has been opened.

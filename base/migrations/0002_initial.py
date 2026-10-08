@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
         ("attendance", "0002_initial"),
         ("base", "0001_initial"),
         ("employee", "0001_initial"),
-        ("candour_audit", "0001_initial"),
+        ("horilla_audit", "0001_initial"),
         ("leave", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
@@ -509,7 +509,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="historicalrotatingshiftassign",
             name="history_tags",
-            field=models.ManyToManyField(to="candour_audit.audittag"),
+            field=models.ManyToManyField(to="horilla_audit.audittag"),
         ),
         migrations.AddField(
             model_name="historicalrotatingshiftassign",
@@ -578,7 +578,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="historicalrotatingworktypeassign",
             name="history_tags",
-            field=models.ManyToManyField(to="candour_audit.audittag"),
+            field=models.ManyToManyField(to="horilla_audit.audittag"),
         ),
         migrations.AddField(
             model_name="historicalrotatingworktypeassign",
@@ -634,7 +634,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="historicalshiftrequest",
             name="history_tags",
-            field=models.ManyToManyField(to="candour_audit.audittag"),
+            field=models.ManyToManyField(to="horilla_audit.audittag"),
         ),
         migrations.AddField(
             model_name="historicalshiftrequest",
@@ -729,7 +729,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="historicalworktyperequest",
             name="history_tags",
-            field=models.ManyToManyField(to="candour_audit.audittag"),
+            field=models.ManyToManyField(to="horilla_audit.audittag"),
         ),
         migrations.AddField(
             model_name="historicalworktyperequest",
@@ -791,7 +791,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AddField(
-            model_name="candourmailtemplate",
+            model_name="horillamailtemplate",
             name="company_id",
             field=models.ForeignKey(
                 blank=True,
@@ -802,7 +802,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AddField(
-            model_name="candourmailtemplate",
+            model_name="horillamailtemplate",
             name="created_by",
             field=models.ForeignKey(
                 blank=True,
@@ -814,7 +814,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AddField(
-            model_name="candourmailtemplate",
+            model_name="horillamailtemplate",
             name="modified_by",
             field=models.ForeignKey(
                 blank=True,

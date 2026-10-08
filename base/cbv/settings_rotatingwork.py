@@ -15,18 +15,18 @@ from base.decorators import manager_can_enter
 from base.filters import RotatingWorkTypeFilter
 from base.forms import RotatingWorkTypeForm
 from base.models import RotatingWorkType
-from candour.decorators import permission_required
-from candour_views.cbv_methods import login_required
-from candour_views.generic.cbv.views import (
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
+from horilla.decorators import permission_required
+from horilla_views.cbv_methods import login_required
+from horilla_views.generic.cbv.views import (
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
 )
 
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("base.view_rotatingworktype"), name="dispatch")
-class RotatingWorkTypeList(CandourListView):
+class RotatingWorkTypeList(HorillaListView):
     """
     list view of Rotating work types in settings
     """
@@ -92,7 +92,7 @@ class RotatingWorkTypeList(CandourListView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("base.view_rotatingworktype"), name="dispatch")
-class RotatingWorkTypeNav(CandourNavView):
+class RotatingWorkTypeNav(HorillaNavView):
     """
     navbar of Rotating worktype
     """
@@ -118,7 +118,7 @@ class RotatingWorkTypeNav(CandourNavView):
 
 @method_decorator(manager_can_enter("base.add_rotatingworktype"), name="dispatch")
 @method_decorator(login_required, name="dispatch")
-class DynamicRotatingWorkTypeCreate(CandourFormView):
+class DynamicRotatingWorkTypeCreate(HorillaFormView):
     """
     form view for creating dynamic rotating work type
     """

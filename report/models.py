@@ -1,15 +1,15 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from base.candour_company_manager import CandourCompanyManager
+from base.horilla_company_manager import HorillaCompanyManager
 from base.models import Company
 from employee.models import Employee
-from candour import candour_middlewares
-from candour.models import CandourModel
-from candour_auth.models import CandourUser
+from horilla import horilla_middlewares
+from horilla.models import HorillaModel
+from horilla_auth.models import HorillaUser
 
 
-class ReportTemplate(CandourModel):
+class ReportTemplate(HorillaModel):
     """
     A saved field arrangement (Rows/Columns/renderer/aggregator) for a
     report's pivot table, or a shared/system layout for standard reports.
@@ -42,7 +42,7 @@ class ReportTemplate(CandourModel):
         Company, null=True, editable=False, on_delete=models.PROTECT
     )
 
-    objects = CandourCompanyManager(related_company_field="company_id")
+    objects = HorillaCompanyManager(related_company_field="company_id")
 
     class Meta:
         ordering = ["-created_at"]
@@ -52,7 +52,7 @@ class ReportTemplate(CandourModel):
         return f"{self.name} ({self.report_slug})"
 
     def save(self, *args, **kwargs):
-        request = getattr(candour_middlewares._thread_locals, "request", None)
+        request = getattr(horilla_middlewares._thread_locals, "request", None)
         selected_company = request.session.get("selected_company") if request else None
         if (
             not self.id
@@ -64,7 +64,7 @@ class ReportTemplate(CandourModel):
         super().save(*args, **kwargs)
 
 
-class ReportSubscription(CandourModel):
+class ReportSubscription(HorillaModel):
     """
     Scheduled delivery of a standard report (Excel attachment via email).
     """
@@ -103,14 +103,14 @@ class ReportSubscription(CandourModel):
         Company, null=True, blank=True, on_delete=models.PROTECT
     )
     owner = models.ForeignKey(
-        CandourUser,
+        HorillaUser,
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
         related_name="report_subscriptions",
     )
 
-    objects = CandourCompanyManager(related_company_field="company_id")
+    objects = HorillaCompanyManager(related_company_field="company_id")
 
     class Meta:
         ordering = ["-created_at"]
@@ -190,7 +190,7 @@ class ReportSubscription(CandourModel):
         return reverse("report-subscription-view", args=[self.pk])
 
     def save(self, *args, **kwargs):
-        request = getattr(candour_middlewares._thread_locals, "request", None)
+        request = getattr(horilla_middlewares._thread_locals, "request", None)
         selected_company = request.session.get("selected_company") if request else None
         if (
             not self.id
@@ -204,12 +204,12 @@ class ReportSubscription(CandourModel):
         super().save(*args, **kwargs)
 
 
-class ReportFavorite(CandourModel):
+class ReportFavorite(HorillaModel):
     """User-pinned standard report for quick catalog access."""
 
     report_slug = models.CharField(max_length=100, verbose_name=_("Report"))
     user = models.ForeignKey(
-        CandourUser,
+        HorillaUser,
         on_delete=models.CASCADE,
         related_name="report_favorites",
         verbose_name=_("User"),
@@ -218,7 +218,7 @@ class ReportFavorite(CandourModel):
         Company, null=True, blank=True, on_delete=models.PROTECT
     )
 
-    objects = CandourCompanyManager(related_company_field="company_id")
+    objects = HorillaCompanyManager(related_company_field="company_id")
 
     class Meta:
         ordering = ["-created_at"]
@@ -230,7 +230,7 @@ class ReportFavorite(CandourModel):
         return f"{self.report_slug} ({self.user_id})"
 
 
-class ReportSavedView(CandourModel):
+class ReportSavedView(HorillaModel):
     """
     A user-named collection of standard reports for quick catalog filtering
     (e.g. "Q3 board pack") — distinct from ReportFavorite (a single implicit
@@ -241,7 +241,7 @@ class ReportSavedView(CandourModel):
     name = models.CharField(max_length=100, verbose_name=_("View Name"))
     report_slugs = models.JSONField(default=list, blank=True, verbose_name=_("Reports"))
     owner = models.ForeignKey(
-        CandourUser,
+        HorillaUser,
         on_delete=models.CASCADE,
         related_name="report_saved_views",
         verbose_name=_("Owner"),
@@ -250,7 +250,7 @@ class ReportSavedView(CandourModel):
         Company, null=True, blank=True, on_delete=models.PROTECT
     )
 
-    objects = CandourCompanyManager(related_company_field="company_id")
+    objects = HorillaCompanyManager(related_company_field="company_id")
 
     class Meta:
         ordering = ["name"]
@@ -275,7 +275,7 @@ class ReportSavedView(CandourModel):
         self.save(update_fields=["report_slugs"])
 
 
-class ReportFilterPreset(CandourModel):
+class ReportFilterPreset(HorillaModel):
     """Named filter snapshot for a standard report (period + advanced fields)."""
 
     report_slug = models.CharField(max_length=100, verbose_name=_("Report"))
@@ -287,7 +287,7 @@ class ReportFilterPreset(CandourModel):
         help_text=_("period_preset, dates, and report-specific filter keys."),
     )
     user = models.ForeignKey(
-        CandourUser,
+        HorillaUser,
         on_delete=models.CASCADE,
         related_name="report_filter_presets",
         verbose_name=_("User"),
@@ -296,7 +296,7 @@ class ReportFilterPreset(CandourModel):
         Company, null=True, blank=True, on_delete=models.PROTECT
     )
 
-    objects = CandourCompanyManager(related_company_field="company_id")
+    objects = HorillaCompanyManager(related_company_field="company_id")
 
     class Meta:
         ordering = ["name"]
@@ -308,7 +308,7 @@ class ReportFilterPreset(CandourModel):
         return f"{self.name} ({self.report_slug})"
 
     def save(self, *args, **kwargs):
-        request = getattr(candour_middlewares._thread_locals, "request", None)
+        request = getattr(horilla_middlewares._thread_locals, "request", None)
         selected_company = request.session.get("selected_company") if request else None
         if (
             not self.id
@@ -322,7 +322,7 @@ class ReportFilterPreset(CandourModel):
         super().save(*args, **kwargs)
 
 
-class ReportRunLog(CandourModel):
+class ReportRunLog(HorillaModel):
     """Lite audit of standard report runs (UI view / export)."""
 
     ACTION_VIEW = "view"
@@ -343,7 +343,7 @@ class ReportRunLog(CandourModel):
     )
     filters = models.JSONField(default=dict, blank=True, verbose_name=_("Filters"))
     user = models.ForeignKey(
-        CandourUser,
+        HorillaUser,
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -354,7 +354,7 @@ class ReportRunLog(CandourModel):
         Company, null=True, blank=True, on_delete=models.PROTECT
     )
 
-    objects = CandourCompanyManager(related_company_field="company_id")
+    objects = HorillaCompanyManager(related_company_field="company_id")
 
     @property
     def report_name(self) -> str:
@@ -374,7 +374,7 @@ class ReportRunLog(CandourModel):
     @property
     def employee_label(self) -> str:
         """Employee name (e.g. "Adam Admin (PEP00)") instead of the raw
-        CandourUser username — more recognizable to HR admins reading the
+        HorillaUser username — more recognizable to HR admins reading the
         audit trail, who think in terms of employees, not login names."""
         if not self.user_id:
             return ""
@@ -402,7 +402,7 @@ class ReportRunLog(CandourModel):
         return f"{self.report_slug} · {self.action}"
 
 
-class ReportAccess(CandourModel):
+class ReportAccess(HorillaModel):
     """
     Optional access matrix for standard reports.
 
@@ -450,7 +450,7 @@ class ReportAccess(CandourModel):
         Company, null=True, blank=True, on_delete=models.PROTECT
     )
 
-    objects = CandourCompanyManager(related_company_field="company_id")
+    objects = HorillaCompanyManager(related_company_field="company_id")
 
     class Meta:
         ordering = ["report_slug", "domain", "group_id"]

@@ -9,7 +9,7 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 
 from employee.cbv.employee_profile import EmployeeProfileView
-from candour_views.cbv_methods import check_feature_enabled, login_required
+from horilla_views.cbv_methods import check_feature_enabled, login_required
 from offboarding.cbv.resignation import ResignationLetterDetailView, ResignationListView
 from offboarding.models import OffboardingGeneralSetting
 

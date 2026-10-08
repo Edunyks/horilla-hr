@@ -18,14 +18,14 @@ from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from attendance.methods.utils import validate_time_format
-from base.candour_company_manager import CandourCompanyManager
+from base.horilla_company_manager import HorillaCompanyManager
 from base.models import Company
 from employee.methods.duration_methods import format_time, strtime_seconds
 from employee.models import Employee
-from candour import candour_middlewares
-from candour.candour_middlewares import _thread_locals
-from candour.models import CandourModel, upload_path
-from candour_views.cbv_methods import render_template
+from horilla import horilla_middlewares
+from horilla.horilla_middlewares import _thread_locals
+from horilla.models import HorillaModel, upload_path
+from horilla_views.cbv_methods import render_template
 
 # Create your models here.
 
@@ -49,7 +49,7 @@ def validate_time_format(value):
         raise ValidationError(_("Invalid format")) from error
 
 
-class Project(CandourModel):
+class Project(HorillaModel):
     PROJECT_STATUS = [
         ("new", _("New")),
         ("in_progress", _("In Progress")),
@@ -77,7 +77,7 @@ class Project(CandourModel):
     company_id = models.ForeignKey(
         Company, null=True, editable=False, on_delete=models.PROTECT
     )
-    objects = CandourCompanyManager("company_id")
+    objects = HorillaCompanyManager("company_id")
 
     def get_description(self, length=50):
         """
@@ -229,7 +229,7 @@ class Project(CandourModel):
 
     def save(self, *args, **kwargs):
         is_new, request = self.pk is None, getattr(
-            candour_middlewares._thread_locals, "request", None
+            horilla_middlewares._thread_locals, "request", None
         )
         if (
             is_new
@@ -257,7 +257,7 @@ class Project(CandourModel):
         ordering = ["-id"]
 
 
-class ProjectStage(CandourModel):
+class ProjectStage(HorillaModel):
     """
     ProjectStage model
     """
@@ -273,7 +273,7 @@ class ProjectStage(CandourModel):
     )
     sequence = models.IntegerField(null=True, blank=True, editable=False)
     is_end_stage = models.BooleanField(default=False, verbose_name=_("Is end stage"))
-    objects = CandourCompanyManager("project__company_id")
+    objects = HorillaCompanyManager("project__company_id")
 
     def __str__(self) -> str:
         return f"{self.title}"
@@ -324,7 +324,7 @@ class ProjectStage(CandourModel):
         verbose_name_plural = _("Project Stages")
 
 
-class Task(CandourModel):
+class Task(HorillaModel):
     """
     Task model
     """
@@ -372,7 +372,7 @@ class Task(CandourModel):
     )
     description = models.TextField(verbose_name=_("Description"))
     sequence = models.IntegerField(default=0)
-    objects = CandourCompanyManager("project__company_id")
+    objects = HorillaCompanyManager("project__company_id")
 
     def clean(self) -> None:
         if (
@@ -650,7 +650,7 @@ class Task(CandourModel):
         return f"'{url_with_params}'" + "," + f"'{message}'"
 
 
-class TimeSheet(CandourModel):
+class TimeSheet(HorillaModel):
     """
     TimeSheet model
     """
@@ -693,7 +693,7 @@ class TimeSheet(CandourModel):
         verbose_name=_("Status"),
     )
     description = models.TextField(blank=True, null=True, verbose_name=_("Description"))
-    objects = CandourCompanyManager("project_id__company_id")
+    objects = HorillaCompanyManager("project_id__company_id")
 
     def clean(self):
         if self.project_id is None:

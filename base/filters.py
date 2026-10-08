@@ -38,15 +38,15 @@ from base.models import (
     WorkTypeRequest,
 )
 from employee.models import Employee
-from candour.filters import (
+from horilla.filters import (
     FilterSet,
-    CandourFilterSet,
+    HorillaFilterSet,
     filter_by_name,
     filter_name_or_badge_terms,
 )
 
 
-class ShiftRequestFilter(CandourFilterSet):
+class ShiftRequestFilter(HorillaFilterSet):
     """
     Custom filter for Shift Requests.
     """
@@ -78,13 +78,13 @@ class ShiftRequestFilter(CandourFilterSet):
     # Dedicated comma-separated "Name or Badge ID" search, alongside the
     # AJAX employee_id picker below rather than instead of it -- same
     # field/behavior as EmployeeFilter.name_or_badge/AttendanceFilters.
-    # name_or_badge; see candour.filters.filter_name_or_badge_terms for
+    # name_or_badge; see horilla.filters.filter_name_or_badge_terms for
     # the shared matching logic.
     name_or_badge = django_filters.CharFilter(
         method="filter_name_or_badge", label=__("Name or Badge ID")
     )
 
-    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism,
+    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism,
     # see EmployeeFilter.ajax_fields for the full explanation) -- every
     # model/queryset-backed field in the modern filter panel opts in here
     # instead of pre-rendering its whole queryset as <option> tags.
@@ -216,7 +216,7 @@ class ShiftRequestFilter(CandourFilterSet):
     def filter_name_or_badge(self, queryset, name, value):
         """
         Filter panel's dedicated "Name or Badge ID" field (see
-        name_or_badge above) -- see candour.filters.
+        name_or_badge above) -- see horilla.filters.
         filter_name_or_badge_terms for the shared comma-separated
         matching logic (also used by EmployeeFilter/AttendanceFilters).
         """
@@ -229,7 +229,7 @@ class ShiftRequestFilter(CandourFilterSet):
         )
 
 
-class WorkTypeRequestFilter(CandourFilterSet):
+class WorkTypeRequestFilter(HorillaFilterSet):
     """
     Custom filter for Work Type Requests.
     """
@@ -260,13 +260,13 @@ class WorkTypeRequestFilter(CandourFilterSet):
     # Dedicated comma-separated "Name or Badge ID" search, alongside the
     # AJAX employee_id picker below rather than instead of it -- same
     # field/behavior as ShiftRequestFilter.name_or_badge; see
-    # candour.filters.filter_name_or_badge_terms for the shared matching
+    # horilla.filters.filter_name_or_badge_terms for the shared matching
     # logic.
     name_or_badge = django_filters.CharFilter(
         method="filter_name_or_badge", label=__("Name or Badge ID")
     )
 
-    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism,
+    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism,
     # see EmployeeFilter.ajax_fields for the full explanation) -- every
     # model/queryset-backed field in the modern filter panel opts in here
     # instead of pre-rendering its whole queryset as <option> tags.
@@ -397,7 +397,7 @@ class WorkTypeRequestFilter(CandourFilterSet):
     def filter_name_or_badge(self, queryset, name, value):
         """
         Filter panel's dedicated "Name or Badge ID" field (see
-        name_or_badge above) -- see candour.filters.
+        name_or_badge above) -- see horilla.filters.
         filter_name_or_badge_terms for the shared comma-separated
         matching logic (also used by EmployeeFilter/AttendanceFilters/
         ShiftRequestFilter).
@@ -411,7 +411,7 @@ class WorkTypeRequestFilter(CandourFilterSet):
         )
 
 
-class RotatingShiftAssignFilters(CandourFilterSet):
+class RotatingShiftAssignFilters(HorillaFilterSet):
     """
     Custom filter for Rotating Shift Assign.
     """
@@ -427,13 +427,13 @@ class RotatingShiftAssignFilters(CandourFilterSet):
     # Dedicated comma-separated "Name or Badge ID" search, alongside the
     # AJAX employee_id picker below rather than instead of it -- same
     # field/behavior as ShiftRequestFilter.name_or_badge; see
-    # candour.filters.filter_name_or_badge_terms for the shared matching
+    # horilla.filters.filter_name_or_badge_terms for the shared matching
     # logic.
     name_or_badge = django_filters.CharFilter(
         method="filter_name_or_badge", label=__("Name or Badge ID")
     )
 
-    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism,
+    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism,
     # see EmployeeFilter.ajax_fields for the full explanation) -- every
     # model/queryset-backed field in the modern filter panel opts in here
     # instead of pre-rendering its whole queryset as <option> tags.
@@ -559,7 +559,7 @@ class RotatingShiftAssignFilters(CandourFilterSet):
     def filter_name_or_badge(self, queryset, name, value):
         """
         Filter panel's dedicated "Name or Badge ID" field (see
-        name_or_badge above) -- see candour.filters.
+        name_or_badge above) -- see horilla.filters.
         filter_name_or_badge_terms for the shared comma-separated
         matching logic (also used by EmployeeFilter/AttendanceFilters/
         ShiftRequestFilter).
@@ -573,7 +573,7 @@ class RotatingShiftAssignFilters(CandourFilterSet):
         )
 
 
-class RotatingWorkTypeAssignFilter(CandourFilterSet):
+class RotatingWorkTypeAssignFilter(HorillaFilterSet):
     """
     Custom filter for Rotating Work Type Assign.
     """
@@ -589,13 +589,13 @@ class RotatingWorkTypeAssignFilter(CandourFilterSet):
     # Dedicated comma-separated "Name or Badge ID" search, alongside the
     # AJAX employee_id picker below rather than instead of it -- same
     # field/behavior as RotatingShiftAssignFilters.name_or_badge; see
-    # candour.filters.filter_name_or_badge_terms for the shared matching
+    # horilla.filters.filter_name_or_badge_terms for the shared matching
     # logic.
     name_or_badge = django_filters.CharFilter(
         method="filter_name_or_badge", label=__("Name or Badge ID")
     )
 
-    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism,
+    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism,
     # see EmployeeFilter.ajax_fields for the full explanation) -- every
     # model/queryset-backed field in the modern filter panel opts in here
     # instead of pre-rendering its whole queryset as <option> tags.
@@ -721,7 +721,7 @@ class RotatingWorkTypeAssignFilter(CandourFilterSet):
     def filter_name_or_badge(self, queryset, name, value):
         """
         Filter panel's dedicated "Name or Badge ID" field (see
-        name_or_badge above) -- see candour.filters.
+        name_or_badge above) -- see horilla.filters.
         filter_name_or_badge_terms for the shared comma-separated
         matching logic (also used by EmployeeFilter/AttendanceFilters/
         ShiftRequestFilter/RotatingShiftAssignFilters).
@@ -799,7 +799,7 @@ class RotatingShiftRequestReGroup:
     ]
 
 
-class MultipleApprovalConditionFilter(CandourFilterSet):
+class MultipleApprovalConditionFilter(HorillaFilterSet):
 
     search = django_filters.CharFilter(method="search_method")
 
@@ -839,7 +839,7 @@ class EmployeeShiftScheduleFilter(FilterSet):
         fields = []
 
 
-class RotatingShiftFilter(CandourFilterSet):
+class RotatingShiftFilter(HorillaFilterSet):
 
     # search = django_filters.CharFilter(
     #     field_name="name", lookup_expr="icontains"
@@ -862,7 +862,7 @@ class RotatingShiftFilter(CandourFilterSet):
         ).distinct()
 
 
-class DepartmentViewFilter(CandourFilterSet):
+class DepartmentViewFilter(HorillaFilterSet):
     search = django_filters.CharFilter(method="filter_by_all_fields")
 
     class Meta:
@@ -878,7 +878,7 @@ class DepartmentViewFilter(CandourFilterSet):
         ).distinct()
 
 
-class WorkTypeFilter(CandourFilterSet):
+class WorkTypeFilter(HorillaFilterSet):
 
     search = django_filters.CharFilter(field_name="work_type", lookup_expr="icontains")
 
@@ -889,7 +889,7 @@ class WorkTypeFilter(CandourFilterSet):
         ]
 
 
-class RotatingWorkTypeFilter(CandourFilterSet):
+class RotatingWorkTypeFilter(HorillaFilterSet):
 
     search = django_filters.CharFilter(method="search_method")
 
@@ -922,7 +922,7 @@ class EmployeeTypeFilter(FilterSet):
         ]
 
 
-class JobRoleFilter(CandourFilterSet):
+class JobRoleFilter(HorillaFilterSet):
     search = django_filters.CharFilter(method="filter_by_all_fields")
 
     class Meta:
@@ -961,7 +961,7 @@ class CompanyFilter(FilterSet):
         fields = ["company", "hq", "address", "country", "state", "city", "zip"]
 
 
-class MailServerFilter(CandourFilterSet):
+class MailServerFilter(HorillaFilterSet):
 
     search = django_filters.CharFilter(method="search_method")
 
@@ -977,7 +977,7 @@ class MailServerFilter(CandourFilterSet):
         return ((queryset.filter(username__icontains=value))).distinct()
 
 
-class HolidayFilter(CandourFilterSet):
+class HolidayFilter(HorillaFilterSet):
     """
     Filter class for Holidays model.
 
@@ -1020,7 +1020,7 @@ class HolidayFilter(CandourFilterSet):
     def _build_custom_filter_fields(self):
         """
         Registry backing the Advanced section's "+ Add filter" builder
-        (see CandourFilterSet._build_custom_filter_fields's docstring
+        (see HorillaFilterSet._build_custom_filter_fields's docstring
         for the two supported entry shapes) -- same "choose field, then
         lookup, then value" pattern used by AttendanceFilters/
         EmployeeFilter/AssetFilter. Start Date/End Date used to each
@@ -1057,7 +1057,7 @@ class HolidayFilter(CandourFilterSet):
 
     def filter_queryset(self, queryset):
         """
-        CandourFilterSet._apply_custom_filters isn't wired into the base
+        HorillaFilterSet._apply_custom_filters isn't wired into the base
         filter_queryset automatically -- this is the minimal "call it at
         the end" hookup, same as AttendanceFilters/FeedbackFilter/
         AssetFilter.
@@ -1066,7 +1066,7 @@ class HolidayFilter(CandourFilterSet):
         return self._apply_custom_filters(queryset)
 
 
-class CompanyLeaveFilter(CandourFilterSet):
+class CompanyLeaveFilter(HorillaFilterSet):
     """
     Filter class for CompanyLeaves model.
 
@@ -1132,7 +1132,7 @@ class PenaltyFilter(FilterSet):
         fields = "__all__"
 
 
-class MailLogFilter(CandourFilterSet):
+class MailLogFilter(HorillaFilterSet):
 
     search = django_filters.CharFilter(field_name="subject", lookup_expr="icontains")
 
@@ -1141,7 +1141,7 @@ class MailLogFilter(CandourFilterSet):
         fields = "__all__"
 
 
-class AnnouncementFilter(CandourFilterSet):
+class AnnouncementFilter(HorillaFilterSet):
 
     search = django_filters.CharFilter(field_name="title", lookup_expr="icontains")
 
@@ -1150,7 +1150,7 @@ class AnnouncementFilter(CandourFilterSet):
         fields = "__all__"
 
 
-class AnnouncementViewFilter(CandourFilterSet):
+class AnnouncementViewFilter(HorillaFilterSet):
 
     search = django_filters.CharFilter(
         field_name="announcement", lookup_expr="icontains"
@@ -1166,7 +1166,7 @@ class AnnouncementViewFilter(CandourFilterSet):
 # ---------------------------------------------------------------------------
 
 
-class RosterFilter(CandourFilterSet):
+class RosterFilter(HorillaFilterSet):
     """
     Filters the Roster queryset by employee, department, and date range.
     """
@@ -1177,7 +1177,7 @@ class RosterFilter(CandourFilterSet):
     )
     # queryset=Department.objects.all() directly (not deferred to
     # queryset=None + a real assignment in __init__ like the pre-modern
-    # version of this field did) -- CandourFilterSet.__init__ calls
+    # version of this field did) -- HorillaFilterSet.__init__ calls
     # reload_queryset() on every ModelChoiceField before __init__'s own
     # body gets a chance to run, and that reads field.queryset.model
     # unconditionally, crashing on a still-None queryset. A plain
@@ -1200,7 +1200,7 @@ class RosterFilter(CandourFilterSet):
         label=__("To Date"),
         widget=forms.DateInput(attrs={"type": "date", "class": "oh-input w-100"}),
     )
-    # NOT the shared candour.filters.filter_by_name -- that helper assumes
+    # NOT the shared horilla.filters.filter_by_name -- that helper assumes
     # an "employee_id"-named FK (Coalesce("employee_id__employee_first_
     # name", ...)), but Roster's own FK field is named "employee" (see
     # base/models.py), so that lookup path doesn't resolve on this model
@@ -1213,13 +1213,13 @@ class RosterFilter(CandourFilterSet):
     # Dedicated comma-separated "Name or Badge ID" search, alongside the
     # AJAX employee picker above rather than instead of it -- same
     # field/behavior as EmployeeFilter.name_or_badge/AttendanceFilters.
-    # name_or_badge; see candour.filters.filter_name_or_badge_terms for
+    # name_or_badge; see horilla.filters.filter_name_or_badge_terms for
     # the shared matching logic.
     name_or_badge = django_filters.CharFilter(
         method="filter_name_or_badge", label=__("Name or Badge ID")
     )
 
-    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism,
+    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism,
     # see EmployeeFilter.ajax_fields for the full explanation).
     ajax_fields = {
         "employee": {
@@ -1252,7 +1252,7 @@ class RosterFilter(CandourFilterSet):
         """
         Name-only search box (inline_nav.html's own "search" field) --
         see this field's own comment above for why it can't reuse the
-        shared candour.filters.filter_by_name.
+        shared horilla.filters.filter_by_name.
         """
         if self.data.get("search_field"):
             return queryset
@@ -1269,7 +1269,7 @@ class RosterFilter(CandourFilterSet):
     def filter_name_or_badge(self, queryset, name, value):
         """
         Filter panel's dedicated "Name or Badge ID" field (see
-        name_or_badge above) -- see candour.filters.
+        name_or_badge above) -- see horilla.filters.
         filter_name_or_badge_terms for the shared comma-separated
         matching logic (also used by EmployeeFilter/AttendanceFilters).
         """
@@ -1284,7 +1284,7 @@ class RosterFilter(CandourFilterSet):
     def _build_custom_filter_fields(self):
         """
         Registry backing the Advanced section's "+ Add filter" builder
-        (see CandourFilterSet._build_custom_filter_fields's docstring
+        (see HorillaFilterSet._build_custom_filter_fields's docstring
         for the two supported entry shapes) -- same "choose field, then
         lookup, then value" pattern used by AttendanceFilters/
         EmployeeFilter/AssetFilter. Date's existing from_date/to_date
@@ -1315,7 +1315,7 @@ class RosterFilter(CandourFilterSet):
 
     def filter_queryset(self, queryset):
         """
-        CandourFilterSet._apply_custom_filters isn't wired into the base
+        HorillaFilterSet._apply_custom_filters isn't wired into the base
         filter_queryset automatically -- this is the minimal "call it at
         the end" hookup, same as AttendanceFilters/FeedbackFilter/
         AssetFilter.

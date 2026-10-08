@@ -22,22 +22,22 @@ from django.views import View
 
 from base.context_processors import intial_notice_period
 from base.methods import eval_validate
-from candour.http.response import CandourRedirect
-from candour.methods import get_candour_model_class
-from candour_views.cbv_methods import (
+from horilla.http.response import HorillaRedirect
+from horilla.methods import get_horilla_model_class
+from horilla_views.cbv_methods import (
     hx_request_required,
     login_required,
     permission_required,
 )
-from candour_views.generic.cbv.kanban import CandourKanbanView
-from candour_views.generic.cbv.pipeline import Pipeline
-from candour_views.generic.cbv.views import (
-    CandourDetailedView,
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
-    CandourSectionView,
-    CandourTabView,
+from horilla_views.generic.cbv.kanban import HorillaKanbanView
+from horilla_views.generic.cbv.pipeline import Pipeline
+from horilla_views.generic.cbv.views import (
+    HorillaDetailedView,
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
+    HorillaSectionView,
+    HorillaTabView,
     TemplateView,
 )
 from notifications.signals import notify
@@ -117,7 +117,7 @@ def offboarding_pipeline_modal_success_response(request) -> HttpResponse:
 @method_decorator(
     offboarding_manager_can_enter("offboarding.add_offboardingstage"), name="dispatch"
 )
-class OffboardingStageFormView(CandourFormView):
+class OffboardingStageFormView(HorillaFormView):
     """
     form view for create button
     """
@@ -166,7 +166,7 @@ class OffboardingStageFormView(CandourFormView):
 @method_decorator(
     any_manager_can_enter("offboarding.add_offboardingemployee"), name="dispatch"
 )
-class OffboardingStageAddEmployeeForm(CandourFormView):
+class OffboardingStageAddEmployeeForm(HorillaFormView):
     """
     form view for create button
     """
@@ -231,7 +231,7 @@ class OffboardingStageAddEmployeeForm(CandourFormView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("offboarding.add_offboarding"), name="dispatch")
-class OffboardingCreateFormView(CandourFormView):
+class OffboardingCreateFormView(HorillaFormView):
     """
     form view for create and edit offboarding
     """
@@ -266,7 +266,7 @@ class OffboardingCreateFormView(CandourFormView):
     offboarding_or_stage_manager_can_enter("offboarding.add_offboardingtask"),
     name="dispatch",
 )
-class OffboardingTaskFormView(CandourFormView):
+class OffboardingTaskFormView(HorillaFormView):
     """
     form view for create and edit offboarding tasks
     """
@@ -319,7 +319,7 @@ class OffboardingTaskFormView(CandourFormView):
 
 
 @method_decorator(login_required, name="dispatch")
-class ExitProcessDetailView(CandourDetailedView):
+class ExitProcessDetailView(HorillaDetailedView):
     """
     detail view
     """
@@ -354,7 +354,7 @@ class ExitProcessDetailView(CandourDetailedView):
     ),
     name="dispatch",
 )
-class OffboardingPipelineView(CandourSectionView):
+class OffboardingPipelineView(HorillaSectionView):
     """
     Offboarding Pipeline View
     """
@@ -371,7 +371,7 @@ class OffboardingPipelineView(CandourSectionView):
     ),
     name="dispatch",
 )
-class OffboardingPipelineNav(CandourNavView):
+class OffboardingPipelineNav(HorillaNavView):
     """
     Offboarding Pipeline Navigation View
 
@@ -387,7 +387,7 @@ class OffboardingPipelineNav(CandourNavView):
     search_url = reverse_lazy("get-offboarding-tab")
     filter_body_template = "cbv/exit_process/pipeline_filter.html"
     apply_first_filter = False
-    # Modern slide-over filter panel (generic/candour_nav.html's own
+    # Modern slide-over filter panel (generic/horilla_nav.html's own
     # {% if modern_filter %} branch) -- same treatment as every other
     # panel this session. PipelineEmployeeFilter/PipelineFilter/
     # PipelineStageFilter each carry their own ajax_fields for the FK
@@ -428,7 +428,7 @@ class OffboardingPipelineNav(CandourNavView):
 
         context = super().get_context_data(**kwargs)
         # Bound to self.request.GET: this form's own hx-trigger="load"
-        # auto-submits it on every load (see candour_nav.html), serializing
+        # auto-submits it on every load (see horilla_nav.html), serializing
         # its current field values as the query string. Left unbound, every
         # field (including "Stage > Status") always renders blank, so that
         # auto-submit silently wipes out any filter (e.g. ?type=archived)
@@ -443,7 +443,7 @@ class OffboardingPipelineNav(CandourNavView):
         # This Nav has no single filter_instance of its own (all three
         # filtersets above are combined into one panel), so the generic
         # custom_filter_fields/custom_filter_rows context
-        # (CandourNavView.get_context_data) is never populated -- expose
+        # (HorillaNavView.get_context_data) is never populated -- expose
         # each filterset's own registry/restore-rows under its own key
         # instead, matching the namespaced builder each accordion uses
         # in the template.
@@ -546,7 +546,7 @@ def offboarding_pipeline_actions(request, offboarding):
     ),
     name="dispatch",
 )
-class PipeLineTabView(CandourTabView):
+class PipeLineTabView(HorillaTabView):
     """
     Pipeline Tab View
     """
@@ -596,7 +596,7 @@ class OffboardingPipelineContentShell(TemplateView):
     def dispatch(self, request, *args, **kwargs):
         if not Offboarding.objects.filter(pk=kwargs.get("pk")).exists():
             messages.error(request, _("No Offboarding found matching the query."))
-            return CandourRedirect(request)
+            return HorillaRedirect(request)
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -617,7 +617,7 @@ class OffboardingPipelineContentShell(TemplateView):
         context["content_url"] = content_url
         context["offboarding"] = offboarding
         # Always pass the resolved view_type through, not just when ?view=
-        # was explicitly on this shell's own request - CandourNavView only
+        # was explicitly on this shell's own request - HorillaNavView only
         # marks a view-type button active (oh-view-btn--active) when its
         # own request carries ?view=, and inline_nav.html's onload script
         # fires an extra full-board resubmit whenever no button is active.
@@ -639,7 +639,7 @@ class OffboardingPipelineContentShell(TemplateView):
     ),
     name="dispatch",
 )
-class OffboardingPipelineTabNav(CandourNavView):
+class OffboardingPipelineTabNav(HorillaNavView):
     """
     Per-offboarding-tab Search+Filter for the Exit Process pipeline.
 
@@ -656,7 +656,7 @@ class OffboardingPipelineTabNav(CandourNavView):
     filter_form_context_name = "form"
     filter_body_template = "cbv/exit_process/pipeline_tab_filter.html"
     filter_instance = PipelineEmployeeFilter()
-    # Modern slide-over filter panel (generic/candour_nav.html's own
+    # Modern slide-over filter panel (generic/horilla_nav.html's own
     # {% if modern_filter %} branch) -- same treatment as the page-level
     # OffboardingPipelineNav/pipeline_filter.html. PipelineEmployeeFilter
     # already carries ajax_fields for the FK pickers this panel renders.
@@ -819,7 +819,7 @@ class OffboardingPipelineStage(Pipeline):
 
 
 @method_decorator(login_required, name="dispatch")
-class OffboardingKanbanView(CandourKanbanView):
+class OffboardingKanbanView(HorillaKanbanView):
     """
     Offboarding Kanban View
     """
@@ -1002,7 +1002,7 @@ class OffboardingKanbanRequiredTaskCheck(View):
 
 
 @method_decorator(login_required, name="dispatch")
-class OffboardingEmployeeList(CandourListView):
+class OffboardingEmployeeList(HorillaListView):
     """
     Offboarding Employee List View
     """
@@ -1218,7 +1218,7 @@ class OffboardingEmployeeList(CandourListView):
 
 
 @method_decorator(login_required, name="dispatch")
-class DashboardTaskListview(CandourListView):
+class DashboardTaskListview(HorillaListView):
     """
     For dashboard task status table
     """
@@ -1253,7 +1253,7 @@ if apps.is_installed("asset"):
     @method_decorator(
         any_manager_can_enter("offboarding.view_offboarding"), name="dispatch"
     )
-    class DashboardNotReturndAsssets(CandourListView):
+    class DashboardNotReturndAsssets(HorillaListView):
         """
         For dashboard task status table
         """
@@ -1263,7 +1263,7 @@ if apps.is_installed("asset"):
         show_toggle_form = False
 
         def __init__(self, *args, **kwargs):
-            AssetAssignment = get_candour_model_class(
+            AssetAssignment = get_horilla_model_class(
                 app_label="asset", model="assetassignment"
             )
             self.model = AssetAssignment  # 809
@@ -1309,7 +1309,7 @@ if apps.is_installed("pms"):
     @method_decorator(
         any_manager_can_enter("offboarding.view_offboarding"), name="dispatch"
     )
-    class DashboardFeedbackView(CandourListView):
+    class DashboardFeedbackView(HorillaListView):
         """
         For dashboard task status table
         """
@@ -1325,7 +1325,7 @@ if apps.is_installed("pms"):
         ]
 
         def __init__(self, *args, **kwargs):
-            self.Feedback = get_candour_model_class(app_label="pms", model="feedback")
+            self.Feedback = get_horilla_model_class(app_label="pms", model="feedback")
             self.model = self.Feedback  # 809
             super().__init__(*args, **kwargs)
 

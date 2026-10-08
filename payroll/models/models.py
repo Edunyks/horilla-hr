@@ -20,7 +20,7 @@ from django.utils.functional import cached_property
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
-from base.candour_company_manager import CandourCompanyManager
+from base.horilla_company_manager import HorillaCompanyManager
 from base.methods import get_next_month_same_date
 from base.models import (
     Company,
@@ -33,11 +33,11 @@ from base.models import (
 )
 from employee.methods.duration_methods import strtime_seconds
 from employee.models import BonusPoint, Employee, EmployeeWorkInformation
-from candour import candour_middlewares
-from candour.candour_middlewares import _thread_locals
-from candour.models import CandourModel, upload_path
-from candour_audit.models import CandourAuditInfo, CandourAuditLog
-from candour_views.cbv_methods import render_template
+from horilla import horilla_middlewares
+from horilla.horilla_middlewares import _thread_locals
+from horilla.models import HorillaModel, upload_path
+from horilla_audit.models import HorillaAuditInfo, HorillaAuditLog
+from horilla_views.cbv_methods import render_template
 
 logger = logging.getLogger(__name__)
 
@@ -79,7 +79,7 @@ def get_date_range(start_date, end_date):
     return date_list
 
 
-class FilingStatus(CandourModel):
+class FilingStatus(HorillaModel):
     """
     FilingStatus model
     """
@@ -112,7 +112,7 @@ class FilingStatus(CandourModel):
     company_id = models.ForeignKey(
         Company, null=True, editable=False, on_delete=models.PROTECT
     )
-    objects = CandourCompanyManager()
+    objects = HorillaCompanyManager()
 
     def __str__(self) -> str:
         return str(self.filing_status)
@@ -153,7 +153,7 @@ class FilingStatus(CandourModel):
         verbose_name_plural = _("Filing Statuses")
 
 
-class Contract(CandourModel):
+class Contract(HorillaModel):
     """
     Contract Model
     """
@@ -300,14 +300,14 @@ class Contract(CandourModel):
     )
 
     note = models.TextField(null=True, blank=True)
-    history = CandourAuditLog(
+    history = HorillaAuditLog(
         related_name="history_set",
         bases=[
-            CandourAuditInfo,
+            HorillaAuditInfo,
         ],
     )
 
-    objects = CandourCompanyManager("employee_id__employee_work_info__company_id")
+    objects = HorillaCompanyManager("employee_id__employee_work_info__company_id")
 
     def get_wage_type_display(self):
         """
@@ -596,7 +596,7 @@ class WorkRecord(models.Model):
     is_leave_record = models.BooleanField(default=False)
     day_percentage = models.FloatField(default=0)
     last_update = models.DateTimeField(null=True, blank=True)
-    objects = CandourCompanyManager("employee_id__employee_work_info__company_id")
+    objects = HorillaCompanyManager("employee_id__employee_work_info__company_id")
 
     def save(self, *args, **kwargs):
         self.last_update = timezone.now()
@@ -868,7 +868,7 @@ class MultipleCondition(models.Model):
     )
 
 
-class Allowance(CandourModel):
+class Allowance(HorillaModel):
     """
     Allowance model
     """
@@ -1064,7 +1064,7 @@ class Allowance(CandourModel):
     )
     only_show_under_employee = models.BooleanField(default=False, editable=False)
     is_loan = models.BooleanField(default=False, editable=False)
-    objects = CandourCompanyManager()
+    objects = HorillaCompanyManager()
     other_conditions = models.ManyToManyField(
         MultipleCondition, blank=True, editable=False
     )
@@ -1405,7 +1405,7 @@ class Allowance(CandourModel):
         super().save(*args, **kwargs)
 
 
-class Deduction(CandourModel):
+class Deduction(HorillaModel):
     """
     Deduction model
     """
@@ -1559,7 +1559,7 @@ class Deduction(CandourModel):
         Company, null=True, editable=False, on_delete=models.PROTECT
     )
     only_show_under_employee = models.BooleanField(default=False, editable=False)
-    objects = CandourCompanyManager()
+    objects = HorillaCompanyManager()
 
     is_installment = models.BooleanField(default=False, editable=False)
     other_conditions = models.ManyToManyField(
@@ -1878,7 +1878,7 @@ class Deduction(CandourModel):
         super().save(*args, **kwargs)
 
 
-class SalaryStructure(CandourModel):
+class SalaryStructure(HorillaModel):
     """
     Salary Structure model
 
@@ -1907,7 +1907,7 @@ class SalaryStructure(CandourModel):
     company_id = models.ForeignKey(
         Company, null=True, editable=False, on_delete=models.PROTECT
     )
-    objects = CandourCompanyManager()
+    objects = HorillaCompanyManager()
 
     class Meta:
         """
@@ -2064,7 +2064,7 @@ class SalaryStructure(CandourModel):
         )
 
 
-class Payslip(CandourModel):
+class Payslip(HorillaModel):
     """
     Payslip model
     """
@@ -2094,12 +2094,12 @@ class Payslip(CandourModel):
         max_length=20, null=True, default="draft", choices=status_choices
     )
     sent_to_employee = models.BooleanField(null=True, default=False)
-    objects = CandourCompanyManager("employee_id__employee_work_info__company_id")
+    objects = HorillaCompanyManager("employee_id__employee_work_info__company_id")
     installment_ids = models.ManyToManyField(Deduction, editable=False)
-    history = CandourAuditLog(
+    history = HorillaAuditLog(
         related_name="history_set",
         bases=[
-            CandourAuditInfo,
+            HorillaAuditInfo,
         ],
     )
 
@@ -2278,7 +2278,7 @@ class Payslip(CandourModel):
         ]
 
 
-class LoanAccount(CandourModel):
+class LoanAccount(HorillaModel):
     """
     This modal is used to store the loan Account details
     """
@@ -2322,7 +2322,7 @@ class LoanAccount(CandourModel):
             null=True,
             editable=False,
         )
-    objects = CandourCompanyManager("employee_id__employee_work_info__company_id")
+    objects = HorillaCompanyManager("employee_id__employee_work_info__company_id")
 
     def __str__(self):
         return f"{self.title} - {self.employee_id}"
@@ -2465,7 +2465,7 @@ class ReimbursementMultipleAttachment(models.Model):
     objects = models.Manager()
 
 
-class Reimbursement(CandourModel):
+class Reimbursement(HorillaModel):
     """
     Reimbursement Model
     """
@@ -2535,13 +2535,13 @@ class Reimbursement(CandourModel):
     allowance_id = models.ForeignKey(
         Allowance, on_delete=models.SET_NULL, null=True, editable=False
     )
-    objects = CandourCompanyManager("employee_id__employee_work_info__company_id")
+    objects = HorillaCompanyManager("employee_id__employee_work_info__company_id")
 
     class Meta:
         ordering = ["-id"]
 
     def save(self, *args, **kwargs) -> None:
-        request = getattr(candour_middlewares._thread_locals, "request", None)
+        request = getattr(horilla_middlewares._thread_locals, "request", None)
         amount_for_leave = (
             EncashmentGeneralSettings.objects.first().leave_amount
             if EncashmentGeneralSettings.objects.first()
@@ -2589,7 +2589,7 @@ class Reimbursement(CandourModel):
                         bonus_points.save()
                     else:
                         request = getattr(
-                            candour_middlewares._thread_locals, "request", None
+                            horilla_middlewares._thread_locals, "request", None
                         )
                         if request:
                             messages.info(
@@ -2615,7 +2615,7 @@ class Reimbursement(CandourModel):
                             assigned_leave.save()
                         else:
                             request = getattr(
-                                candour_middlewares._thread_locals, "request", None
+                                horilla_middlewares._thread_locals, "request", None
                             )
                             if request:
                                 messages.info(
@@ -2658,7 +2658,7 @@ class Reimbursement(CandourModel):
                     self.allowance_id.delete()
 
     def delete(self, *args, **kwargs):
-        request = getattr(candour_middlewares._thread_locals, "request", None)
+        request = getattr(horilla_middlewares._thread_locals, "request", None)
         if self.status == "approved":
             message = messages.info(
                 request,
@@ -2771,7 +2771,7 @@ class ReimbursementFile(models.Model):
     objects = models.Manager()
 
 
-class ReimbursementrequestComment(CandourModel):
+class ReimbursementrequestComment(HorillaModel):
     """
     ReimbursementRequestComment Model
     """
@@ -2801,7 +2801,7 @@ class PayrollGeneralSetting(models.Model):
         default=30,
     )
     company_id = models.ForeignKey(Company, on_delete=models.CASCADE, null=True)
-    objects = CandourCompanyManager("company_id")
+    objects = HorillaCompanyManager("company_id")
 
 
 class EncashmentGeneralSettings(models.Model):
@@ -2906,7 +2906,7 @@ class PayslipAutoGenerate(models.Model):
         blank=True,
         verbose_name=_("Company"),
     )
-    objects = CandourCompanyManager(related_company_field="company_id")
+    objects = HorillaCompanyManager(related_company_field="company_id")
 
     def get_generate_day_display(self):
         """

@@ -24,12 +24,12 @@ from biometric.views import (
     str_time_seconds,
     zk_biometric_attendance_scheduler,
 )
-from candour.http.response import CandourRedirect
-from candour_views.cbv_methods import login_required, permission_required
-from candour_views.generic.cbv.views import (
-    CandourCardView,
-    CandourFormView,
-    CandourNavView,
+from horilla.http.response import HorillaRedirect
+from horilla_views.cbv_methods import login_required, permission_required
+from horilla_views.generic.cbv.views import (
+    HorillaCardView,
+    HorillaFormView,
+    HorillaNavView,
 )
 
 
@@ -37,7 +37,7 @@ from candour_views.generic.cbv.views import (
 @method_decorator(
     permission_required(perm="biometric.view_biometricdevices"), name="dispatch"
 )
-class BiometricNavBar(CandourNavView):
+class BiometricNavBar(HorillaNavView):
     """
     nav bar of the page
     """
@@ -64,7 +64,7 @@ class BiometricNavBar(CandourNavView):
 @method_decorator(
     permission_required(perm="biometric.view_biometricdevices"), name="dispatch"
 )
-class BiometricCardView(CandourCardView):
+class BiometricCardView(HorillaCardView):
     """
     card view of the page
     """
@@ -187,7 +187,7 @@ class BiometricCardView(CandourCardView):
 @method_decorator(
     permission_required(perm="biometric.add_biometricdevices"), name="dispatch"
 )
-class BiometricFormView(CandourFormView):
+class BiometricFormView(HorillaFormView):
     """
     from view for create and update biometric devices
     """
@@ -222,7 +222,7 @@ class BiometricFormView(CandourFormView):
 @method_decorator(
     permission_required(perm="biometric.change_biometricdevices"), name="dispatch"
 )
-class BiometricSheduleForm(CandourFormView):
+class BiometricSheduleForm(HorillaFormView):
     """
     form view for shedule biometric device
     """
@@ -274,7 +274,7 @@ class BiometricSheduleForm(CandourFormView):
                             seconds=str_time_seconds(device.scheduler_duration),
                         )
                         scheduler.start()
-                        return CandourRedirect(self.request)
+                        return HorillaRedirect(self.request)
                     except Exception as error:
                         logger.error(
                             "An error comes in biometric_device_schedule ", error
@@ -307,7 +307,7 @@ class BiometricSheduleForm(CandourFormView):
                         seconds=str_time_seconds(device.scheduler_duration),
                     )
                     scheduler.start()
-                    return CandourRedirect(self.request)
+                    return HorillaRedirect(self.request)
                 else:
                     duration = self.request.POST.get("scheduler_duration")
                     device.is_scheduler = True
@@ -325,7 +325,7 @@ class BiometricSheduleForm(CandourFormView):
                         seconds=str_time_seconds(device.scheduler_duration),
                     )
                     scheduler.start()
-                    return CandourRedirect(self.request)
+                    return HorillaRedirect(self.request)
             # else:
             #     message = _("Biometric device added successfully.")
             form.save()

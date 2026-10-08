@@ -15,12 +15,12 @@ from django.utils.translation import gettext_lazy as _
 from base.filters import DepartmentViewFilter
 from base.forms import DepartmentForm
 from base.models import Department
-from candour_views.cbv_methods import login_required, permission_required
-from candour_views.generic.cbv.views import (
-    CandourDetailedView,
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
+from horilla_views.cbv_methods import login_required, permission_required
+from horilla_views.generic.cbv.views import (
+    HorillaDetailedView,
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
 )
 
 
@@ -50,7 +50,7 @@ def _attach_department_managers(departments):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="base.view_department"), name="dispatch")
-class DepartmentListView(CandourListView):
+class DepartmentListView(HorillaListView):
     """
     list view for department in settings
     """
@@ -117,7 +117,7 @@ class DepartmentListView(CandourListView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="base.view_department"), name="dispatch")
-class DepartmentNavView(CandourNavView):
+class DepartmentNavView(HorillaNavView):
     """
     nav bar of the department view
     """
@@ -141,7 +141,7 @@ class DepartmentNavView(CandourNavView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="base.view_department"), name="dispatch")
-class DepartmentDetailView(CandourDetailedView):
+class DepartmentDetailView(HorillaDetailedView):
     """
     detail view for department, also registered as the related-object-link
     target for Department via detail_view_url_name
@@ -165,7 +165,7 @@ class DepartmentDetailView(CandourDetailedView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="base.add_department"), name="dispatch")
-class DepartmentCreateForm(CandourFormView):
+class DepartmentCreateForm(HorillaFormView):
     """
     form view for creating and editing departments in settings
     """

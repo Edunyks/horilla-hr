@@ -23,24 +23,24 @@ from django.views.generic import View
 
 from base.forms import AddToUserGroupForm, ModelForm, forms
 from base.methods import paginator_qry
-from base.templatetags.candourfilters import app_installed
+from base.templatetags.horillafilters import app_installed
 from base.views import get_models_in_app
 from employee.cbv.accessibility import allocation_accessibility
 from employee.models import Employee, EmployeeBankDetails, EmployeeWorkInformation
 from employee.models import models as django_models
-from candour.candour_middlewares import _thread_locals
-from candour.http import CandourRedirect
-from candour.methods import handle_no_permission
-from candour_views.cbv_methods import (
+from horilla.horilla_middlewares import _thread_locals
+from horilla.http import HorillaRedirect
+from horilla.methods import handle_no_permission
+from horilla_views.cbv_methods import (
     allocation_manager_can_enter,
     hx_request_required,
     login_required,
     render_template,
 )
-from candour_views.generic.cbv.views import (
-    CandourDetailedView,
-    CandourFormView,
-    CandourListView,
+from horilla_views.generic.cbv.views import (
+    HorillaDetailedView,
+    HorillaFormView,
+    HorillaListView,
     TemplateView,
 )
 
@@ -62,7 +62,7 @@ logger = logging.getLogger(__name__)
 
 
 @method_decorator(login_required, name="dispatch")
-class AllocationView(CandourDetailedView):
+class AllocationView(HorillaDetailedView):
     """
     AllocationView
     """
@@ -84,7 +84,7 @@ class AllocationView(CandourDetailedView):
             candidate = Candidate.objects.filter(pk=pk).first()
             if not candidate:
                 messages.error(request, _("Record not found."))
-                return CandourFormView.HttpResponse()
+                return HorillaFormView.HttpResponse()
             if not allocation_accessibility(request, candidate):
                 return handle_no_permission(request)
             # set candidate to request for accessing inside work info signal
@@ -115,12 +115,12 @@ class AllocationView(CandourDetailedView):
                 messages.info(
                     request, _("Allocation feature not possible to this candidate")
                 )
-                return CandourFormView.HttpResponse()
+                return HorillaFormView.HttpResponse()
         else:
             instance = Employee.objects.filter(pk=pk).first()
             if not instance:
                 messages.error(request, _("Employee not found."))
-                return CandourFormView.HttpResponse()
+                return HorillaFormView.HttpResponse()
             if not allocation_accessibility(request, instance):
                 return handle_no_permission(request)
 
@@ -275,7 +275,7 @@ class BankInfo(ModelForm):
 
 
 @method_decorator(login_required, name="dispatch")
-class PersonalFormView(CandourFormView):
+class PersonalFormView(HorillaFormView):
     """
     PersonalFormView
     """
@@ -328,7 +328,7 @@ class PersonalFormView(CandourFormView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(allocation_manager_can_enter(), name="dispatch")
-class WorkFormView(CandourFormView):
+class WorkFormView(HorillaFormView):
     """
     WorkFormView
     """
@@ -394,7 +394,7 @@ def work_info_post_save(sender, instance, created, **kwargs):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(allocation_manager_can_enter(), name="dispatch")
-class BankFormView(CandourFormView):
+class BankFormView(HorillaFormView):
     """
     WorkFormView
     """
@@ -647,7 +647,7 @@ if app_installed("asset"):
 
     @method_decorator(login_required, name="dispatch")
     @method_decorator(allocation_manager_can_enter(), name="dispatch")
-    class AssetAllocationList(CandourListView):
+    class AssetAllocationList(HorillaListView):
         """
         AssetAllocationLists
         """
@@ -812,7 +812,7 @@ if app_installed("asset"):
 
     @method_decorator(login_required, name="dispatch")
     @method_decorator(allocation_manager_can_enter(), name="dispatch")
-    class AssetCategoryAllocationList(CandourListView):
+    class AssetCategoryAllocationList(HorillaListView):
         """
         Lists asset categories for the employee and lets managers raise an
         AssetRequest for the selected categories instead of allocating an
@@ -1009,7 +1009,7 @@ class GroupAssignView(TemplateView):
         employee_id = request.GET.get("employee")
         employee = Employee.objects.filter(id=employee_id).first()
         if not employee:
-            return CandourRedirect(request, message=_("Employee not found"))
+            return HorillaRedirect(request, message=_("Employee not found"))
         groups = employee.employee_user_id.groups.all()
         form = AddToUserGroupForm(
             initial={
@@ -1331,12 +1331,12 @@ class Summary(TemplateView):
         instance_id = request.GET.get("instance_id")
 
         if not instance_id:
-            return CandourRedirect(request, message=_("Employee ID missing."))
+            return HorillaRedirect(request, message=_("Employee ID missing."))
 
         try:
             Employee.objects.get(pk=instance_id)
         except Employee.DoesNotExist:
-            return CandourRedirect(
+            return HorillaRedirect(
                 request, message=_("No Employee found matching the query.")
             )
 

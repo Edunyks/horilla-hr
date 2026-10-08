@@ -19,7 +19,7 @@ class PayrollConfig(AppConfig):
         ready = super().ready()
         from django.urls import include, path
 
-        from candour.urls import urlpatterns
+        from horilla.urls import urlpatterns
         from payroll import scheduler, signals
 
         settings.APPS.append("payroll")

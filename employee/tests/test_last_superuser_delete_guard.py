@@ -17,7 +17,7 @@ from django.test import Client, TestCase
 from django.urls import reverse
 
 from employee.models import Employee
-from candour.testkit import make_company, make_employee, make_user
+from horilla.testkit import make_company, make_employee, make_user
 from payroll.models.models import Contract
 
 User = get_user_model()
@@ -32,7 +32,7 @@ class LastSuperuserDeleteGuardTests(TestCase):
         user = make_user(username, is_superuser=True, email=email)
         employee = make_employee(
             company=self.company,
-            email=email or f"{username}@test.candour",
+            email=email or f"{username}@test.horilla",
             first_name=username,
             user=user,
         )
@@ -88,7 +88,7 @@ class LastSuperuserDeleteGuardTests(TestCase):
     def test_can_still_delete_an_ordinary_employee(self):
         admin = self._superuser_employee("admin-c")
         staffer = make_employee(
-            company=self.company, email="staffer@test.candour", first_name="Staffer"
+            company=self.company, email="staffer@test.horilla", first_name="Staffer"
         )
         Contract.objects.filter(employee_id=staffer).update(contract_status="expired")
         client = self._client_as(admin)
@@ -135,7 +135,7 @@ class LastSuperuserDeleteGuardTests(TestCase):
         )
         requester = make_employee(
             company=self.company,
-            email="requester@test.candour",
+            email="requester@test.horilla",
             first_name="Requester",
             user=requester_user,
         )
@@ -160,11 +160,11 @@ class LastSuperuserDeleteGuardTests(TestCase):
         """employee_user_id is nullable -- the guard must tolerate None."""
         self._superuser_employee("solo-admin")  # keeps count() >= 1 either way
         orphan = make_employee(
-            company=self.company, email="orphan@test.candour", first_name="Orphan"
+            company=self.company, email="orphan@test.horilla", first_name="Orphan"
         )
         Contract.objects.filter(employee_id=orphan).update(contract_status="expired")
         # .update() bypasses Employee.save(), which would otherwise
-        # auto-create a fresh CandourUser the moment the FK goes null.
+        # auto-create a fresh HorillaUser the moment the FK goes null.
         Employee.objects.filter(pk=orphan.pk).update(employee_user_id=None)
 
         client = Client()

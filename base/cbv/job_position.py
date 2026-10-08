@@ -14,18 +14,18 @@ from django.utils.translation import gettext_lazy as _
 from base.filters import DepartmentViewFilter
 from base.forms import JobPositionForm
 from base.models import Department, JobPosition
-from candour_views.cbv_methods import login_required, permission_required
-from candour_views.generic.cbv.views import (
-    CandourDetailedView,
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
+from horilla_views.cbv_methods import login_required, permission_required
+from horilla_views.generic.cbv.views import (
+    HorillaDetailedView,
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
 )
 
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="base.view_jobposition"), name="dispatch")
-class JobPositionListView(CandourListView):
+class JobPositionListView(HorillaListView):
     """
     list view for job positions in settings
     """
@@ -62,7 +62,7 @@ class JobPositionListView(CandourListView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="base.view_jobposition"), name="dispatch")
-class JobPositionNavView(CandourNavView):
+class JobPositionNavView(HorillaNavView):
     """
     nav bar of the job position view
     """
@@ -86,7 +86,7 @@ class JobPositionNavView(CandourNavView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="base.view_jobposition"), name="dispatch")
-class JobPositionDetailView(CandourDetailedView):
+class JobPositionDetailView(HorillaDetailedView):
     """
     detail view for job position, also registered as the related-object-link
     target for JobPosition via detail_view_url_name
@@ -111,7 +111,7 @@ class JobPositionDetailView(CandourDetailedView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="base.view_jobposition"), name="dispatch")
-class JobPositionCreateForm(CandourFormView):
+class JobPositionCreateForm(HorillaFormView):
     """
     form view for creating job position in settings
     """

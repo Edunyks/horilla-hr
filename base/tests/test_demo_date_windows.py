@@ -17,7 +17,7 @@ from base.demo_data.dates import (
     weekdays_inclusive,
 )
 from base.models import EmployeeShift
-from candour.testkit import make_company, make_employee
+from horilla.testkit import make_company, make_employee
 
 
 class DemoDateWindowTests(SimpleTestCase):
@@ -162,7 +162,7 @@ class DemoDatePolicyDBTests(TestCase):
     def setUpTestData(cls):
         cls.today = date.today()
         cls.company = make_company("Demo Clamp Co")
-        cls.employee = make_employee(company=cls.company, email="clamp@test.candour")
+        cls.employee = make_employee(company=cls.company, email="clamp@test.horilla")
         cls.shift = EmployeeShift.objects.create(employee_shift="Clamp Day")
 
     def test_a_class_activity_dates_not_after_today(self):

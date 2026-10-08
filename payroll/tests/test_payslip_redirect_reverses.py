@@ -20,7 +20,7 @@ Asserting the reverse directly rather than exercising the views: the defect is
 entirely in the URL name, and a view-level test would need a contract, a
 period and a full payslip computation to reach the same line.
 
-Reported as https://github.com/candour/candour-hr/issues/1238 by @Safeer1877.
+Reported as https://github.com/horilla/horilla-hr/issues/1238 by @Safeer1877.
 """
 
 import re

@@ -96,7 +96,7 @@ def backfill_employee_feature_coverage(today: date | None = None) -> dict[str, i
             RosterPublishLog,
         )
         from employee.models import EmployeeWorkInformation
-        from candour_auth.models import CandourUser
+        from horilla_auth.models import HorillaUser
 
         # Roster: a week-ahead published schedule for a few employees per
         # department, so the "My Roster" / roster-planning views have
@@ -148,7 +148,7 @@ def backfill_employee_feature_coverage(today: date | None = None) -> dict[str, i
         # the existing announcements, not "everyone has seen everything" or
         # "no one has seen anything."
         user_ids = list(
-            CandourUser._base_manager.filter(is_active=True)
+            HorillaUser._base_manager.filter(is_active=True)
             .order_by("id")
             .values_list("id", flat=True)[:20]
         )

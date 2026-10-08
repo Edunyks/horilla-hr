@@ -16,22 +16,22 @@ from asset.filters import AssetFilter
 from asset.forms import AssetCategoryForm, AssetForm, AssetReportForm
 from asset.models import Asset, AssetCategory, AssetDocuments, AssetReport
 from base.methods import has_export_access
-from candour_views.cbv_methods import (
+from horilla_views.cbv_methods import (
     hx_request_required,
     login_required,
     permission_required,
 )
-from candour_views.generic.cbv.views import (
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
+from horilla_views.generic.cbv.views import (
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
 )
-from candour_views.views import CandourDeleteConfirmationView
+from horilla_views.views import HorillaDeleteConfirmationView
 
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("asset.view_assetcategory"), name="dispatch")
-class AssetCategoryFormView(CandourFormView):
+class AssetCategoryFormView(HorillaFormView):
     """
     form view for create asset category
     """
@@ -63,7 +63,7 @@ class AssetCategoryFormView(CandourFormView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("asset.add_asset"), name="dispatch")
-class AssetFormView(CandourFormView):
+class AssetFormView(HorillaFormView):
     """
     form view for create asset
     """
@@ -100,7 +100,7 @@ class AssetFormView(CandourFormView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("asset.view_assetcategory"), name="dispatch")
-class AssetCategoryDuplicateFormView(CandourFormView):
+class AssetCategoryDuplicateFormView(HorillaFormView):
     """
     form view for create duplicate asset category
     """
@@ -138,7 +138,7 @@ class AssetCategoryDuplicateFormView(CandourFormView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("asset.view_asset"), name="dispatch")
-class AssetDuplicateFormView(CandourFormView):
+class AssetDuplicateFormView(HorillaFormView):
     """
     form view for create duplicate for asset
     """
@@ -179,7 +179,7 @@ class AssetDuplicateFormView(CandourFormView):
 
 
 @method_decorator(login_required, name="dispatch")
-class AssetReportFormView(CandourFormView):
+class AssetReportFormView(HorillaFormView):
     """
     form view for create button
     """
@@ -215,13 +215,13 @@ class AssetReportFormView(CandourFormView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("asset.view_asset"), name="dispatch")
-class AssetCategoryListView(CandourListView):
+class AssetCategoryListView(HorillaListView):
     """
     Grouped list view for assets on the Asset Category page.
 
     Lists every Asset (unlike asset.cbv.asset.AssetListView, which is
     hard-filtered to one category for the per-category HTMX refresh used by
-    the asset CRUD forms) so the standard CandourListView group-by engine can
+    the asset CRUD forms) so the standard HorillaListView group-by engine can
     group it by category.
     """
 
@@ -305,7 +305,7 @@ class AssetCategoryListView(CandourListView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("asset.view_asset"), name="dispatch")
-class AssetCategoryNav(CandourNavView):
+class AssetCategoryNav(HorillaNavView):
     """
     nav bar for asset category
     """
@@ -315,7 +315,7 @@ class AssetCategoryNav(CandourNavView):
     filter_instance = AssetFilter()
     filter_form_context_name = "form"
     search_swap_target = "#assetCategoryList"
-    # Modern slide-over filter panel (generic/candour_nav.html's own
+    # Modern slide-over filter panel (generic/horilla_nav.html's own
     # {% if modern_filter %} branch) -- same treatment as every other
     # panel this session. AssetFilter.ajax_fields carries the
     # AJAX-loaded comboboxes this needs.
@@ -368,10 +368,10 @@ class AssetCategoryNav(CandourNavView):
             )
 
 
-class AssetDeleteConfirmationView(CandourDeleteConfirmationView):
+class AssetDeleteConfirmationView(HorillaDeleteConfirmationView):
     generic_delete_url_name = "generic-delete-asset-category"
 
     def post(self, *args, **kwargs):
         super().post(*args, **kwargs)
         # asset-category-view uses `.filterButton` (theme nav may also have `#applyFilter`)
-        return CandourFormView.HttpResponse(targets_to_reload=[".filterButton"])
+        return HorillaFormView.HttpResponse(targets_to_reload=[".filterButton"])

@@ -7,8 +7,8 @@ from django.utils.translation import gettext_lazy as _
 
 from accessibility.methods import check_is_accessible
 from base.decorators import decorator_with_arguments
-from candour.candour_middlewares import _thread_locals
-from candour.http.response import CandourRedirect
+from horilla.horilla_middlewares import _thread_locals
+from horilla.http.response import HorillaRedirect
 
 
 @decorator_with_arguments
@@ -39,6 +39,6 @@ def enter_if_accessible(function, feature, perm=None, method=None):
 
         messages.info(request, _("You don't have access to the feature"))
 
-        return CandourRedirect(request)
+        return HorillaRedirect(request)
 
     return check_accessible

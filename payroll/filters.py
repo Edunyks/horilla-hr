@@ -25,7 +25,7 @@ from base.models import (
     WorkType,
 )
 from employee.models import Employee
-from candour.filters import CandourFilterSet, filter_by_name, filter_name_or_badge_terms
+from horilla.filters import HorillaFilterSet, filter_by_name, filter_name_or_badge_terms
 from payroll.models.models import (
     Allowance,
     Contract,
@@ -40,7 +40,7 @@ from payroll.models.models import (
 from payroll.models.tax_models import TaxBracket
 
 
-class ContractFilter(CandourFilterSet):
+class ContractFilter(HorillaFilterSet):
     """
     Filter set class for Contract model
 
@@ -84,13 +84,13 @@ class ContractFilter(CandourFilterSet):
     # Dedicated comma-separated "Name or Badge ID" search, alongside the
     # AJAX employee_id picker below rather than instead of it -- same
     # field/behavior as every other modernized panel this session; see
-    # candour.filters.filter_name_or_badge_terms for the shared matching
+    # horilla.filters.filter_name_or_badge_terms for the shared matching
     # logic.
     name_or_badge = django_filters.CharFilter(
         method="filter_name_or_badge", label=_("Name or Badge ID")
     )
 
-    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
+    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
     # -- every model/queryset-backed field in the modern filter panel opts
     # in here instead of pre-rendering its whole queryset as <option> tags.
     # Note: department/job_position/job_role/shift/work_type are FK fields
@@ -194,7 +194,7 @@ class ContractFilter(CandourFilterSet):
     def filter_name_or_badge(self, queryset, name, value):
         """
         Filter panel's dedicated "Name or Badge ID" field (see
-        name_or_badge above) -- see candour.filters.
+        name_or_badge above) -- see horilla.filters.
         filter_name_or_badge_terms for the shared comma-separated
         matching logic.
         """
@@ -235,7 +235,7 @@ class ContractFilter(CandourFilterSet):
         return queryset
 
 
-class AllowanceFilter(CandourFilterSet):
+class AllowanceFilter(HorillaFilterSet):
     """
     Filter set class for Allowance model.
     """
@@ -286,7 +286,7 @@ class AllowanceFilter(CandourFilterSet):
     def _build_custom_filter_fields(self):
         """
         Registry backing the Advanced section's "+ Add filter" builder
-        (see CandourFilterSet._build_custom_filter_fields's docstring
+        (see HorillaFilterSet._build_custom_filter_fields's docstring
         for the two supported entry shapes) -- same "choose field, then
         lookup, then value" pattern used by AttendanceFilters/
         EmployeeFilter/AssetFilter. Created At is the only real date
@@ -309,7 +309,7 @@ class AllowanceFilter(CandourFilterSet):
 
     def filter_queryset(self, queryset):
         """
-        CandourFilterSet._apply_custom_filters isn't wired into the base
+        HorillaFilterSet._apply_custom_filters isn't wired into the base
         filter_queryset automatically -- this is the minimal "call it at
         the end" hookup, same as AttendanceFilters/FeedbackFilter/
         AssetFilter.
@@ -318,7 +318,7 @@ class AllowanceFilter(CandourFilterSet):
         return self._apply_custom_filters(queryset)
 
 
-class DeductionFilter(CandourFilterSet):
+class DeductionFilter(HorillaFilterSet):
     """
     Filter set class for Deduction model.
     """
@@ -369,7 +369,7 @@ class DeductionFilter(CandourFilterSet):
     def _build_custom_filter_fields(self):
         """
         Registry backing the Advanced section's "+ Add filter" builder
-        (see CandourFilterSet._build_custom_filter_fields's docstring
+        (see HorillaFilterSet._build_custom_filter_fields's docstring
         for the two supported entry shapes) -- same "choose field, then
         lookup, then value" pattern used by AttendanceFilters/
         EmployeeFilter/AssetFilter. Created At is the only real date
@@ -392,7 +392,7 @@ class DeductionFilter(CandourFilterSet):
 
     def filter_queryset(self, queryset):
         """
-        CandourFilterSet._apply_custom_filters isn't wired into the base
+        HorillaFilterSet._apply_custom_filters isn't wired into the base
         filter_queryset automatically -- this is the minimal "call it at
         the end" hookup, same as AttendanceFilters/FeedbackFilter/
         AssetFilter.
@@ -401,7 +401,7 @@ class DeductionFilter(CandourFilterSet):
         return self._apply_custom_filters(queryset)
 
 
-class SalaryStructureFilter(CandourFilterSet):
+class SalaryStructureFilter(HorillaFilterSet):
     """
     Filter set class for SalaryStructure model.
     """
@@ -417,7 +417,7 @@ class SalaryStructureFilter(CandourFilterSet):
         fields = ["title"]
 
 
-class PayslipFilter(CandourFilterSet):
+class PayslipFilter(HorillaFilterSet):
     """
     Filter set class for payslip model.
     """
@@ -431,13 +431,13 @@ class PayslipFilter(CandourFilterSet):
     # Dedicated comma-separated "Name or Badge ID" search, alongside the
     # AJAX employee_id picker below rather than instead of it -- same
     # field/behavior as every other modernized panel this session; see
-    # candour.filters.filter_name_or_badge_terms for the shared matching
+    # horilla.filters.filter_name_or_badge_terms for the shared matching
     # logic.
     name_or_badge = django_filters.CharFilter(
         method="filter_name_or_badge", label=_("Name or Badge ID")
     )
 
-    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
+    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
     # -- Employee is opted into an AJAX-searched combobox instead of a
     # pre-rendered <option> list.
     ajax_fields = {
@@ -452,9 +452,9 @@ class PayslipFilter(CandourFilterSet):
 
     def filter_by_name(self, queryset, name, value):
         """
-        Delegates to the shared candour.filters.filter_by_name, except when
+        Delegates to the shared horilla.filters.filter_by_name, except when
         search_field is set (field-scoped search takes over instead -- see
-        CandourFilterSet.search_in).
+        HorillaFilterSet.search_in).
         """
         if self.data.get("search_field"):
             return queryset
@@ -618,7 +618,7 @@ class PayslipFilter(CandourFilterSet):
     def filter_name_or_badge(self, queryset, name, value):
         """
         Filter panel's dedicated "Name or Badge ID" field (see
-        name_or_badge above) -- see candour.filters.
+        name_or_badge above) -- see horilla.filters.
         filter_name_or_badge_terms for the shared comma-separated
         matching logic.
         """
@@ -639,7 +639,7 @@ class PayslipFilter(CandourFilterSet):
         )
 
 
-class LoanAccountFilter(CandourFilterSet):
+class LoanAccountFilter(HorillaFilterSet):
     """
     LoanAccountFilter
     """
@@ -664,13 +664,13 @@ class LoanAccountFilter(CandourFilterSet):
     # Dedicated comma-separated "Name or Badge ID" search, alongside the
     # AJAX employee_id picker below rather than instead of it -- same
     # field/behavior as every other modernized panel this session; see
-    # candour.filters.filter_name_or_badge_terms for the shared matching
+    # horilla.filters.filter_name_or_badge_terms for the shared matching
     # logic.
     name_or_badge = django_filters.CharFilter(
         method="filter_name_or_badge", label=_("Name or Badge ID")
     )
 
-    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
+    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
     # -- every model/queryset-backed field in the modern filter panel opts
     # in here instead of pre-rendering its whole queryset as <option> tags.
     ajax_fields = {
@@ -716,7 +716,7 @@ class LoanAccountFilter(CandourFilterSet):
     def filter_name_or_badge(self, queryset, name, value):
         """
         Filter panel's dedicated "Name or Badge ID" field (see
-        name_or_badge above) -- see candour.filters.
+        name_or_badge above) -- see horilla.filters.
         filter_name_or_badge_terms for the shared comma-separated
         matching logic.
         """
@@ -731,7 +731,7 @@ class LoanAccountFilter(CandourFilterSet):
     def _build_custom_filter_fields(self):
         """
         Registry backing the Advanced section's "+ Add filter" builder
-        (see CandourFilterSet._build_custom_filter_fields's docstring
+        (see HorillaFilterSet._build_custom_filter_fields's docstring
         for the two supported entry shapes) -- same "choose field, then
         lookup, then value" pattern used by AttendanceFilters/
         EmployeeFilter/AssetFilter. Provided Date is a plain DateField
@@ -772,7 +772,7 @@ class LoanAccountFilter(CandourFilterSet):
 
     def filter_queryset(self, queryset):
         """
-        CandourFilterSet._apply_custom_filters isn't wired into the base
+        HorillaFilterSet._apply_custom_filters isn't wired into the base
         filter_queryset automatically -- this is the minimal "call it at
         the end" hookup, same as AttendanceFilters/FeedbackFilter/
         AssetFilter.
@@ -801,7 +801,7 @@ class LoanAccountFilter(CandourFilterSet):
         )
 
 
-class ReimbursementFilter(CandourFilterSet):
+class ReimbursementFilter(HorillaFilterSet):
     """
     ReimbursementFilter
     """
@@ -819,13 +819,13 @@ class ReimbursementFilter(CandourFilterSet):
     # Dedicated comma-separated "Name or Badge ID" search, alongside the
     # AJAX employee_id picker below rather than instead of it -- same
     # field/behavior as every other modernized panel this session; see
-    # candour.filters.filter_name_or_badge_terms for the shared matching
+    # horilla.filters.filter_name_or_badge_terms for the shared matching
     # logic.
     name_or_badge = django_filters.CharFilter(
         method="filter_name_or_badge", label=_("Name or Badge ID")
     )
 
-    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
+    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
     # -- every model/queryset-backed field in the modern filter panel opts
     # in here instead of pre-rendering its whole queryset as <option> tags.
     ajax_fields = {
@@ -887,7 +887,7 @@ class ReimbursementFilter(CandourFilterSet):
     def filter_name_or_badge(self, queryset, name, value):
         """
         Filter panel's dedicated "Name or Badge ID" field (see
-        name_or_badge above) -- see candour.filters.
+        name_or_badge above) -- see horilla.filters.
         filter_name_or_badge_terms for the shared comma-separated
         matching logic.
         """
@@ -902,7 +902,7 @@ class ReimbursementFilter(CandourFilterSet):
     def _build_custom_filter_fields(self):
         """
         Registry backing the Advanced section's "+ Add filter" builder
-        (see CandourFilterSet._build_custom_filter_fields's docstring
+        (see HorillaFilterSet._build_custom_filter_fields's docstring
         for the two supported entry shapes) -- same "choose field, then
         lookup, then value" pattern used by AttendanceFilters/
         EmployeeFilter/AssetFilter/LoanAccountFilter. Allowance On and
@@ -932,7 +932,7 @@ class ReimbursementFilter(CandourFilterSet):
 
     def filter_queryset(self, queryset):
         """
-        CandourFilterSet._apply_custom_filters isn't wired into the base
+        HorillaFilterSet._apply_custom_filters isn't wired into the base
         filter_queryset automatically -- this is the minimal "call it at
         the end" hookup, same as AttendanceFilters/FeedbackFilter/
         AssetFilter/LoanAccountFilter.
@@ -947,7 +947,7 @@ class ReimbursementFilter(CandourFilterSet):
         )
 
 
-class TaxBracketFilter(CandourFilterSet):
+class TaxBracketFilter(HorillaFilterSet):
     """
     Filter set class for TaxBracket model.
     """
@@ -968,7 +968,7 @@ class TaxBracketFilter(CandourFilterSet):
         ).distinct()
 
 
-class FilingStatusFilter(CandourFilterSet):
+class FilingStatusFilter(HorillaFilterSet):
     """
     Filter set class for TaxBracket model.
     """
@@ -1031,7 +1031,7 @@ class PayslipReGroup:
     ]
 
 
-class PayslipAutoGenerateFilter(CandourFilterSet):
+class PayslipAutoGenerateFilter(HorillaFilterSet):
 
     search = django_filters.CharFilter(method="search_method")
 

@@ -1,13 +1,13 @@
-# Candour HRMS
+# Horilla HRMS
 
 [![License: LGPL v2.1](https://img.shields.io/badge/License-LGPL%20v2.1-blue.svg)](https://www.gnu.org/licenses/lgpl-2.1)
 [![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![Django](https://img.shields.io/badge/django-5.0+-green.svg)](https://www.djangoproject.com/)
-[![Stars](https://img.shields.io/github/stars/candour/candour-hr)](https://github.com/candour/candour-hr/stargazers)
-[![Forks](https://img.shields.io/github/forks/candour/candour-hr)](https://github.com/candour/candour-hr/network/members)
+[![Stars](https://img.shields.io/github/stars/horilla/horilla-hr)](https://github.com/horilla/horilla-hr/stargazers)
+[![Forks](https://img.shields.io/github/forks/horilla/horilla-hr)](https://github.com/horilla/horilla-hr/network/members)
 
 > [!IMPORTANT]
-> **`2.0` is now this repository’s default branch.** Use it to run or deploy Candour (a plain `git clone` checks it out). To contribute code, branch from and open PRs against `dev/v2.0` — GitHub still pre-selects `2.0` as the PR base, so switch it manually. v1 (`1.0`/`master`) is deprioritized, with fixes considered case-by-case rather than on a guaranteed schedule. Full details → [Discussion #1127](https://github.com/candour/candour-hr/discussions/1127).
+> **`2.0` is now this repository’s default branch.** Use it to run or deploy Horilla (a plain `git clone` checks it out). To contribute code, branch from and open PRs against `dev/v2.0` — GitHub still pre-selects `2.0` as the PR base, so switch it manually. v1 (`1.0`/`master`) is deprioritized, with fixes considered case-by-case rather than on a guaranteed schedule. Full details → [Discussion #1127](https://github.com/horilla/horilla-hr/discussions/1127).
 
 > **A comprehensive, free, and open-source Human Resource Management System (HRMS) designed to streamline HR operations and enhance organizational efficiency.**
 
@@ -38,28 +38,28 @@
 
 ## 🌳 Which Branch Do I Want?
 
-- **`2.0`** (default) — the latest stable v2 snapshot. This is what a plain `git clone` gives you. Use it to run or deploy Candour.
+- **`2.0`** (default) — the latest stable v2 snapshot. This is what a plain `git clone` gives you. Use it to run or deploy Horilla.
 - **`dev/v2.0`** — the active integration branch. If you want to contribute code, branch from and open PRs against this, not `2.0`.
 - **`1.0`/`master`** — v1, now deprioritized (fixes considered case-by-case, no guaranteed schedule). Not deleted, but no longer where active development happens.
 
-See [Discussion #1127](https://github.com/candour/candour-hr/discussions/1127) for full background on this transition.
+See [Discussion #1127](https://github.com/horilla/horilla-hr/discussions/1127) for full background on this transition.
 
 ## ⚡ Quick Start
 
 ### Using the official Docker image (Recommended)
 
 Published for `linux/amd64` and `linux/arm64` as
-[`candour/candour-hr`](https://hub.docker.com/r/candour/candour-hr):
+[`horilla/horilla-hr`](https://hub.docker.com/r/horilla/horilla-hr):
 
 ```bash
-docker pull candour/candour-hr:2.1.5
+docker pull horilla/horilla-hr:2.1.5
 ```
 
 Pin an exact version in production rather than `latest`, so a deploy cannot
 pick up a new release unattended; see
-[all tags](https://hub.docker.com/r/candour/candour-hr/tags) for the current
+[all tags](https://hub.docker.com/r/horilla/horilla-hr/tags) for the current
 one. The
-[repository overview](https://hub.docker.com/r/candour/candour-hr) documents
+[repository overview](https://hub.docker.com/r/horilla/horilla-hr) documents
 every environment variable, the volumes to back up, and a working Compose file.
 
 First boot applies the full migration set before the web server binds, which
@@ -69,8 +69,8 @@ takes a few minutes on an empty database.
 
 ```bash
 # Clone the repository (defaults to the stable 2.0 branch)
-git clone https://github.com/candour/candour-hr.git
-cd candour-hr
+git clone https://github.com/horilla/horilla-hr.git
+cd horilla-hr
 
 # Start with Docker Compose
 docker compose up -d
@@ -89,8 +89,8 @@ module scope, so the app cannot start on it.
 
 ```bash
 # Clone and setup (defaults to the stable 2.0 branch)
-git clone https://github.com/candour/candour-hr.git
-cd candour-hr
+git clone https://github.com/horilla/horilla-hr.git
+cd horilla-hr
 
 # Create virtual environment
 python3 -m venv venv
@@ -123,7 +123,7 @@ python manage.py runserver
 
 For detailed installation instructions, configuration guides, and platform-specific setup instructions, please visit our comprehensive documentation:
 
-### 📖 [Complete Installation Guide → docs.candoursystems.com/technical/v2.0/ ](https://docs.candoursystems.com/technical/v2.0/)
+### 📖 [Complete Installation Guide → docs.horilla.com/technical/v2.0/ ](https://docs.horilla.com/technical/v2.0/)
 
 Our documentation includes:
 - **Step-by-step installation** for all supported platforms
@@ -133,12 +133,12 @@ Our documentation includes:
 - **Troubleshooting** common issues
 - **Advanced configuration** options
 
-<!-- Need help? Check out the [Installation FAQ](https://docs.candoursystems.com) or reach out to our [community support](#-support). -->
+<!-- Need help? Check out the [Installation FAQ](https://docs.horilla.com) or reach out to our [community support](#-support). -->
 
 ## 🚀 Deployment
 
 For production deployment guides including Nginx, Apache, and cloud platforms:
-### 📖 [Deployment Guide → docs.candoursystems.com/technical/v2.0/doc/deployment/nginx-gunicorn](https://docs.candoursystems.com/technical/v2.0/doc/deployment/nginx-gunicorn)
+### 📖 [Deployment Guide → docs.horilla.com/technical/v2.0/doc/deployment/nginx-gunicorn](https://docs.horilla.com/technical/v2.0/doc/deployment/nginx-gunicorn)
 
 
 ## 🤝 Contributing
@@ -149,11 +149,11 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 ```bash
 # Fork and clone your fork
-git clone -b dev/v2.0 https://github.com/YOUR_USERNAME/candour-hr.git
-cd candour-hr
+git clone -b dev/v2.0 https://github.com/YOUR_USERNAME/horilla-hr.git
+cd horilla-hr
 
 # Add upstream remote
-git remote add upstream https://github.com/candour/candour-hr.git
+git remote add upstream https://github.com/horilla/horilla-hr.git
 
 # Create feature branch
 git checkout -b feature/your-feature-name
@@ -185,7 +185,7 @@ pip install -r requirements.txt
 
 ### Reporting Security Issues
 
-Please report security vulnerabilities via [GitHub Private Vulnerability Reporting](https://github.com/candour/candour-hr/security/advisories/new), not email. Do not create public GitHub issues for security vulnerabilities. See [SECURITY.md](SECURITY.md) for full details.
+Please report security vulnerabilities via [GitHub Private Vulnerability Reporting](https://github.com/horilla/horilla-hr/security/advisories/new), not email. Do not create public GitHub issues for security vulnerabilities. See [SECURITY.md](SECURITY.md) for full details.
 
 ### Security Best Practices
 
@@ -198,16 +198,16 @@ Please report security vulnerabilities via [GitHub Private Vulnerability Reporti
 
 ### Community Support
 
-- 📖 **Documentation**: [docs.candoursystems.com](https://docs.candoursystems.com)
-- 💬 **GitHub Discussions**: [GitHub Discussions](https://github.com/candour/candour-hr/discussions)
-- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/candour/candour-hr/issues)
-- ✨ **Feature Requests**: [GitHub Issues](https://github.com/candour/candour-hr/issues)
+- 📖 **Documentation**: [docs.horilla.com](https://docs.horilla.com)
+- 💬 **GitHub Discussions**: [GitHub Discussions](https://github.com/horilla/horilla-hr/discussions)
+- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/horilla/horilla-hr/issues)
+- ✨ **Feature Requests**: [GitHub Issues](https://github.com/horilla/horilla-hr/issues)
 
 ### Professional Support
 
 For enterprise support, custom development, and consulting services:
-- 📧 **Email**: support@candoursystems.com
-- 🌐 **Website**: [www.candoursystems.com](https://www.candoursystems.com)
+- 📧 **Email**: support@horilla.com
+- 🌐 **Website**: [www.horilla.com](https://www.horilla.com)
 
 
 ## 📄 License
@@ -216,8 +216,8 @@ This project is licensed under the [LGPL-2.1 License](LICENSE) - see the LICENSE
 
 <div align="center">
 
-**Made with ❤️ by the Candour Team**
+**Made with ❤️ by the Horilla Team**
 
-[⭐ Star us on GitHub](https://github.com/candour/candour-hr) | [🐛 Report Bug](https://github.com/candour/candour-hr/issues) | [💡 Request Feature](https://github.com/candour/candour-hr/issues)
+[⭐ Star us on GitHub](https://github.com/horilla/horilla-hr) | [🐛 Report Bug](https://github.com/horilla/horilla-hr/issues) | [💡 Request Feature](https://github.com/horilla/horilla-hr/issues)
 
 </div>

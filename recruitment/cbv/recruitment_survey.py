@@ -12,16 +12,16 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 
-from candour.decorators import hx_request_required
-from candour.http.response import CandourRedirect
-from candour_views.cbv_methods import login_required, permission_required
-from candour_views.generic.cbv.views import (
-    CandourDetailedView,
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
-    CandourTabContentShell,
-    CandourTabView,
+from horilla.decorators import hx_request_required
+from horilla.http.response import HorillaRedirect
+from horilla_views.cbv_methods import login_required, permission_required
+from horilla_views.generic.cbv.views import (
+    HorillaDetailedView,
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
+    HorillaTabContentShell,
+    HorillaTabView,
     TemplateView,
 )
 from recruitment.filters import SurveyFilter, SurveyTemplateFilter
@@ -33,7 +33,7 @@ from recruitment.models import RecruitmentSurvey, SurveyTemplate
 @method_decorator(
     permission_required("recruitment.add_recruitmentsurvey"), name="dispatch"
 )
-class QuestionFormView(CandourFormView):
+class QuestionFormView(HorillaFormView):
     """
     form view for create button
     """
@@ -71,7 +71,7 @@ class QuestionFormView(CandourFormView):
 @method_decorator(
     permission_required("recruitment.add_recruitmentsurvey"), name="dispatch"
 )
-class QuestionDuplicateFormView(CandourFormView):
+class QuestionDuplicateFormView(HorillaFormView):
     """
     form view for create duplicate for asset
     """
@@ -120,7 +120,7 @@ class QuestionDuplicateFormView(CandourFormView):
 @method_decorator(
     permission_required("recruitment.add_surveytemplate"), name="dispatch"
 )
-class SurveyTemplateFormView(CandourFormView):
+class SurveyTemplateFormView(HorillaFormView):
     """
     form view for create and edit survey templates
     """
@@ -158,7 +158,7 @@ class SurveyTemplateFormView(CandourFormView):
 
 
 @method_decorator(login_required, name="dispatch")
-class RecruitmentSurveyDetailView(CandourDetailedView):
+class RecruitmentSurveyDetailView(HorillaDetailedView):
     """
     detail view of the page
     """
@@ -215,7 +215,7 @@ class SurveyTemplateSettingsView(TemplateView):
 @method_decorator(
     permission_required(perm="recruitment.view_recruitmentsurvey"), name="dispatch"
 )
-class SurveyTemplateTabView(CandourTabView):
+class SurveyTemplateTabView(HorillaTabView):
     """
     tab view for survey templates, shows template and questions as tabs
     """
@@ -242,7 +242,7 @@ class SurveyTemplateTabView(CandourTabView):
 @method_decorator(
     permission_required(perm="recruitment.view_recruitmentsurvey"), name="dispatch"
 )
-class SurveyTemplateNavView(CandourNavView):
+class SurveyTemplateNavView(HorillaNavView):
     """
     navbar of the Template tab
     """
@@ -265,7 +265,7 @@ class SurveyTemplateNavView(CandourNavView):
     filter_form_context_name = "form"
     filter_body_template = "survey/filter.html"
     search_swap_target = "#view-container"
-    # Modern slide-over filter panel (candour_nav.html's .oh-filter-modern
+    # Modern slide-over filter panel (horilla_nav.html's .oh-filter-modern
     # styles) -- same treatment as every other modernized nav view this
     # session. Presentational only; no change needed to SurveyFilter.
     modern_filter = True
@@ -275,7 +275,7 @@ class SurveyTemplateNavView(CandourNavView):
 @method_decorator(
     permission_required(perm="recruitment.view_recruitmentsurvey"), name="dispatch"
 )
-class SurveyQuestionNavView(CandourNavView):
+class SurveyQuestionNavView(HorillaNavView):
     """
     navbar of the Questions tab
     """
@@ -298,7 +298,7 @@ class SurveyQuestionNavView(CandourNavView):
     filter_form_context_name = "form"
     filter_body_template = "survey/filter.html"
     search_swap_target = "#questionViewContainer"
-    # Modern slide-over filter panel (candour_nav.html's .oh-filter-modern
+    # Modern slide-over filter panel (horilla_nav.html's .oh-filter-modern
     # styles) -- same treatment as every other modernized nav view this
     # session. Presentational only; no change needed to SurveyFilter.
     modern_filter = True
@@ -321,7 +321,7 @@ def _recruitment_survey_queryset_for(request):
 
 
 @method_decorator(login_required, name="dispatch")
-class SurveyTemplateQuestionsTab(CandourTabView):
+class SurveyTemplateQuestionsTab(HorillaTabView):
     """
     Tab View for the Survey Templates page
     """
@@ -344,7 +344,7 @@ class SurveyTemplateQuestionsTab(CandourTabView):
 
 
 @method_decorator(login_required, name="dispatch")
-class SurveyTemplateList(CandourListView):
+class SurveyTemplateList(HorillaListView):
     """
     List view of the Templates tab
     """
@@ -360,7 +360,7 @@ class SurveyTemplateList(CandourListView):
 
 
 @method_decorator(login_required, name="dispatch")
-class SurveyQuestionList(CandourListView):
+class SurveyQuestionList(HorillaListView):
     """
     List view of the Questions tab
     """
@@ -383,13 +383,13 @@ class SurveyQuestionList(CandourListView):
         return queryset
 
 
-class SurveyTemplateTabShell(CandourTabContentShell):
+class SurveyTemplateTabShell(HorillaTabContentShell):
     nav_url_name = "survey-template-nav"
     container_id = "surveyTemplatesListContainer"
     tabs_root_id = "survey-templates"
 
 
-class SurveyQuestionTabShell(CandourTabContentShell):
+class SurveyQuestionTabShell(HorillaTabContentShell):
     nav_url_name = "survey-question-nav"
     container_id = "surveyQuestionsListContainer"
     tabs_root_id = "survey-templates"

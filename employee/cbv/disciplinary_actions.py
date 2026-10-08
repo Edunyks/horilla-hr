@@ -18,12 +18,12 @@ from base.methods import filtersubordinates
 from employee.filters import DisciplinaryActionFilter
 from employee.forms import ActiontypeForm, DisciplinaryActionForm
 from employee.models import Actiontype, DisciplinaryAction
-from candour_views.cbv_methods import login_required, permission_required
-from candour_views.generic.cbv.views import (
-    CandourDetailedView,
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
+from horilla_views.cbv_methods import login_required, permission_required
+from horilla_views.generic.cbv.views import (
+    HorillaDetailedView,
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
     TemplateView,
 )
 from notifications.signals import notify
@@ -39,7 +39,7 @@ class DisciplinaryActionsView(TemplateView):
 
 
 @method_decorator(login_required, name="dispatch")
-class DisciplinaryActionsList(CandourListView):
+class DisciplinaryActionsList(HorillaListView):
     """
     List view of disciplinary actions
     """
@@ -99,7 +99,7 @@ class DisciplinaryActionsList(CandourListView):
 
 
 @method_decorator(login_required, name="dispatch")
-class DisciplinaryActionsNav(CandourNavView):
+class DisciplinaryActionsNav(HorillaNavView):
     """
     For nav bar
     """
@@ -123,14 +123,14 @@ class DisciplinaryActionsNav(CandourNavView):
     search_swap_target = "#listContainer"
     template_name = "generic/inline_nav.html"
     # Modern slide-over filter panel (generic/inline_nav.html's own
-    # {% if modern_filter %} branch, mirroring candour_nav.html's
+    # {% if modern_filter %} branch, mirroring horilla_nav.html's
     # .oh-filter-modern styles) -- same treatment as every other panel
     # this session. DisciplinaryActionFilter.ajax_fields carries the
     # AJAX-loaded comboboxes this needs.
     modern_filter = True
 
 
-class DynamicActionTypeFormView(CandourFormView):
+class DynamicActionTypeFormView(HorillaFormView):
 
     model = Actiontype
     form_class = ActiontypeForm
@@ -151,7 +151,7 @@ class DynamicActionTypeFormView(CandourFormView):
 @method_decorator(
     permission_required("employee.add_disciplinaryaction"), name="dispatch"
 )
-class DisciplinaryActionsFormView(CandourFormView):
+class DisciplinaryActionsFormView(HorillaFormView):
     """
     Form View
     """
@@ -209,7 +209,7 @@ class DisciplinaryActionsFormView(CandourFormView):
 @method_decorator(
     permission_required("employee.add_disciplinaryaction"), name="dispatch"
 )
-class DisciplinaryActionsFormDuplicate(CandourFormView):
+class DisciplinaryActionsFormDuplicate(HorillaFormView):
     """
     Duplicate form view
     """
@@ -253,7 +253,7 @@ class DisciplinaryActionsFormDuplicate(CandourFormView):
 
 
 @method_decorator(login_required, name="dispatch")
-class DisciplinaryActionsDetailView(CandourDetailedView):
+class DisciplinaryActionsDetailView(HorillaDetailedView):
     """
     detail view of page
     """

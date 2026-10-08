@@ -15,7 +15,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from base.models import Department
-from candour.testkit import make_company, make_employee
+from horilla.testkit import make_company, make_employee
 from onboarding.models import CandidateStage, OnboardingStage
 from recruitment.models import Candidate, JobPosition, Recruitment
 
@@ -26,12 +26,12 @@ class OnboardingStagePipelineWidgetTests(TestCase):
         User = get_user_model()
         self.admin = User.objects.create_superuser(
             username="stage-pipeline-admin",
-            email="stage-pipeline-admin@test.candour",
+            email="stage-pipeline-admin@test.horilla",
             password="pass",
         )
         make_employee(
             company=self.company,
-            email="stage-pipeline-admin-profile@test.candour",
+            email="stage-pipeline-admin-profile@test.horilla",
             user=self.admin,
         )
         self.client = Client()
@@ -73,7 +73,7 @@ class OnboardingStagePipelineWidgetTests(TestCase):
         self.candidates = [
             Candidate.objects.create(
                 recruitment_id=self.recruitment_a,
-                email=f"stage-cand-a{i}@test.candour",
+                email=f"stage-cand-a{i}@test.horilla",
                 name=f"Candidate A{i}",
                 start_onboard=True,
             )
@@ -81,7 +81,7 @@ class OnboardingStagePipelineWidgetTests(TestCase):
         ] + [
             Candidate.objects.create(
                 recruitment_id=self.recruitment_b,
-                email="stage-cand-b0@test.candour",
+                email="stage-cand-b0@test.horilla",
                 name="Candidate B0",
                 start_onboard=True,
             )

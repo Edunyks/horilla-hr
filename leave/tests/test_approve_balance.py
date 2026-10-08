@@ -7,11 +7,11 @@ from django.test import TestCase
 
 class LeaveRequestApproveBalanceTests(TestCase):
     def setUp(self):
-        from candour.testkit import make_company, make_employee
+        from horilla.testkit import make_company, make_employee
         from leave.models import AvailableLeave, LeaveType
 
         company = make_company("Approve Bal Co")
-        self.employee = make_employee(company=company, email="approvebal@test.candour")
+        self.employee = make_employee(company=company, email="approvebal@test.horilla")
         self.leave_type = LeaveType.objects.create(
             name="Approve Balance Leave",
             total_days=20,

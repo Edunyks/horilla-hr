@@ -8,15 +8,15 @@ from django.urls import reverse_lazy
 from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 
-from base.candour_company_manager import CandourCompanyManager
+from base.horilla_company_manager import HorillaCompanyManager
 from base.models import Company, Department, JobPosition, Tags
 from employee.models import Employee
-from candour import candour_middlewares
-from candour.candour_middlewares import _thread_locals
-from candour.models import CandourModel, upload_path
-from candour_audit.methods import get_diff
-from candour_audit.models import CandourAuditInfo, CandourAuditLog
-from candour_views.cbv_methods import render_template
+from horilla import horilla_middlewares
+from horilla.horilla_middlewares import _thread_locals
+from horilla.models import HorillaModel, upload_path
+from horilla_audit.methods import get_diff
+from horilla_audit.models import HorillaAuditInfo, HorillaAuditLog
+from horilla_views.cbv_methods import render_template
 
 PRIORITY = [
     ("low", _("Low")),
@@ -47,7 +47,7 @@ TICKET_STATUS = [
 ]
 
 
-class DepartmentManager(CandourModel):
+class DepartmentManager(HorillaModel):
     manager = models.ForeignKey(
         Employee,
         verbose_name=_("Manager"),
@@ -64,7 +64,7 @@ class DepartmentManager(CandourModel):
         Company, null=True, editable=False, on_delete=models.PROTECT
     )
 
-    objects = CandourCompanyManager("manager__employee_work_info__company_id")
+    objects = HorillaCompanyManager("manager__employee_work_info__company_id")
 
     def get_update_url(self):
         """
@@ -95,14 +95,14 @@ class DepartmentManager(CandourModel):
             raise ValidationError(_(f"This employee is not from {self.department} ."))
 
 
-class TicketType(CandourModel):
+class TicketType(HorillaModel):
     title = models.CharField(max_length=100, verbose_name=_("Title"))
     type = models.CharField(choices=TICKET_TYPES, max_length=50, verbose_name=_("Type"))
     prefix = models.CharField(max_length=3, verbose_name=_("Prefix"))
     company_id = models.ForeignKey(
         Company, null=True, editable=False, on_delete=models.PROTECT
     )
-    objects = CandourCompanyManager(related_company_field="company_id")
+    objects = HorillaCompanyManager(related_company_field="company_id")
 
     def __str__(self):
         return self.title
@@ -139,7 +139,7 @@ class TicketType(CandourModel):
         verbose_name_plural = _("Ticket Types")
 
 
-class Ticket(CandourModel):
+class Ticket(HorillaModel):
 
     title = models.CharField(max_length=50)
     employee_id = models.ForeignKey(
@@ -169,13 +169,13 @@ class Ticket(CandourModel):
     deadline = models.DateField(null=True, blank=True)
     tags = models.ManyToManyField(Tags, blank=True, related_name="ticket_tags")
     status = models.CharField(choices=TICKET_STATUS, default="new", max_length=50)
-    history = CandourAuditLog(
+    history = HorillaAuditLog(
         related_name="history_set",
         bases=[
-            CandourAuditInfo,
+            HorillaAuditInfo,
         ],
     )
-    objects = CandourCompanyManager(
+    objects = HorillaCompanyManager(
         related_company_field="employee_id__employee_work_info__company_id"
     )
 
@@ -416,7 +416,7 @@ class Ticket(CandourModel):
         return get_diff(self)
 
 
-class ClaimRequest(CandourModel):
+class ClaimRequest(HorillaModel):
     ticket_id = models.ForeignKey(
         Ticket,
         on_delete=models.CASCADE,
@@ -446,7 +446,7 @@ class ClaimRequest(CandourModel):
             raise ValidationError({"employee_id": _("This field is required.")})
 
 
-class Comment(CandourModel):
+class Comment(HorillaModel):
     comment = models.TextField(null=True, blank=True)
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name="comment")
     employee_id = models.ForeignKey(
@@ -458,7 +458,7 @@ class Comment(CandourModel):
         return self.comment
 
 
-class Attachment(CandourModel):
+class Attachment(HorillaModel):
     file = models.FileField(upload_to=upload_path)
     description = models.CharField(max_length=100, blank=True, null=True)
     format = models.CharField(max_length=50, blank=True, null=True)
@@ -497,7 +497,7 @@ class Attachment(CandourModel):
         return os.path.basename(self.file.name)
 
 
-class FAQCategory(CandourModel):
+class FAQCategory(HorillaModel):
     title = models.CharField(max_length=30)
     description = models.TextField(blank=True, null=True, max_length=255)
     company_id = models.ForeignKey(
@@ -508,7 +508,7 @@ class FAQCategory(CandourModel):
         verbose_name=_("Company"),
         on_delete=models.CASCADE,
     )
-    objects = CandourCompanyManager()
+    objects = HorillaCompanyManager()
 
     def __str__(self):
         return self.title
@@ -524,7 +524,7 @@ class FAQCategory(CandourModel):
         verbose_name_plural = _("FAQ Categories")
 
 
-class FAQ(CandourModel):
+class FAQ(HorillaModel):
     question = models.CharField(max_length=255)
     answer = models.TextField()
     tags = models.ManyToManyField(Tags, blank=True)
@@ -532,7 +532,7 @@ class FAQ(CandourModel):
     company_id = models.ForeignKey(
         Company, null=True, editable=False, on_delete=models.PROTECT
     )
-    objects = CandourCompanyManager()
+    objects = HorillaCompanyManager()
 
     def __str__(self):
         return self.question

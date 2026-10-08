@@ -20,7 +20,7 @@ from base.models import (
     WorkType,
 )
 from employee.models import Employee
-from candour.filters import CandourFilterSet, filter_name_or_badge_terms
+from horilla.filters import HorillaFilterSet, filter_name_or_badge_terms
 from offboarding.models import (
     Offboarding,
     OffboardingEmployee,
@@ -29,7 +29,7 @@ from offboarding.models import (
 )
 
 
-class LetterFilter(CandourFilterSet):
+class LetterFilter(HorillaFilterSet):
     """
     LetterFilter class
     """
@@ -42,7 +42,7 @@ class LetterFilter(CandourFilterSet):
     # Dedicated comma-separated "Name or Badge ID" search, alongside the
     # AJAX employee_id picker below rather than instead of it -- same
     # field/behavior as every other modernized panel this session; see
-    # candour.filters.filter_name_or_badge_terms for the shared matching
+    # horilla.filters.filter_name_or_badge_terms for the shared matching
     # logic.
     name_or_badge = django_filters.CharFilter(
         method="filter_name_or_badge", label=_("Name or Badge ID")
@@ -60,7 +60,7 @@ class LetterFilter(CandourFilterSet):
     # (see _build_custom_filter_fields below), but that mechanism submits
     # gte/lte as two rows sharing the same custom_field/custom_lookup/
     # custom_value <select> names -- fine for the builder's own UI, but the
-    # generic filter-tag chip bar (candour_views/templates/generic/
+    # generic filter-tag chip bar (horilla_views/templates/generic/
     # filter_tags.html) has no way to tell those rows apart and renders
     # garbled tags ("Custom field: Created at" / "Custom lookup: GteLte").
     # A uniquely-named field per direction (same "_from"/"_till" convention
@@ -119,7 +119,7 @@ class LetterFilter(CandourFilterSet):
     # note in this same module).
     exit_reason = django_filters.CharFilter(method="filter_exit_reason")
 
-    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
+    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
     # -- every model/queryset-backed field in the modern filter panel opts
     # in here instead of pre-rendering its whole queryset as <option> tags.
     ajax_fields = {
@@ -169,7 +169,7 @@ class LetterFilter(CandourFilterSet):
     def filter_name_or_badge(self, queryset, name, value):
         """
         Filter panel's dedicated "Name or Badge ID" field (see
-        name_or_badge above) -- see candour.filters.
+        name_or_badge above) -- see horilla.filters.
         filter_name_or_badge_terms for the shared comma-separated
         matching logic.
         """
@@ -194,7 +194,7 @@ class LetterFilter(CandourFilterSet):
     def _build_custom_filter_fields(self):
         """
         Registry backing the Advanced section's "+ Add filter" builder
-        (see CandourFilterSet._build_custom_filter_fields's docstring
+        (see HorillaFilterSet._build_custom_filter_fields's docstring
         for the two supported entry shapes) -- same "choose field, then
         lookup, then value" pattern used by AttendanceFilters/
         EmployeeFilter/AssetFilter. Planned To Leave On stays available
@@ -243,7 +243,7 @@ class LetterFilter(CandourFilterSet):
 
     def filter_queryset(self, queryset):
         """
-        CandourFilterSet._apply_custom_filters isn't wired into the base
+        HorillaFilterSet._apply_custom_filters isn't wired into the base
         filter_queryset automatically -- this is the minimal "call it at
         the end" hookup, same as AttendanceFilters/FeedbackFilter/
         AssetFilter.
@@ -258,7 +258,7 @@ class LetterFilter(CandourFilterSet):
         )
 
 
-class PipelineFilter(CandourFilterSet):
+class PipelineFilter(HorillaFilterSet):
     """
     PipelineFilter
     """
@@ -268,7 +268,7 @@ class PipelineFilter(CandourFilterSet):
         field_name="managers", queryset=Employee.objects.all()
     )
 
-    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
+    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
     # -- Managers opts into an AJAX-searched combobox instead of
     # pre-rendering its whole queryset as <option> tags.
     ajax_fields = {
@@ -300,7 +300,7 @@ class PipelineFilter(CandourFilterSet):
     def _build_custom_filter_fields(self):
         """
         Registry backing the Advanced section's "+ Add filter" builder
-        (see CandourFilterSet._build_custom_filter_fields's docstring
+        (see HorillaFilterSet._build_custom_filter_fields's docstring
         for the two supported entry shapes) -- same "choose field, then
         lookup, then value" pattern used by AttendanceFilters/
         EmployeeFilter/AssetFilter. Created At is the only real date
@@ -323,7 +323,7 @@ class PipelineFilter(CandourFilterSet):
 
     def filter_queryset(self, queryset):
         """
-        CandourFilterSet._apply_custom_filters isn't wired into the base
+        HorillaFilterSet._apply_custom_filters isn't wired into the base
         filter_queryset automatically -- this is the minimal "call it at
         the end" hookup, same as AttendanceFilters/FeedbackFilter/
         AssetFilter.
@@ -332,14 +332,14 @@ class PipelineFilter(CandourFilterSet):
         return self._apply_custom_filters(queryset)
 
 
-class PipelineStageFilter(CandourFilterSet):
+class PipelineStageFilter(HorillaFilterSet):
     """
     PipelineStageFilter
     """
 
     search = django_filters.CharFilter(method="search_method", lookup_expr="icontains")
 
-    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
+    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
     # -- Offboarding opts into an AJAX-searched combobox instead of
     # pre-rendering its whole queryset as <option> tags.
     ajax_fields = {
@@ -375,7 +375,7 @@ class PipelineStageFilter(CandourFilterSet):
     def _build_custom_filter_fields(self):
         """
         Registry backing the Advanced section's "+ Add filter" builder
-        (see CandourFilterSet._build_custom_filter_fields's docstring
+        (see HorillaFilterSet._build_custom_filter_fields's docstring
         for the two supported entry shapes) -- same "choose field, then
         lookup, then value" pattern used by AttendanceFilters/
         EmployeeFilter/AssetFilter. Created At is the only real date
@@ -398,7 +398,7 @@ class PipelineStageFilter(CandourFilterSet):
 
     def filter_queryset(self, queryset):
         """
-        CandourFilterSet._apply_custom_filters isn't wired into the base
+        HorillaFilterSet._apply_custom_filters isn't wired into the base
         filter_queryset automatically -- this is the minimal "call it at
         the end" hookup, same as AttendanceFilters/FeedbackFilter/
         AssetFilter.
@@ -407,7 +407,7 @@ class PipelineStageFilter(CandourFilterSet):
         return self._apply_custom_filters(queryset)
 
 
-class PipelineEmployeeFilter(CandourFilterSet):
+class PipelineEmployeeFilter(HorillaFilterSet):
     """
     PipelineEmployeeFilter
     """
@@ -451,7 +451,7 @@ class PipelineEmployeeFilter(CandourFilterSet):
     def filter_exit_reason(self, queryset, name, value):
         return queryset.filter(exitreason__title=value)
 
-    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
+    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
     # -- Department/Job Position/Job Role/Employee Type/Shift/Work Type
     # opt into AJAX-searched comboboxes instead of pre-rendering their
     # whole queryset as <option> tags.
@@ -530,7 +530,7 @@ class PipelineEmployeeFilter(CandourFilterSet):
     def _build_custom_filter_fields(self):
         """
         Registry backing the Advanced section's "+ Add filter" builder
-        (see CandourFilterSet._build_custom_filter_fields's docstring
+        (see HorillaFilterSet._build_custom_filter_fields's docstring
         for the two supported entry shapes) -- same "choose field, then
         lookup, then value" pattern used by AttendanceFilters/
         EmployeeFilter/AssetFilter. Notice Period Starts/Ends used to
@@ -573,7 +573,7 @@ class PipelineEmployeeFilter(CandourFilterSet):
 
     def filter_queryset(self, queryset):
         """
-        CandourFilterSet._apply_custom_filters isn't wired into the base
+        HorillaFilterSet._apply_custom_filters isn't wired into the base
         filter_queryset automatically -- this is the minimal "call it at
         the end" hookup, same as AttendanceFilters/FeedbackFilter/
         AssetFilter.

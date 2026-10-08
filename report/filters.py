@@ -1,6 +1,6 @@
 import django_filters
 
-from candour.filters import FilterSet
+from horilla.filters import FilterSet
 from report.models import ReportRunLog
 
 

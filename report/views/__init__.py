@@ -2,7 +2,7 @@ from django.apps import apps
 from django.http import JsonResponse
 
 from base.methods import has_export_access
-from candour.decorators import login_required
+from horilla.decorators import login_required
 
 
 @login_required

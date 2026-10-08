@@ -1,6 +1,6 @@
 # Demo data
 
-Enterprise demo fixtures and the post-load seeder used by Candour HR.
+Enterprise demo fixtures and the post-load seeder used by Horilla HR.
 
 ## Load
 

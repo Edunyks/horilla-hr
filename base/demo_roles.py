@@ -13,23 +13,23 @@ from django.contrib.auth.models import Group
 from django.db import transaction
 
 from base.models import Company, CompanyGroupAssignment
-from candour_auth.models import CandourUser
+from horilla_auth.models import HorillaUser
 
 logger = logging.getLogger(__name__)
 
 # (user email, group name, company name)
 # Keep this small — enough to demo Roles & Permissions and company-scoped access.
 DEMO_ROLE_ASSIGNMENTS = (
-    ("alexander.smith@candoursystems.com", "Asset Manager", "Your Company"),
-    ("alexander.smith@candoursystems.com", "Asset Manager", "Your Company Inc."),
-    ("michael.brown@candoursystems.com", "HR Manager", "Your Company"),
-    ("sarah.anderson@candoursystems.com", "Payroll Manager", "Your Company"),
-    ("emily.clark@candoursystems.com", "Leave Manager", "Your Company"),
-    ("jessica.evans@candoursystems.com", "Attendance Manager", "Your Company"),
-    ("benjamin.parker@candoursystems.com", "Recruiter", "Your Company Ltd."),
-    ("lily.campbell@candoursystems.com", "Helpdesk Agent", "Your Company Inc."),
-    ("matthew.harris@candoursystems.com", "Performance Manager", "Your Company"),
-    ("david.king@candoursystems.com", "Project Manager", "Your Company"),
+    ("alexander.smith@horilla.com", "Asset Manager", "Your Company"),
+    ("alexander.smith@horilla.com", "Asset Manager", "Your Company Inc."),
+    ("michael.brown@horilla.com", "HR Manager", "Your Company"),
+    ("sarah.anderson@horilla.com", "Payroll Manager", "Your Company"),
+    ("emily.clark@horilla.com", "Leave Manager", "Your Company"),
+    ("jessica.evans@horilla.com", "Attendance Manager", "Your Company"),
+    ("benjamin.parker@horilla.com", "Recruiter", "Your Company Ltd."),
+    ("lily.campbell@horilla.com", "Helpdesk Agent", "Your Company Inc."),
+    ("matthew.harris@horilla.com", "Performance Manager", "Your Company"),
+    ("david.king@horilla.com", "Project Manager", "Your Company"),
 )
 
 
@@ -43,9 +43,9 @@ def assign_demo_user_groups():
     """
     created = 0
     for email, group_name, company_name in DEMO_ROLE_ASSIGNMENTS:
-        user = CandourUser.objects.filter(email=email).first()
+        user = HorillaUser.objects.filter(email=email).first()
         if not user:
-            user = CandourUser.objects.filter(username=email).first()
+            user = HorillaUser.objects.filter(username=email).first()
         group = Group.objects.filter(name=group_name).first()
         company = Company.objects.filter(company=company_name).first()
         if not user or not group or not company:

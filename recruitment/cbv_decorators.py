@@ -3,9 +3,9 @@ from django.http import HttpResponse
 from django.shortcuts import render
 
 from employee.models import Employee
-from candour.candour_middlewares import _thread_locals
-from candour.methods import handle_no_permission
-from candour_views.cbv_methods import decorator_with_arguments
+from horilla.horilla_middlewares import _thread_locals
+from horilla.methods import handle_no_permission
+from horilla_views.cbv_methods import decorator_with_arguments
 from recruitment.models import Recruitment, Stage
 
 

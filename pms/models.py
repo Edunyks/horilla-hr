@@ -13,19 +13,19 @@ from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from base.candour_company_manager import CandourCompanyManager
+from base.horilla_company_manager import HorillaCompanyManager
 from base.models import Company, Department, JobPosition
 from employee.models import BonusPoint, Employee
-from candour.candour_middlewares import _thread_locals
-from candour.models import CandourModel
-from candour_audit.methods import get_diff
-from candour_audit.models import CandourAuditInfo, CandourAuditLog
-from candour_views.cbv_methods import render_template
+from horilla.horilla_middlewares import _thread_locals
+from horilla.models import HorillaModel
+from horilla_audit.methods import get_diff
+from horilla_audit.models import HorillaAuditInfo, HorillaAuditLog
+from horilla_views.cbv_methods import render_template
 
 """Objectives and key result section"""
 
 
-class Period(CandourModel):
+class Period(HorillaModel):
     """this is a period model used for creating period"""
 
     period_name = models.CharField(
@@ -34,7 +34,7 @@ class Period(CandourModel):
     start_date = models.DateField()
     end_date = models.DateField()
     company_id = models.ManyToManyField(Company, blank=True, verbose_name=_("Company"))
-    objects = CandourCompanyManager("company_id")
+    objects = HorillaCompanyManager("company_id")
 
     def __str__(self):
         return self.period_name
@@ -75,7 +75,7 @@ class Period(CandourModel):
         return company_names_string
 
 
-class KeyResult(CandourModel):
+class KeyResult(HorillaModel):
     """model used to create key results"""
 
     PROGRESS_CHOICES = (
@@ -100,7 +100,7 @@ class KeyResult(CandourModel):
     )
     duration = models.IntegerField(null=True, blank=True, help_text=_("In Days"))
     archive = models.BooleanField(default=False)
-    history = CandourAuditLog(bases=[CandourAuditInfo])
+    history = HorillaAuditLog(bases=[HorillaAuditInfo])
     company_id = models.ForeignKey(
         Company,
         null=True,
@@ -108,7 +108,7 @@ class KeyResult(CandourModel):
         verbose_name=_("Company"),
         on_delete=models.CASCADE,
     )
-    objects = CandourCompanyManager()
+    objects = HorillaCompanyManager()
 
     class Meta:
         """
@@ -182,7 +182,7 @@ class KeyResult(CandourModel):
         return url
 
 
-class Objective(CandourModel):
+class Objective(HorillaModel):
     """Model used for creating objectives"""
 
     DURATION_UNIT = (
@@ -223,7 +223,7 @@ class Objective(CandourModel):
     add_assignees = models.BooleanField(default=False)
     is_template = models.BooleanField(default=False)
     archive = models.BooleanField(default=False)
-    history = CandourAuditLog(bases=[CandourAuditInfo])
+    history = HorillaAuditLog(bases=[HorillaAuditInfo])
     company_id = models.ForeignKey(
         Company,
         null=True,
@@ -234,7 +234,7 @@ class Objective(CandourModel):
     self_employee_progress_update = models.BooleanField(
         default=True, verbose_name=_("Self employee progress update")
     )
-    objects = CandourCompanyManager()
+    objects = HorillaCompanyManager()
 
     class Meta:
         """
@@ -350,7 +350,7 @@ class Objective(CandourModel):
         super().save()
 
 
-class EmployeeObjective(CandourModel):
+class EmployeeObjective(HorillaModel):
     """this is a EmployObjective model used for creating Employee objectives"""
 
     STATUS_CHOICES = (
@@ -407,9 +407,9 @@ class EmployeeObjective(CandourModel):
     )
     progress_percentage = models.IntegerField(default=0)
 
-    history = CandourAuditLog(bases=[CandourAuditInfo], related_name="history_set")
+    history = HorillaAuditLog(bases=[HorillaAuditInfo], related_name="history_set")
     archive = models.BooleanField(default=False)
-    objects = CandourCompanyManager("employee_id__employee_work_info__company_id")
+    objects = HorillaCompanyManager("employee_id__employee_work_info__company_id")
 
     class Meta:
         """
@@ -578,8 +578,8 @@ class Comment(models.Model):
         blank=True,
     )
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    history = CandourAuditLog(excluded_fields=["comment"], bases=[CandourAuditInfo])
-    objects = CandourCompanyManager(
+    history = HorillaAuditLog(excluded_fields=["comment"], bases=[HorillaAuditInfo])
+    objects = HorillaCompanyManager(
         related_company_field="employee_id__employee_work_info__company_id"
     )
 
@@ -643,8 +643,8 @@ class EmployeeKeyResult(models.Model):
     )
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
-    history = CandourAuditLog(bases=[CandourAuditInfo])
-    objects = CandourCompanyManager(
+    history = HorillaAuditLog(bases=[HorillaAuditInfo])
+    objects = HorillaCompanyManager(
         related_company_field="employee_objective_id__objective_id__company_id"
     )
     progress_percentage = models.IntegerField(default=0)
@@ -910,7 +910,7 @@ class EmployeeKeyResult(models.Model):
 """360degree feedback section"""
 
 
-class QuestionTemplate(CandourModel):
+class QuestionTemplate(HorillaModel):
     """question template creation"""
 
     question_template = models.CharField(
@@ -918,7 +918,7 @@ class QuestionTemplate(CandourModel):
     )
     company_id = models.ManyToManyField(Company, blank=True, verbose_name=_("Company"))
 
-    objects = CandourCompanyManager("company_id")
+    objects = HorillaCompanyManager("company_id")
 
     def __str__(self):
         return self.question_template
@@ -969,7 +969,7 @@ class QuestionTemplate(CandourModel):
         return url
 
 
-class Question(CandourModel):
+class Question(HorillaModel):
     """question creation"""
 
     QUESTION_TYPE_CHOICE = (
@@ -990,13 +990,13 @@ class Question(CandourModel):
         null=True,
         blank=True,
     )
-    objects = CandourCompanyManager("template_id__company_id")
+    objects = HorillaCompanyManager("template_id__company_id")
 
     def __str__(self):
         return self.question
 
 
-class QuestionOptions(CandourModel):
+class QuestionOptions(HorillaModel):
     """options for question"""
 
     question_id = models.ForeignKey(
@@ -1010,10 +1010,10 @@ class QuestionOptions(CandourModel):
     option_b = models.CharField(max_length=250, null=True, blank=True)
     option_c = models.CharField(max_length=250, null=True, blank=True)
     option_d = models.CharField(max_length=250, null=True, blank=True)
-    objects = CandourCompanyManager("question_id__template_id__company_id")
+    objects = HorillaCompanyManager("question_id__template_id__company_id")
 
 
-class Feedback(CandourModel):
+class Feedback(HorillaModel):
     """feedback model for creating feedback"""
 
     STATUS_CHOICES = (
@@ -1098,7 +1098,7 @@ class Feedback(CandourModel):
     cyclic_next_start_date = models.DateField(null=True, blank=True)
     cyclic_next_end_date = models.DateField(null=True, blank=True)
 
-    objects = CandourCompanyManager("employee_id__employee_work_info__company_id")
+    objects = HorillaCompanyManager("employee_id__employee_work_info__company_id")
 
     class Meta:
         ordering = ["-id"]
@@ -1402,7 +1402,7 @@ class Answer(models.Model):
     feedback_id = models.ForeignKey(
         Feedback, on_delete=models.PROTECT, related_name="feedback_answer"
     )
-    objects = CandourCompanyManager("employee_id__employee_work_info__company_id")
+    objects = HorillaCompanyManager("employee_id__employee_work_info__company_id")
 
     def __str__(self):
         return f"{self.employee_id.employee_first_name} - {self.answer}"
@@ -1427,10 +1427,10 @@ class KeyResultFeedback(models.Model):
         blank=True,
         on_delete=models.DO_NOTHING,
     )
-    objects = CandourCompanyManager("employee_id__employee_work_info__company_id")
+    objects = HorillaCompanyManager("employee_id__employee_work_info__company_id")
 
 
-class Meetings(CandourModel):
+class Meetings(HorillaModel):
     title = models.CharField(max_length=100)
     date = models.DateTimeField(null=True, blank=True)
     employee_id = models.ManyToManyField(
@@ -1465,7 +1465,7 @@ class Meetings(CandourModel):
         verbose_name=_("Company"),
         on_delete=models.CASCADE,
     )
-    objects = CandourCompanyManager()
+    objects = HorillaCompanyManager()
 
     class Meta:
         verbose_name = _("Meetings")
@@ -1640,13 +1640,13 @@ class MeetingsAnswer(models.Model):
     meeting_id = models.ForeignKey(
         Meetings, on_delete=models.PROTECT, related_name="meeting_answer"
     )
-    objects = CandourCompanyManager("employee_id__employee_work_info__company_id")
+    objects = HorillaCompanyManager("employee_id__employee_work_info__company_id")
 
     def __str__(self):
         return f"{self.employee_id.employee_first_name} - {self.answer}"
 
 
-class EmployeeBonusPoint(CandourModel):
+class EmployeeBonusPoint(HorillaModel):
     employee_id = models.ForeignKey(
         Employee,
         on_delete=models.DO_NOTHING,
@@ -1665,7 +1665,7 @@ class EmployeeBonusPoint(CandourModel):
         on_delete=models.CASCADE,
         related_name="employeebonuspoint_set",
     )
-    objects = CandourCompanyManager("employee_id__employee_work_info__company_id")
+    objects = HorillaCompanyManager("employee_id__employee_work_info__company_id")
 
     def __str__(self):
         return f"{self.employee_id.employee_first_name} - {self.bonus_point}"
@@ -1761,7 +1761,7 @@ class BonusPointSetting(models.Model):
         verbose_name=_("Company"),
         on_delete=models.CASCADE,
     )
-    objects = CandourCompanyManager()
+    objects = HorillaCompanyManager()
 
     def get_model_display(self):
         """

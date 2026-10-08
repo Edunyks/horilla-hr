@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 from django.test import TestCase
 
-from candour.testkit import make_company, make_employee
+from horilla.testkit import make_company, make_employee
 from payroll.methods.methods import compute_salary_on_period
 from payroll.models.models import Contract
 
@@ -25,7 +25,7 @@ EMPTY_LEAVES = {
 class ComputeSalaryOnPeriodTests(TestCase):
     def setUp(self):
         company = make_company("Salary Co")
-        self.employee = make_employee(company=company, email="salary@test.candour")
+        self.employee = make_employee(company=company, email="salary@test.horilla")
         Contract.objects.filter(employee_id=self.employee).delete()
         self.start = date(2024, 1, 1)
         self.end = date(2024, 1, 31)

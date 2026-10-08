@@ -13,8 +13,8 @@ from asset.models import AssetAssignment, AssetRequest
 from base.cbv.work_shift_tab import ProfileTabShellView
 from employee.cbv.employee_profile import EmployeeProfileView
 from employee.models import Employee
-from candour_views.cbv_methods import login_required, owner_can_enter
-from candour_views.generic.cbv.views import CandourNavView, CandourTabView
+from horilla_views.cbv_methods import login_required, owner_can_enter
+from horilla_views.generic.cbv.views import HorillaNavView, HorillaTabView
 
 
 @method_decorator(login_required, name="dispatch")
@@ -99,7 +99,7 @@ class AssetRequestIndividualTabShell(ProfileTabShellView):
     ),
     name="dispatch",
 )
-class AssetRequestIndividualNav(CandourNavView):
+class AssetRequestIndividualNav(HorillaNavView):
     """
     Minimal nav (Create button only) for the Asset Request profile tab -
     matches the original create_asset_request_accessibility check (perm,
@@ -136,7 +136,7 @@ class AssetRequestIndividualNav(CandourNavView):
     ),
     name="dispatch",
 )
-class AssetTabView(CandourTabView):
+class AssetTabView(HorillaTabView):
     """
     generic tab view for asset tab
     """

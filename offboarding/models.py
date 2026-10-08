@@ -14,21 +14,21 @@ from django.utils.timesince import timesince
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import gettext_noop
 
-from base.candour_company_manager import CandourCompanyManager
+from base.horilla_company_manager import HorillaCompanyManager
 from base.models import Company
 from employee.models import Employee
-from candour import candour_middlewares
-from candour.candour_middlewares import _thread_locals
-from candour.methods import get_candour_model_class
-from candour.models import CandourModel, upload_path
-from candour_audit.models import CandourAuditInfo, CandourAuditLog
-from candour_views.cbv_methods import render_template
+from horilla import horilla_middlewares
+from horilla.horilla_middlewares import _thread_locals
+from horilla.methods import get_horilla_model_class
+from horilla.models import HorillaModel, upload_path
+from horilla_audit.models import HorillaAuditInfo, HorillaAuditLog
+from horilla_views.cbv_methods import render_template
 from notifications.signals import notify
 
 # Create your models here.
 
 
-class Offboarding(CandourModel):
+class Offboarding(HorillaModel):
     """
     Offboarding model
     """
@@ -44,7 +44,7 @@ class Offboarding(CandourModel):
         null=True,
         verbose_name="Company",
     )
-    objects = CandourCompanyManager("company_id")
+    objects = HorillaCompanyManager("company_id")
 
     def __str__(self):
         return self.title
@@ -70,7 +70,7 @@ class Offboarding(CandourModel):
         return
 
 
-class OffboardingStage(CandourModel):
+class OffboardingStage(HorillaModel):
     """
     Offboarding model
     """
@@ -140,7 +140,7 @@ def create_initial_stage(sender, instance, created, **kwargs):
         initial_stage.save()
 
 
-class OffboardingStageMultipleFile(CandourModel):
+class OffboardingStageMultipleFile(HorillaModel):
     """
     OffboardingStageMultipleFile
     """
@@ -148,7 +148,7 @@ class OffboardingStageMultipleFile(CandourModel):
     attachment = models.FileField(upload_to=upload_path)
 
 
-class OffboardingEmployee(CandourModel):
+class OffboardingEmployee(HorillaModel):
     """
     OffboardingEmployee model / Employee on stage
     """
@@ -168,7 +168,7 @@ class OffboardingEmployee(CandourModel):
     notice_period_ends = models.DateField(
         null=True, blank=True, verbose_name=_("Notice Period Ends")
     )
-    objects = CandourCompanyManager(
+    objects = HorillaCompanyManager(
         related_company_field="employee_id__employee_work_info__company_id"
     )
 
@@ -372,7 +372,7 @@ class OffboardingEmployee(CandourModel):
         return f'{reverse_lazy("get-manager-in")}?employee_id={self.employee_id.id}&offboarding=True'
 
 
-class ResignationLetter(CandourModel):
+class ResignationLetter(HorillaModel):
     """
     Resignation Request Employee model
     """
@@ -392,13 +392,13 @@ class ResignationLetter(CandourModel):
     offboarding_employee_id = models.ForeignKey(
         OffboardingEmployee, on_delete=models.CASCADE, editable=False, null=True
     )
-    objects = CandourCompanyManager(
+    objects = HorillaCompanyManager(
         related_company_field="employee_id__employee_work_info__company_id"
     )
-    history = CandourAuditLog(
+    history = HorillaAuditLog(
         related_name="history_set",
         bases=[
-            CandourAuditInfo,
+            HorillaAuditInfo,
         ],
     )
 
@@ -541,7 +541,7 @@ class ResignationLetter(CandourModel):
             .first()
         )
         default_notice_end = (
-            get_candour_model_class(
+            get_horilla_model_class(
                 app_label="payroll", model="payrollgeneralsetting"
             ).objects.first()
             if apps.is_installed("payroll")
@@ -581,7 +581,7 @@ class ResignationLetter(CandourModel):
         offboarding_employee.save()
 
 
-class OffboardingTask(CandourModel):
+class OffboardingTask(HorillaModel):
     """
     OffboardingTask model
     """
@@ -604,7 +604,7 @@ class OffboardingTask(CandourModel):
         return self.title
 
 
-class EmployeeTask(CandourModel):
+class EmployeeTask(HorillaModel):
     """
     EmployeeTask model
     """
@@ -624,10 +624,10 @@ class EmployeeTask(CandourModel):
     status = models.CharField(max_length=20, choices=statuses, default="todo")
     task_id = models.ForeignKey(OffboardingTask, on_delete=models.CASCADE)
     description = models.TextField(null=True, editable=False, max_length=255)
-    history = CandourAuditLog(
+    history = HorillaAuditLog(
         related_name="history_set",
         bases=[
-            CandourAuditInfo,
+            HorillaAuditInfo,
         ],
     )
 
@@ -647,7 +647,7 @@ class EmployeeTask(CandourModel):
         )
 
 
-class ExitReason(CandourModel):
+class ExitReason(HorillaModel):
     """
     ExitReason model
     """
@@ -660,7 +660,7 @@ class ExitReason(CandourModel):
     attachments = models.ManyToManyField(OffboardingStageMultipleFile)
 
 
-class OffboardingNote(CandourModel):
+class OffboardingNote(HorillaModel):
     """
     OffboardingNote
     """
@@ -683,7 +683,7 @@ class OffboardingNote(CandourModel):
         ordering = ["-created_at"]
 
     def save(self, *args, **kwargs):
-        request = getattr(candour_middlewares._thread_locals, "request", None)
+        request = getattr(horilla_middlewares._thread_locals, "request", None)
         if request:
             updated_by = request.user.employee_get
             self.note_by = updated_by
@@ -692,11 +692,11 @@ class OffboardingNote(CandourModel):
         return super().save(*args, **kwargs)
 
 
-class OffboardingGeneralSetting(CandourModel):
+class OffboardingGeneralSetting(HorillaModel):
     """
     OffboardingGeneralSettings
     """
 
     resignation_request = models.BooleanField(default=False)
     company_id = models.ForeignKey(Company, on_delete=models.CASCADE, null=True)
-    objects = CandourCompanyManager("company_id")
+    objects = HorillaCompanyManager("company_id")

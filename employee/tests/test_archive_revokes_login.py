@@ -15,21 +15,21 @@ to the employee's previous state -- backwards. It never mattered, because only
 the employee was saved. Fixing the save alone would have turned a no-op into
 archiving *enabling* logins, which is why both halves are pinned here.
 
-The gate that matters is ``CandourUser.is_active``: ``CompanyScopedBackend``
+The gate that matters is ``HorillaUser.is_active``: ``CompanyScopedBackend``
 subclasses ``ModelBackend`` without overriding ``user_can_authenticate``, which
 is ``return getattr(user, "is_active", True)`` and knows nothing about
 ``Employee.is_active``. So these tests assert against ``authenticate()`` rather
 than against the flag alone -- the flag is the mechanism, authentication is the
 property that was broken.
 
-Reported as https://github.com/candour/candour-hr/issues/1239 by @Safeer1877.
+Reported as https://github.com/horilla/horilla-hr/issues/1239 by @Safeer1877.
 """
 
 from django.contrib.auth import authenticate
 from django.test import RequestFactory, TestCase
 
 from employee.models import Employee
-from candour.testkit import make_company, make_employee
+from horilla.testkit import make_company, make_employee
 
 
 class ArchiveRevokesLoginTests(TestCase):
@@ -43,7 +43,7 @@ class ArchiveRevokesLoginTests(TestCase):
         # request, so every call below passes one.
         self.request = RequestFactory().post("/login/")
 
-    def _employee_with_password(self, email="leaver@test.candour"):
+    def _employee_with_password(self, email="leaver@test.horilla"):
         emp = make_employee(
             company=self.company,
             email=email,
@@ -82,7 +82,7 @@ class ArchiveRevokesLoginTests(TestCase):
         )
 
     def test_unarchiving_restores_authentication(self):
-        emp = self._employee_with_password("returner@test.candour")
+        emp = self._employee_with_password("returner@test.horilla")
         emp.is_active = False
         emp.save()
         emp.sync_login_access()
@@ -104,7 +104,7 @@ class ArchiveRevokesLoginTests(TestCase):
 
     def test_the_user_flag_is_persisted_not_just_assigned(self):
         """The original bug was an unsaved in-memory assignment."""
-        emp = self._employee_with_password("persist@test.candour")
+        emp = self._employee_with_password("persist@test.horilla")
         emp.is_active = False
         emp.save()
         emp.sync_login_access()
@@ -115,7 +115,7 @@ class ArchiveRevokesLoginTests(TestCase):
 
     def test_value_is_not_inverted(self):
         """Guards the specific `not` that made archiving set the old value."""
-        emp = self._employee_with_password("inversion@test.candour")
+        emp = self._employee_with_password("inversion@test.horilla")
         for employee_state in (False, True, False):
             emp.is_active = employee_state
             emp.save()
@@ -130,14 +130,14 @@ class ArchiveRevokesLoginTests(TestCase):
     def test_employee_without_a_user_does_not_raise(self):
         """employee_user_id is nullable, so the sync must tolerate None.
 
-        Not routed through save(): Employee.save() auto-creates a CandourUser
+        Not routed through save(): Employee.save() auto-creates a HorillaUser
         whenever the FK is empty, which would both defeat the point and collide
         with the account already holding that username. The guard is what is
         under test, so it is called directly.
         """
         emp = make_employee(
             company=self.company,
-            email="nouser@test.candour",
+            email="nouser@test.horilla",
             first_name="No",
             last_name="Account",
         )
@@ -154,7 +154,7 @@ class ArchiveRevokesLoginTests(TestCase):
         the sync is an explicit call at the archive sites only -- and a plain
         employee save must leave the user's flag alone.
         """
-        emp = self._employee_with_password("dashboard@test.candour")
+        emp = self._employee_with_password("dashboard@test.horilla")
         user = emp.employee_user_id
         user.is_active = False  # access revoked, employee still active
         user.save(update_fields=["is_active"])

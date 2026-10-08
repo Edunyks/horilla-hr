@@ -1,7 +1,7 @@
 {% extends 'settings.html' %}
 {% block settings %}
     {% load i18n %}
-    {% load candourfilters %}
+    {% load horillafilters %}
 
     {% if "payroll"|app_installed %}
         {% if perms.payroll.change_encashmentgeneralsettings %}

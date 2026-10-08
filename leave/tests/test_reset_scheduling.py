@@ -43,11 +43,11 @@ class ResetSchedulerTests(TestCase):
     """leave.scheduler.leave_reset()."""
 
     def setUp(self):
-        from candour.testkit import make_company, make_employee
+        from horilla.testkit import make_company, make_employee
         from leave.models import AvailableLeave, LeaveType
 
         company = make_company("Reset Scheduler Co")
-        self.employee = make_employee(company=company, email="reset-sched@test.candour")
+        self.employee = make_employee(company=company, email="reset-sched@test.horilla")
         self.LeaveType = LeaveType
         self.AvailableLeave = AvailableLeave
 

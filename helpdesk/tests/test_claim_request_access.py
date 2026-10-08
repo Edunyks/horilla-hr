@@ -13,7 +13,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from helpdesk.models import ClaimRequest, Ticket, TicketType
-from candour.testkit import make_company, make_employee, make_user
+from horilla.testkit import make_company, make_employee, make_user
 
 
 class ClaimRequestAccessControlTests(TestCase):
@@ -27,7 +27,7 @@ class ClaimRequestAccessControlTests(TestCase):
         cls.owner_user = make_user("claim-owner")
         cls.owner = make_employee(
             company=cls.company,
-            email="claim-owner@test.candour",
+            email="claim-owner@test.horilla",
             first_name="Olive",
             last_name="Owner",
             user=cls.owner_user,
@@ -36,7 +36,7 @@ class ClaimRequestAccessControlTests(TestCase):
         cls.claimant_user = make_user("claim-claimant")
         cls.claimant = make_employee(
             company=cls.company,
-            email="claim-claimant@test.candour",
+            email="claim-claimant@test.horilla",
             first_name="Cody",
             last_name="Claimant",
             user=cls.claimant_user,
@@ -47,7 +47,7 @@ class ClaimRequestAccessControlTests(TestCase):
         cls.outsider_user = make_user("claim-outsider")
         cls.outsider = make_employee(
             company=cls.company,
-            email="claim-outsider@test.candour",
+            email="claim-outsider@test.horilla",
             first_name="Ivan",
             last_name="Outsider",
             user=cls.outsider_user,

@@ -8,11 +8,11 @@ from django.test import TestCase
 
 class LeaveAllocationApproveTests(TestCase):
     def setUp(self):
-        from candour.testkit import make_company, make_employee
+        from horilla.testkit import make_company, make_employee
         from leave.models import LeaveType
 
         company = make_company("Alloc Co")
-        self.employee = make_employee(company=company, email="alloc@test.candour")
+        self.employee = make_employee(company=company, email="alloc@test.horilla")
         self.leave_type = LeaveType.objects.create(
             name="Allocation Leave Type",
             total_days=10,

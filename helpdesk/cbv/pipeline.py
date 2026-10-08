@@ -7,13 +7,13 @@ from django.utils.translation import gettext_lazy as _
 from base.methods import filtersubordinates, is_reportingmanager
 from helpdesk.filter import TicketFilter
 from helpdesk.models import Ticket
-from candour_views.cbv_methods import login_required
-from candour_views.generic.cbv.kanban import CandourKanbanView
-from candour_views.generic.cbv.views import (
-    CandourListView,
-    CandourNavView,
-    CandourTabContentShell,
-    CandourTabView,
+from horilla_views.cbv_methods import login_required
+from horilla_views.generic.cbv.kanban import HorillaKanbanView
+from horilla_views.generic.cbv.views import (
+    HorillaListView,
+    HorillaNavView,
+    HorillaTabContentShell,
+    HorillaTabView,
     TemplateView,
 )
 
@@ -27,7 +27,7 @@ class TicketPipelineView(TemplateView):
     template_name = "cbv/pipeline/ticket_section_view.html"
 
 
-class _TicketTabNavBase(CandourNavView):
+class _TicketTabNavBase(HorillaNavView):
     """
     Shared Filter/Group-by/Actions/Create wiring for each Tickets tab's own,
     independent Nav - only search_url/search_swap_target/view_types differ
@@ -38,7 +38,7 @@ class _TicketTabNavBase(CandourNavView):
     filter_body_template = "cbv/pipeline/ticket_filter_form.html"
     filter_instance = TicketFilter()
     filter_form_context_name = "form"
-    # Modern slide-over filter panel (generic/candour_nav.html's own
+    # Modern slide-over filter panel (generic/horilla_nav.html's own
     # {% if modern_filter %} branch) -- same treatment as every other
     # panel this session. TicketFilter.ajax_fields carries the
     # AJAX-loaded comboboxes this needs.
@@ -179,26 +179,26 @@ class AllTicketsNav(_TicketTabNavBase):
         ]
 
 
-class MyTicketsTabShell(CandourTabContentShell):
+class MyTicketsTabShell(HorillaTabContentShell):
     nav_url_name = "my-tickets-nav"
     container_id = "myTicketsListContainer"
     tabs_root_id = "ticketPipelineContainer"
 
 
-class SuggestedTicketsTabShell(CandourTabContentShell):
+class SuggestedTicketsTabShell(HorillaTabContentShell):
     nav_url_name = "suggested-tickets-nav"
     container_id = "suggestedTicketsListContainer"
     tabs_root_id = "ticketPipelineContainer"
 
 
-class AllTicketsTabShell(CandourTabContentShell):
+class AllTicketsTabShell(HorillaTabContentShell):
     nav_url_name = "all-tickets-nav"
     container_id = "allTicketsListContainer"
     tabs_root_id = "ticketPipelineContainer"
 
 
 @method_decorator(login_required, name="dispatch")
-class TicketTabView(CandourTabView):
+class TicketTabView(HorillaTabView):
     """
     Pipeline List View
     """
@@ -282,7 +282,7 @@ class TicketTabView(CandourTabView):
 
 
 @method_decorator(login_required, name="dispatch")
-class TicketListBase(CandourListView):
+class TicketListBase(HorillaListView):
     """
     Shared columns/actions/queryset base for each Tickets tab's own list.
     """
@@ -486,7 +486,7 @@ class AllTicketsList(TicketListBase):
 
 
 @method_decorator(login_required, name="dispatch")
-class TicketCardBase(CandourKanbanView):
+class TicketCardBase(HorillaKanbanView):
     """
     Shared columns/actions/queryset base for each Tickets tab's own kanban
     board.

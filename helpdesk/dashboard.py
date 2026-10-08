@@ -13,7 +13,7 @@ from django.shortcuts import render
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from candour.decorators import login_required, permission_required
+from horilla.decorators import login_required, permission_required
 
 
 def _parse_period(request):

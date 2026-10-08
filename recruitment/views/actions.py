@@ -23,11 +23,11 @@ from base.methods import (
     sanitize_mail_template_body,
     sanitize_mail_template_placeholders,
 )
-from base.models import CandourMailTemplate
+from base.models import HorillaMailTemplate
 from employee.models import Employee
-from candour.decorators import hx_request_required, login_required, permission_required
-from candour.group_by import group_by_queryset
-from candour.http import CandourRedirect
+from horilla.decorators import hx_request_required, login_required, permission_required
+from horilla.group_by import group_by_queryset
+from horilla.http import HorillaRedirect
 from notifications.signals import notify
 from recruitment.decorators import (
     candidate_login_required,
@@ -55,7 +55,7 @@ def recruitment_delete(request, rec_id):
             recruitment_obj = Recruitment.objects.get(id=rec_id)
         except Recruitment.DoesNotExist:
             messages.error(request, _("Recruitment not found."))
-            return CandourRedirect(request)
+            return HorillaRedirect(request)
         recruitment_mangers = recruitment_obj.recruitment_managers.all()
         all_stage_permissions = Permission.objects.filter(
             content_type__app_label="recruitment", content_type__model="stage"
@@ -106,7 +106,7 @@ def recruitment_delete(request, rec_id):
             "$('#reloadMessagesButton').click();"
             "</script>"
         )
-    return CandourRedirect(request)
+    return HorillaRedirect(request)
 
 
 @login_required
@@ -118,7 +118,7 @@ def recruitment_delete_pipeline(request, rec_id):
     Args:
         id: recruitment instance id
     Returns:
-        CandourRedirect: Used to refresh the page
+        HorillaRedirect: Used to refresh the page
     """
     try:
         recruitment_obj = Recruitment.objects.get(id=rec_id)
@@ -135,7 +135,7 @@ def recruitment_delete_pipeline(request, rec_id):
             request,
             _("Recruitment already in use for {}.".format(models_verbose_name_str)),
         )
-    return CandourRedirect(request)
+    return HorillaRedirect(request)
 
 
 @login_required
@@ -151,7 +151,7 @@ def note_delete(request, note_id):
         messages.success(request, _("Note deleted"))
         script = ""
     except StageNote.DoesNotExist:
-        return CandourRedirect(request, message=_("Note not found."))
+        return HorillaRedirect(request, message=_("Note not found."))
     except ProtectedError:
         messages.error(request, _("You cannot delete this note."))
         script = f"""
@@ -192,7 +192,7 @@ def stage_delete(request, stage_id):
             recruitment_id = stage_obj.recruitment_id.id
         except Stage.DoesNotExist:
             messages.error(request, _("Stage not found."))
-            return CandourRedirect(request)
+            return HorillaRedirect(request)
 
         try:
             stage_managers = stage_obj.stage_managers.all()
@@ -252,8 +252,8 @@ def stage_delete(request, stage_id):
                 "$('#reloadMessagesButton').click();"
                 "</script>"
             )
-        return CandourRedirect(request)
-    return CandourRedirect(request)
+        return HorillaRedirect(request)
+    return HorillaRedirect(request)
 
 
 @login_required
@@ -290,7 +290,7 @@ def candidate_delete(request, cand_id):
         response = HttpResponse(status=204)
         response["HX-Trigger"] = "candidateContainerReload"
         return response
-    return CandourRedirect(request)
+    return HorillaRedirect(request)
 
 
 @login_required
@@ -341,7 +341,7 @@ def candidate_archive(request, cand_id):
         response = HttpResponse(status=204)
         response["HX-Trigger"] = "candidateContainerReload"
         return response
-    return CandourRedirect(request)
+    return HorillaRedirect(request)
 
 
 @login_required
@@ -387,7 +387,7 @@ def remove_stage_manager(request, mid, sid):
     stage_obj = Stage.find(sid)
     manager = Employee.objects.filter(id=mid).first()
     if not stage_obj or not manager:
-        return CandourRedirect(
+        return HorillaRedirect(
             request,
             message=_("No %(model_name)s found matching the query.")
             % {"model_name": "Stage" if not stage_obj else "Employee"},
@@ -477,8 +477,8 @@ def get_template(request, obj_id=None):
     body = ""
     if obj_id:
         body = (
-            CandourMailTemplate.find(obj_id).body
-            if CandourMailTemplate.find(obj_id)
+            HorillaMailTemplate.find(obj_id).body
+            if HorillaMailTemplate.find(obj_id)
             else None
         )
         if not body:
@@ -508,7 +508,7 @@ def get_template_hint(request, obj_id=None):
     template_bdy = None
     allowed_template_words = set(MailTemplateForm().get_template_language().values())
     if obj_id:
-        body = CandourMailTemplate.objects.get(id=obj_id).body
+        body = HorillaMailTemplate.objects.get(id=obj_id).body
         template_bdy = template.Template(sanitize_mail_template_body(body))
     if request.GET.get("word"):
         word = request.GET.get("word").strip()

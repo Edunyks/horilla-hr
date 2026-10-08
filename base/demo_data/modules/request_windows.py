@@ -279,9 +279,9 @@ def _document_expiry(today: date) -> int:
     are represented: already expired, expiring inside the notify window,
     and comfortably valid.
     """
-    if not apps.is_installed("candour_documents"):
+    if not apps.is_installed("horilla_documents"):
         return 0
-    from candour_documents.models import Document
+    from horilla_documents.models import Document
 
     updated = 0
     for i, doc in enumerate(

@@ -5,9 +5,9 @@ from django import forms
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
-from candour.filters import (
+from horilla.filters import (
     FilterSet,
-    CandourFilterSet,
+    HorillaFilterSet,
     filter_by_name,
     filter_name_or_badge_terms,
 )
@@ -15,14 +15,14 @@ from candour.filters import (
 from .models import Employee, Project, ProjectStage, Task, TimeSheet
 
 
-class ProjectFilter(CandourFilterSet):
+class ProjectFilter(HorillaFilterSet):
     search = django_filters.CharFilter(method="filter_by_project")
     search_field = django_filters.CharFilter(method="search_in")
     name_or_badge = django_filters.CharFilter(
         method="filter_name_or_badge", label=_("Name or Badge ID")
     )
 
-    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
+    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
     ajax_fields = {
         "managers": {
             "key": "project-managers",
@@ -115,7 +115,7 @@ class TaskFilter(FilterSet):
         return queryset
 
 
-class TaskAllFilter(CandourFilterSet):
+class TaskAllFilter(HorillaFilterSet):
     search = django_filters.CharFilter(method="filter_by_task")
     end_date = django_filters.DateFilter(
         field_name="end_date",
@@ -134,7 +134,7 @@ class TaskAllFilter(CandourFilterSet):
         label=_("End Date Till"),
     )
 
-    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
+    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
     ajax_fields = {
         "project": {
             "key": "task-project",
@@ -186,7 +186,7 @@ class TaskAllFilter(CandourFilterSet):
         return queryset
 
 
-class TimeSheetFilter(CandourFilterSet):
+class TimeSheetFilter(HorillaFilterSet):
     """
     Filter set class for Timesheet model
     """
@@ -212,7 +212,7 @@ class TimeSheetFilter(CandourFilterSet):
     )
     search = django_filters.CharFilter(method="filter_by_employee")
 
-    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
+    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
     ajax_fields = {
         "project_id": {
             "key": "timesheet-project",

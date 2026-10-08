@@ -11,12 +11,12 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 
 from employee.models import Employee
-from candour_views.cbv_methods import login_required, permission_required
-from candour_views.generic.cbv.views import (
-    CandourDetailedView,
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
+from horilla_views.cbv_methods import login_required, permission_required
+from horilla_views.generic.cbv.views import (
+    HorillaDetailedView,
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
 )
 from payroll.filters import SalaryStructureFilter
 from payroll.forms.component_forms import (
@@ -47,7 +47,7 @@ def _reload_detail_view_script(structure_pk, request):
 @method_decorator(
     permission_required(perm="payroll.view_salarystructure"), name="dispatch"
 )
-class SalaryStructureListView(CandourListView):
+class SalaryStructureListView(HorillaListView):
     """
     list view of salary structures
     """
@@ -89,7 +89,7 @@ class SalaryStructureListView(CandourListView):
 @method_decorator(
     permission_required(perm="payroll.view_salarystructure"), name="dispatch"
 )
-class SalaryStructureNavView(CandourNavView):
+class SalaryStructureNavView(HorillaNavView):
     """
     nav bar of the salary structure page
     """
@@ -114,7 +114,7 @@ class SalaryStructureNavView(CandourNavView):
 
 
 @method_decorator(login_required, name="dispatch")
-class DynamicAllowanceCreateFormView(CandourFormView):
+class DynamicAllowanceCreateFormView(HorillaFormView):
     """
     Quick "create new allowance" form, opened from the Salary Structure
     form's allowances field.
@@ -135,7 +135,7 @@ class DynamicAllowanceCreateFormView(CandourFormView):
 
 
 @method_decorator(login_required, name="dispatch")
-class DynamicDeductionCreateFormView(CandourFormView):
+class DynamicDeductionCreateFormView(HorillaFormView):
     """
     Quick "create new deduction" form, opened from the Salary Structure
     form's deductions field.
@@ -156,7 +156,7 @@ class DynamicDeductionCreateFormView(CandourFormView):
 
 
 @method_decorator(login_required, name="dispatch")
-class SalaryStructureFormView(CandourFormView):
+class SalaryStructureFormView(HorillaFormView):
     """
     Create and edit form for salary structures, opened in the shared modal.
     """
@@ -206,7 +206,7 @@ class SalaryStructureFormView(CandourFormView):
 @method_decorator(
     permission_required(perm="payroll.add_salarystructure"), name="dispatch"
 )
-class SalaryStructureFormDuplicate(CandourFormView):
+class SalaryStructureFormDuplicate(HorillaFormView):
     """
     Duplicate form view for salary structures: pre-fills the title,
     allowances and deductions from an existing structure. Employees are
@@ -256,7 +256,7 @@ class SalaryStructureFormDuplicate(CandourFormView):
 @method_decorator(
     permission_required(perm="payroll.view_salarystructure"), name="dispatch"
 )
-class SalaryStructureDetailView(CandourDetailedView):
+class SalaryStructureDetailView(HorillaDetailedView):
     """
     Detail view for a salary structure: assigned employees span the full
     width on top, allowances and deductions sit side by side below.
@@ -290,7 +290,7 @@ class SalaryStructureDetailView(CandourDetailedView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="payroll.add_allowance"), name="dispatch")
-class AllowanceDuplicateInStructureView(CandourFormView):
+class AllowanceDuplicateInStructureView(HorillaFormView):
     """
     Duplicate a single allowance from within a salary structure's detail
     view. Pre-fills every field as a copy (employee targeting cleared, since
@@ -338,7 +338,7 @@ class AllowanceDuplicateInStructureView(CandourFormView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="payroll.add_deduction"), name="dispatch")
-class DeductionDuplicateInStructureView(CandourFormView):
+class DeductionDuplicateInStructureView(HorillaFormView):
     """
     Duplicate a single deduction from within a salary structure's detail
     view. Pre-fills every field as a copy, and on save swaps the new copy

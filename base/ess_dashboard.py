@@ -13,7 +13,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils.translation import gettext as _
 
-from base.templatetags.candourfilters import is_check_in_enabled
+from base.templatetags.horillafilters import is_check_in_enabled
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -51,10 +51,10 @@ def ess_dashboard(request):
     if not employee:
         from django.contrib import messages
 
-        from candour.http.response import CandourRedirect
+        from horilla.http.response import HorillaRedirect
 
         messages.error(request, _("Your account is not linked to an employee record."))
-        return CandourRedirect(request)
+        return HorillaRedirect(request)
 
     return render(
         request,

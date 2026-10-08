@@ -27,8 +27,8 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from base.models import Company
-from candour.testkit import make_employee
-from candour_auth.models import CandourUser
+from horilla.testkit import make_employee
+from horilla_auth.models import HorillaUser
 
 # Every view in the flow, including the edit/delete endpoints that are easy to
 # miss when auditing "the signup steps".
@@ -45,13 +45,13 @@ class InitializedDatabaseRejectsSetupFlow(TestCase):
 
     def setUp(self):
         company = Company.objects.create(company="Acme", hq=True)
-        user = CandourUser.objects.create_superuser(
-            username="root", email="root@test.candour", password="pw-not-real"
+        user = HorillaUser.objects.create_superuser(
+            username="root", email="root@test.horilla", password="pw-not-real"
         )
         # initialize_database_condition() only counts setup as finished when a
         # superuser has an employee attached, so the guard is not armed without
         # this.
-        make_employee(company=company, email="root@test.candour", user=user)
+        make_employee(company=company, email="root@test.horilla", user=user)
 
     def test_step_views_do_not_serve_the_wizard(self):
         for name in STEP_URL_NAMES:
@@ -76,7 +76,7 @@ class InitializedDatabaseRejectsSetupFlow(TestCase):
                     self.assertIn(response.status_code, (302, 403, 404))
 
     def test_forged_hx_header_cannot_create_a_superuser(self):
-        before = CandourUser.objects.filter(is_superuser=True).count()
+        before = HorillaUser.objects.filter(is_superuser=True).count()
 
         self.client.post(
             reverse("initialize-database-user"),
@@ -87,21 +87,21 @@ class InitializedDatabaseRejectsSetupFlow(TestCase):
                 "firstname": "Back",
                 "lastname": "Door",
                 "badge_id": "BD1",
-                "email": "backdoor@test.candour",
+                "email": "backdoor@test.horilla",
                 "phone": "9999999999",
             },
             headers={"hx-request": "true"},
         )
 
         # The outcome is what matters, not the status code.
-        self.assertFalse(CandourUser.objects.filter(username="backdoor").exists())
-        self.assertEqual(CandourUser.objects.filter(is_superuser=True).count(), before)
+        self.assertFalse(HorillaUser.objects.filter(username="backdoor").exists())
+        self.assertEqual(HorillaUser.objects.filter(is_superuser=True).count(), before)
         # A block that still logged the caller in would defeat the point.
         self.assertNotIn("_auth_user_id", self.client.session)
 
     @override_settings(DEBUG=False)
     def test_still_refused_with_debug_off(self):
-        before = CandourUser.objects.filter(is_superuser=True).count()
+        before = HorillaUser.objects.filter(is_superuser=True).count()
 
         self.client.post(
             reverse("initialize-database-user"),
@@ -112,21 +112,21 @@ class InitializedDatabaseRejectsSetupFlow(TestCase):
                 "firstname": "B",
                 "lastname": "D",
                 "badge_id": "BD2",
-                "email": "bd2@test.candour",
+                "email": "bd2@test.horilla",
                 "phone": "9999999999",
             },
             headers={"hx-request": "true"},
         )
 
-        self.assertFalse(CandourUser.objects.filter(username="backdoor2").exists())
-        self.assertEqual(CandourUser.objects.filter(is_superuser=True).count(), before)
+        self.assertFalse(HorillaUser.objects.filter(username="backdoor2").exists())
+        self.assertEqual(HorillaUser.objects.filter(is_superuser=True).count(), before)
 
 
 class UninitializedDatabaseAllowsSetupFlow(TestCase):
     """A genuinely fresh install must still be able to complete setup."""
 
     def test_user_step_needs_the_init_password_first(self):
-        self.assertFalse(CandourUser.objects.exists())
+        self.assertFalse(HorillaUser.objects.exists())
 
         response = self.client.get(
             reverse("initialize-database-user"), headers={"hx-request": "true"}
@@ -138,7 +138,7 @@ class UninitializedDatabaseAllowsSetupFlow(TestCase):
     def test_user_step_is_reachable_after_verifying_the_init_password(self):
         from django.conf import settings
 
-        self.assertFalse(CandourUser.objects.exists())
+        self.assertFalse(HorillaUser.objects.exists())
 
         self.client.post(
             reverse("initialize-database"),

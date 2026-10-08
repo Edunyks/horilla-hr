@@ -12,15 +12,15 @@ from asset.filters import AssetHistoryFilter
 from asset.forms import AssetHistoryExportForm
 from asset.models import AssetAssignment
 from base.methods import export_data, has_export_access
-from candour_views.cbv_methods import (
+from horilla_views.cbv_methods import (
     hx_request_required,
     login_required,
     permission_required,
 )
-from candour_views.generic.cbv.views import (
-    CandourDetailedView,
-    CandourListView,
-    CandourNavView,
+from horilla_views.generic.cbv.views import (
+    HorillaDetailedView,
+    HorillaListView,
+    HorillaNavView,
     TemplateView,
 )
 
@@ -37,7 +37,7 @@ class AssetHistoryView(TemplateView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("asset.view_assetassignment"), name="dispatch")
-class AssetHistorylistView(CandourListView):
+class AssetHistorylistView(HorillaListView):
     """
     list view
     """
@@ -88,7 +88,7 @@ class AssetHistorylistView(CandourListView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("asset.view_assetassignment"), name="dispatch")
-class AssetHistoryNavView(CandourNavView):
+class AssetHistoryNavView(HorillaNavView):
     """
     navbar
     """
@@ -115,7 +115,7 @@ class AssetHistoryNavView(CandourNavView):
     filter_form_context_name = "form"
     filter_instance = AssetHistoryFilter()
     search_swap_target = "#listContainer"
-    # Modern slide-over filter panel (generic/candour_nav.html's own
+    # Modern slide-over filter panel (generic/horilla_nav.html's own
     # {% if modern_filter %} branch) -- same treatment as every other
     # panel this session. AssetHistoryFilter.ajax_fields carries the
     # AJAX-loaded comboboxes this needs.
@@ -178,7 +178,7 @@ class AssetHistoryExportView(TemplateView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("asset.view_assetassignment"), name="dispatch")
-class AssetHistoryDetailView(CandourDetailedView):
+class AssetHistoryDetailView(HorillaDetailedView):
     """
     detail view of the page
     """

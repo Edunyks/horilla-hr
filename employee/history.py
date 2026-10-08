@@ -11,11 +11,11 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from employee.models import Employee
-from candour_audit.activity_feed import (
+from horilla_audit.activity_feed import (
     normalize_log_entries,
     normalize_tracking_entries,
 )
-from candour_views.history_methods import get_diff
+from horilla_views.history_methods import get_diff
 
 # Overrides for models with more than one Employee FK, or reached only
 # indirectly (a cross-relation lookup path instead of a field on the model
@@ -75,13 +75,13 @@ EMPLOYEE_HISTORY_MODELS = [
     # Conduct / penalties
     ("base", "penaltyaccounts"),
     # Documents / assets
-    ("candour_documents", "document"),
+    ("horilla_documents", "document"),
     ("asset", "assetassignment"),
     ("asset", "assetrequest"),
     # Helpdesk / meetings
     ("helpdesk", "ticket"),
     ("helpdesk", "claimrequest"),
-    ("candour_meet", "googlemeeting"),
+    ("horilla_meet", "googlemeeting"),
     ("project", "timesheet"),
     # Offboarding
     ("offboarding", "offboardingemployee"),
@@ -119,12 +119,12 @@ MODEL_LABELS = {
     ("pms", "anonymousfeedback"): _("Anonymous Feedback"),
     ("employee", "bonuspoint"): _("Bonus Points"),
     ("base", "penaltyaccounts"): _("Penalty"),
-    ("candour_documents", "document"): _("Document"),
+    ("horilla_documents", "document"): _("Document"),
     ("asset", "assetassignment"): _("Asset Allocation"),
     ("asset", "assetrequest"): _("Asset Request"),
     ("helpdesk", "ticket"): _("Helpdesk Ticket"),
     ("helpdesk", "claimrequest"): _("Claim Request"),
-    ("candour_meet", "googlemeeting"): _("Google Meeting"),
+    ("horilla_meet", "googlemeeting"): _("Google Meeting"),
     ("project", "timesheet"): _("Timesheet"),
     ("offboarding", "offboardingemployee"): _("Offboarding"),
     ("offboarding", "offboardingnote"): _("Offboarding Note"),

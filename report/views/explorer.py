@@ -7,7 +7,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _lazy
 
-from candour.decorators import login_required
+from horilla.decorators import login_required
 
 _DOMAINS = (
     (

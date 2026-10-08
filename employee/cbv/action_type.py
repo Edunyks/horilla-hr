@@ -15,13 +15,13 @@ from employee.cbv.disciplinary_actions import DynamicActionTypeFormView
 from employee.filters import ActionTypeFilter
 from employee.forms import ActiontypeForm
 from employee.models import Actiontype
-from candour_views.cbv_methods import login_required, permission_required
-from candour_views.generic.cbv.views import CandourListView, CandourNavView
+from horilla_views.cbv_methods import login_required, permission_required
+from horilla_views.generic.cbv.views import HorillaListView, HorillaNavView
 
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="employee.view_actiontype"), name="dispatch")
-class ActionTypeListView(CandourListView):
+class ActionTypeListView(HorillaListView):
     """
     List view of the Action Type page.
     """
@@ -84,7 +84,7 @@ class ActionTypeListView(CandourListView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="employee.view_actiontype"), name="dispatch")
-class ActionTypeNav(CandourNavView):
+class ActionTypeNav(HorillaNavView):
     """
     Navigation bar for Action Type.
     """

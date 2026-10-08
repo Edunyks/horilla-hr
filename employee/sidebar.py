@@ -1,7 +1,7 @@
 """
 employee/sidebar.py
 
-To set Candour sidebar for employee
+To set Horilla sidebar for employee
 """
 
 from django.urls import reverse_lazy
@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 
 from accessibility.methods import check_is_accessible
 from base.templatetags.basefilters import is_reportingmanager
-from candour.candour_middlewares import _thread_locals
+from horilla.horilla_middlewares import _thread_locals
 
 request = getattr(_thread_locals, "request", None)
 MENU = _("Employee")
@@ -71,7 +71,7 @@ def my_dashboard_accessibility(request, submenu, user_perms, *args, **kwargs):
 
 def document_accessibility(request, submenu, user_perms, *args, **kwargs):
     return request.user.has_perm(
-        "candour_documents.view_documentrequest"
+        "horilla_documents.view_documentrequest"
     ) or is_reportingmanager(request.user)
 
 

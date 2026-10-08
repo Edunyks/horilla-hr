@@ -13,11 +13,11 @@ from django.utils.translation import gettext_lazy as _
 from base.filters import MailServerFilter
 from base.forms import DynamicMailConfForm
 from base.models import DynamicEmailConfiguration
-from candour_views.cbv_methods import login_required, permission_required
-from candour_views.generic.cbv.views import (
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
+from horilla_views.cbv_methods import login_required, permission_required
+from horilla_views.generic.cbv.views import (
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
 )
 
 
@@ -25,7 +25,7 @@ from candour_views.generic.cbv.views import (
 @method_decorator(
     permission_required(perm="base.view_dynamicemailconfiguration"), name="dispatch"
 )
-class MailServerListView(CandourListView):
+class MailServerListView(HorillaListView):
     """
     List view of the resticted days page
     """
@@ -69,7 +69,7 @@ class MailServerListView(CandourListView):
 @method_decorator(
     permission_required(perm="base.view_dynamicemailconfiguration"), name="dispatch"
 )
-class MailServerNav(CandourNavView):
+class MailServerNav(HorillaNavView):
     """
     Nav bar
     """
@@ -96,7 +96,7 @@ class MailServerNav(CandourNavView):
 @method_decorator(
     permission_required(perm="base.add_dynamicemailconfiguration"), name="dispatch"
 )
-class MailServerFormView(CandourFormView):
+class MailServerFormView(HorillaFormView):
     """
     Create and edit form
     """

@@ -1,4 +1,4 @@
-# Candour HR runtime dependencies.
+# Horilla HR runtime dependencies.
 #
 # Supported Python: 3.12, 3.13, 3.14.  Requires pip 21.3 or newer.
 #

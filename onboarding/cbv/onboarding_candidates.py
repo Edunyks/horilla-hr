@@ -10,15 +10,15 @@ from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 
-from base.models import CandourMailTemplate
-from candour_views.cbv_methods import (
+from base.models import HorillaMailTemplate
+from horilla_views.cbv_methods import (
     hx_request_required,
     login_required,
     permission_required,
 )
-from candour_views.generic.cbv.views import (
-    CandourListView,
-    CandourNavView,
+from horilla_views.generic.cbv.views import (
+    HorillaListView,
+    HorillaNavView,
     TemplateView,
 )
 from onboarding.filters import CandidateTaskFilter
@@ -46,7 +46,7 @@ class OnboardingCandidatesView(TemplateView):
             is_active=True,
             recruitment_id__closed=False,
         ).filter(Q(hired=True) | Q(stage_id__stage_type="hired"))
-        mail_templates = CandourMailTemplate.objects.all()
+        mail_templates = HorillaMailTemplate.objects.all()
         context["mail_templates"] = mail_templates
         context["hired_candidates"] = hired_candidates
         return context
@@ -56,7 +56,7 @@ class OnboardingCandidatesView(TemplateView):
 @method_decorator(
     permission_required(perm="recruitment.view_candidate"), name="dispatch"
 )
-class OnboardingCandidatesList(CandourListView):
+class OnboardingCandidatesList(HorillaListView):
     """
     List view
     """
@@ -202,7 +202,7 @@ class OnboardingCandidatesList(CandourListView):
 @method_decorator(
     permission_required(perm="recruitment.view_candidate"), name="dispatch"
 )
-class OnboardingCandidatesNav(CandourNavView):
+class OnboardingCandidatesNav(HorillaNavView):
     """
     Nav bar
     """
@@ -219,7 +219,7 @@ class OnboardingCandidatesNav(CandourNavView):
     filter_body_template = "cbv/onboarding_candidates/filter.html"
     filter_form_context_name = "form"
     search_swap_target = "#listContainer"
-    # Modern slide-over filter panel (generic/candour_nav.html's own
+    # Modern slide-over filter panel (generic/horilla_nav.html's own
     # {% if modern_filter %} branch) -- same treatment as every other
     # panel this session. recruitment.filters.CandidateFilter.ajax_fields
     # already covers Recruitment/Job Position/Rejection Reason from the
@@ -269,7 +269,7 @@ class OnboardingCandidatesNav(CandourNavView):
 @method_decorator(
     all_manager_can_enter(perm="recruitment.view_candidate"), name="dispatch"
 )
-class CandidateProfileTasks(CandourListView):
+class CandidateProfileTasks(HorillaListView):
     """
     CandidateProfileTasks
     """
@@ -328,7 +328,7 @@ class CandidateProfileTasks(CandourListView):
 
     def get_template_names(self):
         if self.request.headers.get("HX-Target") == self.view_id:
-            return ["generic/candour_list_table.html"]
+            return ["generic/horilla_list_table.html"]
         return [self.template_name]
 
     def get_queryset(self, queryset=None, filtered=False, *args, **kwargs):

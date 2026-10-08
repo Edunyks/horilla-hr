@@ -16,13 +16,13 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.translation import gettext_noop
 
 from base.models import CompanyLeaves, Holidays
-from candour.http.response import CandourRedirect
-from candour_views.cbv_methods import login_required
-from candour_views.generic.cbv.views import (
-    CandourDetailedView,
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
+from horilla.http.response import HorillaRedirect
+from horilla_views.cbv_methods import login_required
+from horilla_views.generic.cbv.views import (
+    HorillaDetailedView,
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
     TemplateView,
 )
 from leave.filters import UserLeaveRequestFilter
@@ -58,7 +58,7 @@ class MyLeaveRequestView(TemplateView):
 
 
 @method_decorator(login_required, name="dispatch")
-class MainParentListView(CandourListView):
+class MainParentListView(HorillaListView):
     """
     main parent class for list view
     """
@@ -194,7 +194,7 @@ class MyLeaveRequestListView(MainParentListView):
 
 
 @method_decorator(login_required, name="dispatch")
-class MyLeaveRequestNavView(CandourNavView):
+class MyLeaveRequestNavView(HorillaNavView):
     """
     nav bar
     """
@@ -229,10 +229,10 @@ class MyLeaveRequestNavView(CandourNavView):
 
     filter_form_context_name = "form"
     search_swap_target = "#listContainer"
-    # Modern slide-over filter panel (candour_nav.html's .oh-filter-modern
+    # Modern slide-over filter panel (horilla_nav.html's .oh-filter-modern
     # styles) -- same treatment as Attendance/Late Arrival/Check-in Log/
     # Monthly Summary this session. Safe alongside UserLeaveRequestFilter
-    # staying a plain FilterSet (not CandourFilterSet): modern_filter only
+    # staying a plain FilterSet (not HorillaFilterSet): modern_filter only
     # toggles the panel's own markup/CSS, and every custom_filter_fields/
     # ajax_fields lookup elsewhere already defaults to [] / {} via getattr
     # for a FilterSet that doesn't declare them -- no AJAX combobox is
@@ -247,7 +247,7 @@ class MyLeaveRequestNavView(CandourNavView):
         ("requested_days", _("Requested Days")),
     ]
     # Takes precedence over group_by_fields above in the filter panel's own
-    # "Group By" section (candour_nav.html: `{% if nested_group_by_fields %}`
+    # "Group By" section (horilla_nav.html: `{% if nested_group_by_fields %}`
     # renders the new multi-level picker and suppresses the old single-select
     # one) -- group_by_fields is left in place regardless, same as every
     # other page in this session/codebase that has both.
@@ -265,7 +265,7 @@ class MyLeaveRequestNavView(CandourNavView):
 
 
 @method_decorator(login_required, name="dispatch")
-class MyLeaveRequestDetailView(CandourDetailedView):
+class MyLeaveRequestDetailView(HorillaDetailedView):
     """
     detail view of page
     """
@@ -307,7 +307,7 @@ class MyLeaveRequestDetailView(CandourDetailedView):
 
 
 @method_decorator(login_required, name="dispatch")
-class MyLeaveRequestForm(CandourFormView):
+class MyLeaveRequestForm(HorillaFormView):
     """
     form view
     """
@@ -365,7 +365,7 @@ class MyLeaveRequestForm(CandourFormView):
         def _done():
             if self.request.META.get("HTTP_HX_REQUEST"):
                 return self.HttpResponse(targets_to_reload=["#userRequestReload"])
-            return CandourRedirect(self.request)
+            return HorillaRedirect(self.request)
 
         emp = self.request.user.employee_get
         emp_id = emp.id
@@ -516,7 +516,7 @@ class MyLeaveRequestForm(CandourFormView):
 
 
 @method_decorator(login_required, name="dispatch")
-class MyLeaveRequestSingleForm(CandourFormView):
+class MyLeaveRequestSingleForm(HorillaFormView):
     """
     single leave request form
     """
@@ -665,7 +665,7 @@ class MyLeaveRequestSingleForm(CandourFormView):
                         return self.HttpResponse(
                             targets_to_reload=["#userRequestReload"]
                         )
-                    return CandourRedirect(self.request)
+                    return HorillaRedirect(self.request)
                 else:
                     form.add_error(
                         None,

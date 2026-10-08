@@ -12,7 +12,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils.translation import gettext as _
 
-from candour.decorators import login_required, permission_required
+from horilla.decorators import login_required, permission_required
 
 
 def _parse_period(request):
@@ -148,7 +148,7 @@ def offboarding_pipeline(request):
 
     from offboarding.models import OffboardingEmployee
 
-    # CandourCompanyManager.get_queryset() applies .distinct() whenever the
+    # HorillaCompanyManager.get_queryset() applies .distinct() whenever the
     # company OR-filter is active, which silently corrupts any aggregation
     # built on top of it. This isn't limited to .values().annotate(Count())
     # -- a *plain* .values_list("stage_id__type", flat=True) is just as

@@ -16,7 +16,7 @@ rather than silently allowing the punch).
 
 The third copy of the reporting-manager truthy-HttpResponse bug (the same
 root cause behind PR #3412's fixes to base.views.is_reportingmanger and
-candour_api...base.views._is_reportingmanger) lived in
+horilla_api...base.views._is_reportingmanger) lived in
 attendance.methods.utils.is_reportingmanger, reached via
 attendance.views.views.revalidate_this_attendance: an employee with no
 work-info record yet made every caller's `or` chain pass for anyone.
@@ -36,8 +36,8 @@ from attendance.methods.utils import (
 )
 from attendance.models import Attendance
 from employee.models import EmployeeWorkInformation
-from candour.candour_middlewares import set_selected_company
-from candour.testkit import make_company, make_employee, make_user
+from horilla.horilla_middlewares import set_selected_company
+from horilla.testkit import make_company, make_employee, make_user
 
 
 class GetClientIpTests(TestCase):

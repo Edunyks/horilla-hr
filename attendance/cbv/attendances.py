@@ -31,19 +31,19 @@ from employee.cbv.employee_profile import EmployeeProfileView
 from employee.cbv.employees import EmployeeCard, EmployeeNav, EmployeesList
 from employee.filters import EmployeeFilter
 from employee.models import Employee
-from candour.filters import CandourFilterSet
-from candour_views.cbv_methods import (
+from horilla.filters import HorillaFilterSet
+from horilla_views.cbv_methods import (
     hx_request_required,
     login_required,
     render_template,
 )
-from candour_views.generic.cbv.views import (
-    CandourDetailedView,
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
-    CandourTabContentShell,
-    CandourTabView,
+from horilla_views.generic.cbv.views import (
+    HorillaDetailedView,
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
+    HorillaTabContentShell,
+    HorillaTabView,
     TemplateView,
 )
 
@@ -59,7 +59,7 @@ class AttendancesView(TemplateView):
 
 
 @method_decorator(login_required, name="dispatch")
-class AttendancesListView(CandourListView):
+class AttendancesListView(HorillaListView):
     """
     list view
     """
@@ -233,7 +233,7 @@ class AttendancesListView(CandourListView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(manager_can_enter("attendance.view_attendance"), name="dispatch")
-class AttendancesTabView(CandourTabView):
+class AttendancesTabView(HorillaTabView):
     """
     tabview of candidate page
     """
@@ -346,7 +346,7 @@ def _attendance_ot_bulk_action():
     }
 
 
-class _AttendanceTabNavBase(CandourNavView):
+class _AttendanceTabNavBase(HorillaNavView):
     """
     Shared Search/Filter/Create wiring for each Attendances tab's own,
     independent Nav - only search_url/search_swap_target/actions differ
@@ -358,7 +358,7 @@ class _AttendanceTabNavBase(CandourNavView):
     filter_instance = AttendanceFilters()
     filter_form_context_name = "form"
     # Opts Attendance into the same modern slide-over filter panel built
-    # for Employee (candour_nav.html's .oh-filter-modern styles) --
+    # for Employee (horilla_nav.html's .oh-filter-modern styles) --
     # AttendanceFilters.ajax_fields carries the AJAX-loaded comboboxes
     # this needs.
     modern_filter = True
@@ -476,21 +476,21 @@ class ValidatedAttendanceNav(_AttendanceTabNavBase):
         self.actions = _attendance_nav_common_actions(self.request)
 
 
-class ValidateAttendanceTabShell(CandourTabContentShell):
+class ValidateAttendanceTabShell(HorillaTabContentShell):
     nav_url_name = "validate-attendance-nav"
     container_id = "validateListContainer"
     tabs_root_id = "attendances-tab"
     selected_instances_key_id = "validateselectedInstances"
 
 
-class OTAttendanceTabShell(CandourTabContentShell):
+class OTAttendanceTabShell(HorillaTabContentShell):
     nav_url_name = "ot-attendance-nav"
     container_id = "otListContainer"
     tabs_root_id = "attendances-tab"
     selected_instances_key_id = "overtimeselectedInstances"
 
 
-class ValidatedAttendanceTabShell(CandourTabContentShell):
+class ValidatedAttendanceTabShell(HorillaTabContentShell):
     nav_url_name = "validated-attendance-nav"
     container_id = "validatedListContainer"
     tabs_root_id = "attendances-tab"
@@ -646,7 +646,7 @@ class ValidatedAttendancesList(AttendancesListView):
 
 def _badge_count_from_attendance_list_view(request, view_cls):
     """
-    Use the same queryset rules as each tab's CandourListView (filters, subordinates).
+    Use the same queryset rules as each tab's HorillaListView (filters, subordinates).
     """
     view = view_cls()
     view.request = request
@@ -669,7 +669,7 @@ def attendance_tabs_badge_counts(request):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(manager_can_enter("attendance.view_attendance"), name="dispatch")
-class GenericAttendancesDetailView(CandourDetailedView):
+class GenericAttendancesDetailView(HorillaDetailedView):
     """
     Generic Detail view of page
     """
@@ -734,7 +734,7 @@ class ValidatedDetailView(GenericAttendancesDetailView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(manager_can_enter("attendance.add_attendance"), name="dispatch")
-class AttendancesFormView(CandourFormView):
+class AttendancesFormView(HorillaFormView):
     """
     form view
     """
@@ -767,7 +767,7 @@ class AttendancesFormView(CandourFormView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(manager_can_enter("attendance.change_attendance"), name="dispatch")
-class AttendanceUpdateFormView(CandourFormView):
+class AttendanceUpdateFormView(HorillaFormView):
     """
     form for update
     """
@@ -826,7 +826,7 @@ class AttendanceDetailActivityList(AttendanceActivityListView):
 
 
 @method_decorator(login_required, name="dispatch")
-class PenaltyAccountListView(CandourListView):
+class PenaltyAccountListView(HorillaListView):
     """
     list view for penalty tab
     """

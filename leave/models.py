@@ -17,7 +17,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from base.candour_company_manager import CandourCompanyManager
+from base.horilla_company_manager import HorillaCompanyManager
 from base.models import (
     Company,
     CompanyLeaves,
@@ -28,13 +28,13 @@ from base.models import (
     clear_messages,
 )
 from employee.models import Employee, EmployeeWorkInformation
-from candour import candour_middlewares
-from candour.candour_middlewares import _thread_locals
-from candour.methods import get_candour_model_class
-from candour.models import CandourModel, upload_path
-from candour_audit.methods import get_diff
-from candour_audit.models import CandourAuditInfo, CandourAuditLog
-from candour_views.cbv_methods import render_template
+from horilla import horilla_middlewares
+from horilla.horilla_middlewares import _thread_locals
+from horilla.methods import get_horilla_model_class
+from horilla.models import HorillaModel, upload_path
+from horilla_audit.methods import get_diff
+from horilla_audit.models import HorillaAuditInfo, HorillaAuditLog
+from horilla_views.cbv_methods import render_template
 from leave.methods import (
     calculate_requested_days,
     company_leave_dates_list,
@@ -181,7 +181,7 @@ WEEK_DAYS = [
 ]
 
 
-class LeaveTypeCondition(CandourModel):
+class LeaveTypeCondition(HorillaModel):
     """
     Configurable conditions that restrict leave type assignment to eligible employees.
     Mirrors the allowance condition pattern for consistency.
@@ -230,7 +230,7 @@ class LeaveTypeCondition(CandourModel):
             )
 
 
-class LeaveType(CandourModel):
+class LeaveType(HorillaModel):
     icon = models.ImageField(
         null=True, blank=True, upload_to=upload_path, verbose_name=_("Icon")
     )
@@ -346,7 +346,7 @@ class LeaveType(CandourModel):
             "Eligibility conditions evaluated before assigning this leave type to an employee"
         ),
     )
-    objects = CandourCompanyManager(related_company_field="company_id")
+    objects = HorillaCompanyManager(related_company_field="company_id")
 
     class Meta:
         ordering = ["-id"]
@@ -626,7 +626,7 @@ class LeaveType(CandourModel):
             self.payment_percentage = None
 
 
-class AvailableLeave(CandourModel):
+class AvailableLeave(HorillaModel):
     employee_id = models.ForeignKey(
         Employee,
         on_delete=models.CASCADE,
@@ -655,13 +655,13 @@ class AvailableLeave(CandourModel):
     expired_date = models.DateField(
         blank=True, null=True, verbose_name=_("CarryForward Expired Date")
     )
-    objects = CandourCompanyManager(
+    objects = HorillaCompanyManager(
         related_company_field="employee_id__employee_work_info__company_id"
     )
-    history = CandourAuditLog(
+    history = HorillaAuditLog(
         related_name="history_set",
         bases=[
-            CandourAuditInfo,
+            HorillaAuditInfo,
         ],
     )
 
@@ -1144,7 +1144,7 @@ def cal_effective_requested_days(
     return requested_days
 
 
-class LeaveRequest(CandourModel):
+class LeaveRequest(HorillaModel):
     employee_id = models.ForeignKey(
         Employee, on_delete=models.CASCADE, verbose_name=_("Employee")
     )
@@ -1192,10 +1192,10 @@ class LeaveRequest(CandourModel):
     reject_reason = models.TextField(
         blank=True, verbose_name=_("Rejection Reason"), max_length=255
     )
-    history = CandourAuditLog(
+    history = HorillaAuditLog(
         related_name="history_set",
         bases=[
-            CandourAuditInfo,
+            HorillaAuditInfo,
         ],
     )
     created_by = models.ForeignKey(
@@ -1205,7 +1205,7 @@ class LeaveRequest(CandourModel):
         related_name="leave_request_created",
         verbose_name=_("Created By"),
     )
-    objects = CandourCompanyManager(
+    objects = HorillaCompanyManager(
         related_company_field="employee_id__employee_work_info__company_id"
     )
 
@@ -1313,7 +1313,7 @@ class LeaveRequest(CandourModel):
         leave_requests_with_interview = []
         context = {"instance": self}
         if apps.is_installed("recruitment"):
-            Schedule = get_candour_model_class(
+            Schedule = get_horilla_model_class(
                 app_label="recruitment", model="interviewschedule"
             )
             interviews = Schedule.objects.filter(
@@ -1520,14 +1520,14 @@ class LeaveRequest(CandourModel):
             request = getattr(_thread_locals, "request", None)
             cache = None
             if request is not None:
-                cache = getattr(request, "_candour_interview_clash_cache", None)
+                cache = getattr(request, "_horilla_interview_clash_cache", None)
                 if cache is None:
-                    cache = request._candour_interview_clash_cache = {}
+                    cache = request._horilla_interview_clash_cache = {}
 
             if cache is not None and cache_key in cache:
                 has_interview = cache[cache_key]
             else:
-                Schedule = get_candour_model_class(
+                Schedule = get_horilla_model_class(
                     app_label="recruitment", model="interviewschedule"
                 )
                 has_interview = Schedule.objects.filter(
@@ -1771,7 +1771,7 @@ class LeaveRequest(CandourModel):
         attachment = getattr(self, "attachment", None)
         requ_days = set(self.requested_dates())
         restricted_leaves = RestrictLeave.objects.all()
-        request = getattr(candour_middlewares._thread_locals, "request", None)
+        request = getattr(horilla_middlewares._thread_locals, "request", None)
 
         # Check if leave type is assigned to employee
         if not AvailableLeave.objects.filter(
@@ -2013,13 +2013,13 @@ class LeaveRequest(CandourModel):
         return result
 
     def is_approved(self):
-        request = getattr(candour_middlewares._thread_locals, "request", None)
+        request = getattr(horilla_middlewares._thread_locals, "request", None)
         if request:
-            if not hasattr(request.user, "_candour_employee_cache"):
-                request.user._candour_employee_cache = Employee.objects.filter(
+            if not hasattr(request.user, "_horilla_employee_cache"):
+                request.user._horilla_employee_cache = Employee.objects.filter(
                     employee_user_id=request.user
                 ).first()
-            employee = request.user._candour_employee_cache
+            employee = request.user._horilla_employee_cache
 
             multiple_approvals = self.multiple_approvals()
             condition_approval = None
@@ -2041,7 +2041,7 @@ class LeaveRequest(CandourModel):
             # Update the leave clashes count for all relevant leave requests
             self.update_leave_clashes_count()
         else:
-            request = getattr(candour_middlewares._thread_locals, "request", None)
+            request = getattr(horilla_middlewares._thread_locals, "request", None)
             if request:
                 clear_messages(request)
                 messages.warning(
@@ -2102,7 +2102,7 @@ class LeaverequestFile(models.Model):
     file = models.FileField(upload_to=upload_path)
 
 
-class LeaverequestComment(CandourModel):
+class LeaverequestComment(HorillaModel):
     """
     LeaverequestComment Model
     """
@@ -2116,7 +2116,7 @@ class LeaverequestComment(CandourModel):
         return f"{self.comment}"
 
 
-class LeaveAllocationRequest(CandourModel):
+class LeaveAllocationRequest(HorillaModel):
     leave_type_id = models.ForeignKey(
         LeaveType, on_delete=models.PROTECT, verbose_name=_("Leave type")
     )
@@ -2138,13 +2138,13 @@ class LeaveAllocationRequest(CandourModel):
         max_length=30, choices=LEAVE_ALLOCATION_STATUS, default="requested"
     )
     reject_reason = models.TextField(blank=True)
-    history = CandourAuditLog(
+    history = HorillaAuditLog(
         related_name="history_set",
         bases=[
-            CandourAuditInfo,
+            HorillaAuditInfo,
         ],
     )
-    objects = CandourCompanyManager(
+    objects = HorillaCompanyManager(
         related_company_field="employee_id__employee_work_info__company_id"
     )
 
@@ -2310,7 +2310,7 @@ class LeaveAllocationRequest(CandourModel):
         return url
 
 
-class LeaveallocationrequestComment(CandourModel):
+class LeaveallocationrequestComment(HorillaModel):
     """
     LeaveallocationrequestComment Model
     """
@@ -2332,7 +2332,7 @@ class LeaveRequestConditionApproval(models.Model):
     manager_id = models.ForeignKey(Employee, on_delete=models.CASCADE)
 
 
-class RestrictLeave(CandourModel):
+class RestrictLeave(HorillaModel):
     title = models.CharField(max_length=200, verbose_name=_("Title"))
     start_date = models.DateField(verbose_name=_("Start Date"))
     end_date = models.DateField(verbose_name=_("End Date"))
@@ -2375,7 +2375,7 @@ class RestrictLeave(CandourModel):
         on_delete=models.CASCADE,
         verbose_name=_("Company"),
     )
-    objects = CandourCompanyManager(related_company_field="company_id")
+    objects = HorillaCompanyManager(related_company_field="company_id")
 
     def __str__(self) -> str:
         return f"{self.title}"
@@ -2427,7 +2427,7 @@ class RestrictLeave(CandourModel):
 
 if apps.is_installed("attendance"):
 
-    class CompensatoryLeaveRequest(CandourModel):
+    class CompensatoryLeaveRequest(HorillaModel):
         leave_type_id = models.ForeignKey(
             LeaveType, on_delete=models.PROTECT, verbose_name="Leave type"
         )
@@ -2445,13 +2445,13 @@ if apps.is_installed("attendance"):
             max_length=30, choices=LEAVE_ALLOCATION_STATUS, default="requested"
         )
         reject_reason = models.TextField(blank=True, max_length=255)
-        history = CandourAuditLog(
+        history = HorillaAuditLog(
             related_name="history_set",
             bases=[
-                CandourAuditInfo,
+                HorillaAuditInfo,
             ],
         )
-        objects = CandourCompanyManager(
+        objects = HorillaCompanyManager(
             related_company_field="employee_id__employee_work_info__company_id"
         )
 
@@ -2612,19 +2612,19 @@ if apps.is_installed("attendance"):
             super().save(*args, **kwargs)
 
 
-class LeaveGeneralSetting(CandourModel):
+class LeaveGeneralSetting(HorillaModel):
     """
     LeaveGeneralSettings
     """
 
     compensatory_leave = models.BooleanField(default=True)
-    objects = CandourCompanyManager(related_company_field="company_id")
+    objects = HorillaCompanyManager(related_company_field="company_id")
     company_id = models.ForeignKey(Company, on_delete=models.CASCADE, null=True)
 
 
 if apps.is_installed("attendance"):
 
-    class CompensatoryLeaverequestComment(CandourModel):
+    class CompensatoryLeaverequestComment(HorillaModel):
         """
         CompensatoryLeaverequestComment Model
         """
@@ -2640,12 +2640,12 @@ if apps.is_installed("attendance"):
             return f"{self.comment}"
 
 
-class EmployeePastLeaveRestrict(CandourModel):
+class EmployeePastLeaveRestrict(HorillaModel):
     enabled = models.BooleanField(default=True)
     company_id = models.ForeignKey(
         Company, null=True, blank=True, on_delete=models.CASCADE
     )
-    objects = CandourCompanyManager(related_company_field="company_id")
+    objects = HorillaCompanyManager(related_company_field="company_id")
 
 
 if apps.is_installed("attendance"):
@@ -2662,7 +2662,7 @@ if apps.is_installed("attendance"):
         #     """
         #     Overriding LeaveRequest model save method
         #     """
-        #     WorkRecords = get_candour_model_class(
+        #     WorkRecords = get_horilla_model_class(
         #         app_label="attendance", model="workrecords"
         #     )
         #     if (

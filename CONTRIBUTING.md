@@ -1,24 +1,24 @@
-# Contributing Guidelines for Candour
+# Contributing Guidelines for Horilla
 
-Thank you for considering contributing to Candour! We welcome your input and appreciate the community effort to make this project even better.
+Thank you for considering contributing to Horilla! We welcome your input and appreciate the community effort to make this project even better.
 
 ## Branches
 
 - **`dev/v2.0`** — the active integration branch. Always clone this and always open PRs against this — never against `2.0` directly.
 - **`2.0`** — the repository’s default branch: a periodic public snapshot for running/deploying, not where day-to-day development happens. GitHub pre-selects this as the PR base, so change it to `dev/v2.0` before submitting.
-- **`1.0`/`master`** — v1, now deprioritized. See "Contributing to v1" below and [Discussion #1127](https://github.com/candour/candour-hr/discussions/1127) for full background.
+- **`1.0`/`master`** — v1, now deprioritized. See "Contributing to v1" below and [Discussion #1127](https://github.com/horilla/horilla-hr/discussions/1127) for full background.
 
 ## How to Contribute
 
 1. **Fork the Repository**
-   - Fork [candour/candour-hr](https://github.com/candour/candour-hr) on GitHub.
+   - Fork [horilla/horilla-hr](https://github.com/horilla/horilla-hr) on GitHub.
 
 2. **Clone the Repository**
 
      ```bash
-     git clone -b dev/v2.0 https://github.com/YOUR_USERNAME/candour-hr.git
-     cd candour-hr
-     git remote add upstream https://github.com/candour/candour-hr.git
+     git clone -b dev/v2.0 https://github.com/YOUR_USERNAME/horilla-hr.git
+     cd horilla-hr
+     git remote add upstream https://github.com/horilla/horilla-hr.git
      ```
 
 3. **Create a Branch**
@@ -40,7 +40,7 @@ Thank you for considering contributing to Candour! We welcome your input and app
      ```
 
 5. **Make Changes**
-   - Follow Candour coding conventions (extend `CandourModel`, use Candour decorators, HTMX patterns).
+   - Follow Horilla coding conventions (extend `HorillaModel`, use Horilla decorators, HTMX patterns).
    - Run formatters via pre-commit (Black + isort).
 
 6. **Commit Changes**
@@ -103,7 +103,7 @@ Reviewing a diff that looks far larger than the change: `git diff
 | Workflow | What it checks |
 |----------|----------------|
 | `Docker CI` | Image build, migrate, collectstatic, `/health/`, `/ready/` |
-| `Quality` | `ruff check .` over the whole repo, Black/isort on `candour/settings` + `candour/urls.py`, `manage.py check`, production settings gate |
+| `Quality` | `ruff check .` over the whole repo, Black/isort on `horilla/settings` + `horilla/urls.py`, `manage.py check`, production settings gate |
 
 `ruff`'s enabled rule set is scoped to what the codebase already passes, so
 the gate is green from day one; `pyproject.toml` records the remaining
@@ -113,7 +113,7 @@ by loosening the gate to make a build pass.
 ## Issues
 
 - Bugs and features: open a public GitHub issue with reproduction steps.
-- **Security vulnerabilities:** do **not** open a public issue — use [GitHub Private Vulnerability Reporting](https://github.com/candour/candour-hr/security/advisories/new), not email. See [SECURITY.md](SECURITY.md) for full details.
+- **Security vulnerabilities:** do **not** open a public issue — use [GitHub Private Vulnerability Reporting](https://github.com/horilla/horilla-hr/security/advisories/new), not email. See [SECURITY.md](SECURITY.md) for full details.
 
 ### Contributing to v1 (1.0/master)
 
@@ -125,4 +125,4 @@ v1 is now deprioritized: fixes are considered case-by-case at maintainer discret
 - Provide constructive feedback.
 - Encourage a positive and inclusive community.
 
-Thank you for your contributions to Candour!
+Thank you for your contributions to Horilla!

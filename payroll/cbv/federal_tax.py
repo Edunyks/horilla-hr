@@ -16,17 +16,17 @@ from django.utils.translation import gettext_lazy as _
 
 from base.methods import paginator_qry
 from base.models import Holidays
-from candour_views.cbv_methods import (
+from horilla_views.cbv_methods import (
     hx_request_required,
     login_required,
     permission_required,
 )
-from candour_views.generic.cbv.pipeline import Pipeline
-from candour_views.generic.cbv.views import (
-    CandourDetailedView,
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
+from horilla_views.generic.cbv.pipeline import Pipeline
+from horilla_views.generic.cbv.views import (
+    HorillaDetailedView,
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
 )
 from payroll.filters import FilingStatusFilter, TaxBracketFilter
 from payroll.forms.tax_forms import FilingStatusForm, TaxBracketForm
@@ -36,7 +36,7 @@ from payroll.models.tax_models import TaxBracket
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("payroll.add_filingstatus"), name="dispatch")
-class FederalTaxFormView(CandourFormView):
+class FederalTaxFormView(HorillaFormView):
     """
     form view for create button
     """
@@ -68,7 +68,7 @@ class FederalTaxFormView(CandourFormView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("payroll.view_filingstatus"), name="dispatch")
-class FilingStatusDetailView(CandourDetailedView):
+class FilingStatusDetailView(HorillaDetailedView):
     """
     detail view for filing status, also registered as the related-object-link
     target for FilingStatus via detail_view_url_name
@@ -98,7 +98,7 @@ class FilingStatusDetailView(CandourDetailedView):
 @method_decorator(login_required, name="dispatch")
 @method_decorator(hx_request_required, name="dispatch")
 @method_decorator(permission_required("payroll.add_taxbracket"), name="dispatch")
-class TaxBracketCreateForm(CandourFormView):
+class TaxBracketCreateForm(HorillaFormView):
     """
     from view for create and edit tax brackets
     """
@@ -163,7 +163,7 @@ class TaxBracketCreateForm(CandourFormView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("payroll.view_taxbracket"), name="dispatch")
-class TaxBracketNavView(CandourNavView):
+class TaxBracketNavView(HorillaNavView):
     """
     Nav view for tax bracket list
     """
@@ -262,7 +262,7 @@ class FilingStatusPipeline(Pipeline):
 @method_decorator(login_required, name="dispatch")
 @method_decorator(hx_request_required, name="dispatch")
 @method_decorator(permission_required("payroll.view_taxbracket"), name="dispatch")
-class TaxBracketListView(CandourListView):
+class TaxBracketListView(HorillaListView):
     """
     List view for tax brackets
     """

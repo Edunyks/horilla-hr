@@ -15,16 +15,16 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 
 from base.methods import closest_numbers
-from candour.decorators import manager_can_enter
-from candour.http.response import CandourRedirect
-from candour_views.cbv_methods import login_required, permission_required
-from candour_views.generic.cbv.history import CandourHistoryView
-from candour_views.generic.cbv.views import (
-    CandourCardView,
-    CandourDetailedView,
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
+from horilla.decorators import manager_can_enter
+from horilla.http.response import HorillaRedirect
+from horilla_views.cbv_methods import login_required, permission_required
+from horilla_views.generic.cbv.history import HorillaHistoryView
+from horilla_views.generic.cbv.views import (
+    HorillaCardView,
+    HorillaDetailedView,
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
     TemplateView,
 )
 from pms.filters import ActualKeyResultFilter
@@ -44,7 +44,7 @@ class KeyResultViewPage(TemplateView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(manager_can_enter(perm="pms.view_keyresult"), name="dispatch")
-class KeyResultNavView(CandourNavView):
+class KeyResultNavView(HorillaNavView):
     """
     navbar of the page
     """
@@ -84,7 +84,7 @@ class KeyResultNavView(CandourNavView):
     filter_body_template = "cbv/key_results/key_result_filter.html"
     filter_form_context_name = "form"
     search_swap_target = "#listContainer"
-    # Modern slide-over filter panel (generic/candour_nav.html's own
+    # Modern slide-over filter panel (generic/horilla_nav.html's own
     # {% if modern_filter %} branch) -- same treatment as every other
     # panel this session. ActualKeyResultFilter.ajax_fields carries the
     # AJAX-loaded Company combobox this needs.
@@ -102,7 +102,7 @@ class KeyResultNavView(CandourNavView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(manager_can_enter(perm="pms.view_keyresult"), name="dispatch")
-class KeyResultsListView(CandourListView):
+class KeyResultsListView(HorillaListView):
 
     model = KeyResult
     filter_class = ActualKeyResultFilter
@@ -164,7 +164,7 @@ class KeyResultsListView(CandourListView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(manager_can_enter(perm="pms.view_keyresult"), name="dispatch")
-class KeyResultCardView(CandourCardView):
+class KeyResultCardView(HorillaCardView):
     """
     card view of the page
     """
@@ -230,7 +230,7 @@ class KeyResultCardView(CandourCardView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(manager_can_enter(perm="pms.view_keyresult"), name="dispatch")
-class KeyResultsDetailedView(CandourDetailedView):
+class KeyResultsDetailedView(HorillaDetailedView):
     """
     Detail View
     """
@@ -261,7 +261,7 @@ class KeyResultsDetailedView(CandourDetailedView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(manager_can_enter(perm="pms.view_keyresult"), name="dispatch")
-class KeyResultFormView(CandourFormView):
+class KeyResultFormView(HorillaFormView):
     """
     form view for create and update key results
     """
@@ -340,7 +340,7 @@ class DeleteKeyResults(View):
             # No "next" key result to navigate to (no instances_ids provided,
             # or the deleted one was the last in the list) -- fall back to a
             # safe redirect instead of building a URL with "None" in it.
-            return CandourRedirect(request)
+            return HorillaRedirect(request)
 
         paths = {
             "genericModalBody": f"/pms/key-result-detail-view/{next_instance}?instance_ids={instances_list}&deleted=true",
@@ -354,7 +354,7 @@ class DeleteKeyResults(View):
 
 
 @method_decorator(login_required, name="dispatch")
-class EKRHistory(CandourHistoryView):
+class EKRHistory(HorillaHistoryView):
     """
     EKR History
     """

@@ -1,18 +1,18 @@
 # Changelog
 
-All notable changes to Candour HR are recorded here.
+All notable changes to Horilla HR are recorded here.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this
 project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 This file starts at **2.1.1**, the first release maintained in this format. Releases
 before it are documented on the
-[releases page](https://github.com/candour/candour-hr/releases) and are not reproduced
+[releases page](https://github.com/horilla/horilla-hr/releases) and are not reproduced
 here — they predate this convention and back-filling them would misrepresent how they
 were recorded at the time.
 
 Each released version corresponds to a git tag of the same name (bare semver, no `v`
-prefix) and to the Docker tag `candour/candour-hr:<version>`. `candour/__version__.py`
+prefix) and to the Docker tag `horilla/horilla-hr:<version>`. `horilla/__version__.py`
 is the single source of truth; the release workflow refuses to publish an image whose
 tag disagrees with it.
 
@@ -42,10 +42,10 @@ administrative privileges; the RCE needs no account at all.
 
 | Advisory | Severity | Issue |
 |---|---|---|
-| [GHSA-x567-v324-7mr2](https://github.com/candour/candour-hr/security/advisories/GHSA-x567-v324-7mr2) | High | Unauthenticated remote code execution: the public recruitment application/survey flow let an anonymous visitor upload a `.py` file into an importable path, and the automation `get-to-mail-field` endpoint `__import__()`-ed a request-supplied module path, so a stored `<img>` auto-fetched by any recruiter's browser executed it as the server process |
-| [GHSA-23vp-5g5x-mh2x](https://github.com/candour/candour-hr/security/advisories/GHSA-23vp-5g5x-mh2x) | High | Three `/api/attendance/` mail endpoints took the target `employee_id` from the request body under an unscoped "manages anyone" check, letting any reporting manager read any employee's PII, list every mail template, and send attacker-controlled HTML from the company SMTP identity to any employee |
-| [GHSA-j3hc-6v4r-j658](https://github.com/candour/candour-hr/security/advisories/GHSA-j3hc-6v4r-j658) | Medium | The web check-in/out views did not enforce the configured geofence that the mobile/API flow already applied, so an employee outside the permitted area could punch in from a browser |
-| [GHSA-r59f-4xh4-58cf](https://github.com/candour/candour-hr/security/advisories/GHSA-r59f-4xh4-58cf) | Medium | The web attendance office-IP restriction trusted the first `X-Forwarded-For` value, which the client controls, so an employee off the office network could spoof an allowed address |
+| [GHSA-x567-v324-7mr2](https://github.com/horilla/horilla-hr/security/advisories/GHSA-x567-v324-7mr2) | High | Unauthenticated remote code execution: the public recruitment application/survey flow let an anonymous visitor upload a `.py` file into an importable path, and the automation `get-to-mail-field` endpoint `__import__()`-ed a request-supplied module path, so a stored `<img>` auto-fetched by any recruiter's browser executed it as the server process |
+| [GHSA-23vp-5g5x-mh2x](https://github.com/horilla/horilla-hr/security/advisories/GHSA-23vp-5g5x-mh2x) | High | Three `/api/attendance/` mail endpoints took the target `employee_id` from the request body under an unscoped "manages anyone" check, letting any reporting manager read any employee's PII, list every mail template, and send attacker-controlled HTML from the company SMTP identity to any employee |
+| [GHSA-j3hc-6v4r-j658](https://github.com/horilla/horilla-hr/security/advisories/GHSA-j3hc-6v4r-j658) | Medium | The web check-in/out views did not enforce the configured geofence that the mobile/API flow already applied, so an employee outside the permitted area could punch in from a browser |
+| [GHSA-r59f-4xh4-58cf](https://github.com/horilla/horilla-hr/security/advisories/GHSA-r59f-4xh4-58cf) | Medium | The web attendance office-IP restriction trusted the first `X-Forwarded-For` value, which the client controls, so an employee off the office network could spoof an allowed address |
 
 With thanks to **@AlbertoFDR**, **@Ntn10** (with **@CARLOS1994ROMERO**), and
 **@nanuzn** for reporting these responsibly.
@@ -60,7 +60,7 @@ be imported or executed through it.
 `converted-mail-template` and `offline-employee-mail-send` use the
 instance-scoped `manager_or_owner_permission_required` (the decorator the
 pk-routed attendance endpoints already use), and `mail-templates` requires
-`base.view_candourmailtemplate` — the same permission its web list view uses —
+`base.view_horillamailtemplate` — the same permission its web list view uses —
 instead of "manages anyone".
 
 **Web attendance enforces the same controls as the API.** Check-in/out now
@@ -111,13 +111,13 @@ section before upgrading.
 ### Security
 
 - **Archiving an employee did not revoke their login.**
-  ([#1239](https://github.com/candour/candour-hr/issues/1239), reported by
+  ([#1239](https://github.com/horilla/horilla-hr/issues/1239), reported by
   **@Safeer1877**) Archiving removed the employee from every list and left the
   linked user account active, so an offboarded person could still sign in with
   every permission they held. Two faults masked each other: the user's flag was
   assigned the employee's *previous* value, and the user object was never saved
   — so nothing was written either way. The login gate is
-  `CandourUser.is_active`, which `CompanyScopedBackend` inherits from
+  `HorillaUser.is_active`, which `CompanyScopedBackend` inherits from
   `ModelBackend` and which knows nothing about `Employee.is_active`.
 
   Affected the three archive views **and both REST API archive endpoints**
@@ -139,9 +139,9 @@ section before upgrading.
 ### Fixed
 
 - **Password reset emails linked to `example.com`.**
-  ([#1241](https://github.com/candour/candour-hr/issues/1241), reported by
+  ([#1241](https://github.com/horilla/horilla-hr/issues/1241), reported by
   **@KerelOlivier**) The link was built from `django.contrib.sites`, whose only
-  row on a normal install is the framework's own default — and which Candour
+  row on a normal install is the framework's own default — and which Horilla
   never updates. Reset links now use the request host, matching what
   leave-request mail already did. The host is taken from `request.get_host()`,
   which is validated against `ALLOWED_HOSTS`; deployments behind a proxy should
@@ -149,7 +149,7 @@ section before upgrading.
   steer a link that grants account access.
 
 - **Creating a payslip returned a 500 after the payslip had been saved.**
-  ([#1238](https://github.com/candour/candour-hr/issues/1238), reported by
+  ([#1238](https://github.com/horilla/horilla-hr/issues/1238), reported by
   **@Safeer1877**) The redirect used a URL name belonging to an argument-less
   list view, so it raised `NoReverseMatch` *after* the payslip was committed.
   The obvious response — clicking Create again — produced a duplicate for the
@@ -157,7 +157,7 @@ section before upgrading.
 
 - **Unpaid leave was deducted twice** when `deduct_leave_from_basic_pay` is
   enabled, which is the model default.
-  ([#1225](https://github.com/candour/candour-hr/issues/1225), reported by
+  ([#1225](https://github.com/horilla/horilla-hr/issues/1225), reported by
   **@Safeer1877**) The loss of pay came out of basic pay and again out of net
   pay, so the employee was underpaid by exactly the LOP amount.
 
@@ -263,18 +263,18 @@ until now.
 
 ### Fixed
 
-- **Dashboard panels stuck on "Loading…" forever.** `CandourFilterSet` called
+- **Dashboard panels stuck on "Loading…" forever.** `HorillaFilterSet` called
   `self.data.getlist(...)`, which assumes a `QueryDict`. django-filter accepts
   any mapping, and eight call sites pass a plain dict — the offline/online and
   not-checked-in cards, their API equivalents, asset history and
   reimbursements. Every one raised `AttributeError`, returned a 500, and left
   the card it feeds spinning. Reported independently by **@owino600** in
-  [#1216](https://github.com/candour/candour-hr/issues/1216) and by a customer
+  [#1216](https://github.com/horilla/horilla-hr/issues/1216) and by a customer
   after a v1→v2 migration; it affects every 2.1.x install, migrated or not.
 
-- **Candour would not start on a Windows console.** A warning in
-  `candour/config.py` contained an emoji, printed during `django.setup()` from
-  `candour_ldap`'s `AppConfig.ready()`. On a cp1252 console — the Windows
+- **Horilla would not start on a Windows console.** A warning in
+  `horilla/config.py` contained an emoji, printed during `django.setup()` from
+  `horilla_ldap`'s `AppConfig.ready()`. On a cp1252 console — the Windows
   default — encoding it raised `UnicodeEncodeError`, which propagated out of
   startup and killed the process. Any database predating the LDAP app triggers
   the warning path, so a v1→v2 migration hit it every time. Startup
@@ -285,22 +285,22 @@ until now.
   context processor read every employee and every active candidate on every
   request and rewrote their ids into the session each time. It is now scoped,
   lazy, and writes only when the ids change. Reported and fixed by
-  **@Roshan931** ([#1180](https://github.com/candour/candour-hr/pull/1180)).
+  **@Roshan931** ([#1180](https://github.com/horilla/horilla-hr/pull/1180)).
 
 - **The organisation chart showed a single node** for anyone with no direct
   reports, which read as a page that had failed to load. It now roots at the
   top of the viewer's reporting chain, stopping at a company boundary so a
   cross-company reporting line cannot expose another company's tree. By
-  **@yuri-val** ([#1168](https://github.com/candour/candour-hr/pull/1168)).
+  **@yuri-val** ([#1168](https://github.com/horilla/horilla-hr/pull/1168)).
 
 - **Every employee showed as "Offline", permanently,** when check-in/check-out
   was disabled for the company. The indicator is now hidden rather than
   asserting something false. By **@yuri-val**
-  ([#1169](https://github.com/candour/candour-hr/pull/1169)).
+  ([#1169](https://github.com/horilla/horilla-hr/pull/1169)).
 
 - **Survey template descriptions were saved but never displayed** anywhere a
   user could see them. By **@yuri-val**
-  ([#1171](https://github.com/candour/candour-hr/pull/1171)).
+  ([#1171](https://github.com/horilla/horilla-hr/pull/1171)).
 
 - Candidate cards fall back to initials when a profile image is missing,
   instead of showing a broken image.
@@ -319,7 +319,7 @@ until now.
 
 - Policy documents with an uploaded file now preview inline rather than
   offering a download. By **@yuri-val**
-  ([#1175](https://github.com/candour/candour-hr/pull/1175)).
+  ([#1175](https://github.com/horilla/horilla-hr/pull/1175)).
 
 ### Changed
 
@@ -332,7 +332,7 @@ until now.
 No migration or configuration change is required.
 
 ```bash
-docker pull candour/candour-hr:2.1.5
+docker pull horilla/horilla-hr:2.1.5
 ```
 
 ## [2.1.4] — 2026-09-08
@@ -344,8 +344,8 @@ ordinary employee holding no permission over the data they reach.
 
 | Advisory | Severity | Issue |
 |---|---|---|
-| [GHSA-6fxh-v24c-4cmx](https://github.com/candour/candour-hr/security/advisories/GHSA-6fxh-v24c-4cmx) | Medium | The mail-template sanitizer's denylist was bypassable, leaving the server-side template injection that CVE-2026-63432 was meant to close reachable — any account in the stock `HR Manager` role could read any user's password hash, the superuser's included |
-| [GHSA-97wm-28fj-g4pj](https://github.com/candour/candour-hr/security/advisories/GHSA-97wm-28fj-g4pj) | Critical | The API's manager check asked whether anybody at all reported to the caller, never which employee the record belonged to, so any employee who managed one person could approve, edit and delete other employees' leave, attendance, overtime, rotating assignments and documents |
+| [GHSA-6fxh-v24c-4cmx](https://github.com/horilla/horilla-hr/security/advisories/GHSA-6fxh-v24c-4cmx) | Medium | The mail-template sanitizer's denylist was bypassable, leaving the server-side template injection that CVE-2026-63432 was meant to close reachable — any account in the stock `HR Manager` role could read any user's password hash, the superuser's included |
+| [GHSA-97wm-28fj-g4pj](https://github.com/horilla/horilla-hr/security/advisories/GHSA-97wm-28fj-g4pj) | Critical | The API's manager check asked whether anybody at all reported to the caller, never which employee the record belonged to, so any employee who managed one person could approve, edit and delete other employees' leave, attendance, overtime, rotating assignments and documents |
 
 With thanks to **@Ntn10** and **@lighthousekeeper1212** for reporting these
 responsibly.
@@ -366,8 +366,8 @@ so the fix is at the function, not at the endpoints that were reported.
 established only that the caller managed *somebody*; the record was then loaded
 straight from the URL. Seventeen record-specific handlers were on it. They now
 use the target-scoped decorators introduced for
-[GHSA-39gq-9wwx-p8hx](https://github.com/candour/candour-hr/security/advisories/GHSA-39gq-9wwx-p8hx)
-and [GHSA-gc35-jfv9-r3cm](https://github.com/candour/candour-hr/security/advisories/GHSA-gc35-jfv9-r3cm),
+[GHSA-39gq-9wwx-p8hx](https://github.com/horilla/horilla-hr/security/advisories/GHSA-39gq-9wwx-p8hx)
+and [GHSA-gc35-jfv9-r3cm](https://github.com/horilla/horilla-hr/security/advisories/GHSA-gc35-jfv9-r3cm),
 with approve and reject endpoints refusing self-approval independently of the
 manager test. The two bulk endpoints take their ids from the request body rather
 than the URL and were not in the report; they apply the same rule per record,
@@ -403,7 +403,7 @@ authorization flaw below affects every 2.x release.
 
 | Advisory | Severity | Issue |
 |---|---|---|
-| [GHSA-gc35-jfv9-r3cm](https://github.com/candour/candour-hr/security/advisories/GHSA-gc35-jfv9-r3cm) | Medium | Any employee who was the reporting manager of one person could approve their own leave allocation and credit an arbitrary number of days to their own balance |
+| [GHSA-gc35-jfv9-r3cm](https://github.com/horilla/horilla-hr/security/advisories/GHSA-gc35-jfv9-r3cm) | Medium | Any employee who was the reporting manager of one person could approve their own leave allocation and credit an arbitrary number of days to their own balance |
 
 With thanks to **@je-lv** for reporting it responsibly.
 
@@ -426,7 +426,7 @@ again, and the edit endpoint accepts `requested_days`. Neither was in the report
   the include raised `TemplateDoesNotExist: No template names provided`.
 
   Reported by **@owino600** in
-  [#1216](https://github.com/candour/candour-hr/issues/1216), with an accurate
+  [#1216](https://github.com/horilla/horilla-hr/issues/1216), with an accurate
   diagnosis of the cause.
 
 - Two `{% url %}` tags in a disabled block of jQuery in the grace-time template
@@ -447,7 +447,7 @@ again, and the edit endpoint accepts `requested_days`. Neither was in the report
 No migration or configuration change is required.
 
 ```bash
-docker pull candour/candour-hr:2.1.3
+docker pull horilla/horilla-hr:2.1.3
 ```
 
 ## [2.1.2] — 2026-09-07
@@ -461,9 +461,9 @@ account and none dependent on `DEBUG` or any operator setting.
 
 | Advisory | Severity | Issue |
 |---|---|---|
-| [GHSA-39gq-9wwx-p8hx](https://github.com/candour/candour-hr/security/advisories/GHSA-39gq-9wwx-p8hx) | High | Any employee who managed one person could overwrite — or delete — any other employee's bank account details, redirecting salary payments |
-| [GHSA-x72c-5gf7-97g3](https://github.com/candour/candour-hr/security/advisories/GHSA-x72c-5gf7-97g3) | Medium | Any authenticated employee could delete any other employee's documents, including contracts and identity documents |
-| [GHSA-v963-hrfx-34mw](https://github.com/candour/candour-hr/security/advisories/GHSA-v963-hrfx-34mw) | Medium | Any candidate could write notes onto any other candidate's hiring record, across companies, and read that candidate's tracking page |
+| [GHSA-39gq-9wwx-p8hx](https://github.com/horilla/horilla-hr/security/advisories/GHSA-39gq-9wwx-p8hx) | High | Any employee who managed one person could overwrite — or delete — any other employee's bank account details, redirecting salary payments |
+| [GHSA-x72c-5gf7-97g3](https://github.com/horilla/horilla-hr/security/advisories/GHSA-x72c-5gf7-97g3) | Medium | Any authenticated employee could delete any other employee's documents, including contracts and identity documents |
+| [GHSA-v963-hrfx-34mw](https://github.com/horilla/horilla-hr/security/advisories/GHSA-v963-hrfx-34mw) | Medium | Any candidate could write notes onto any other candidate's hiring record, across companies, and read that candidate's tracking page |
 
 With thanks to **@je-lv** for reporting all three responsibly.
 
@@ -475,8 +475,8 @@ the same way.
 ### Changed
 
 - Editing a document through `PUT /api/employee/documents/<pk>/` now authorizes
-  against `candour_documents.change_document` rather than
-  `candour_documents.view_document`. Owners and reporting managers are
+  against `horilla_documents.change_document` rather than
+  `horilla_documents.view_document`. Owners and reporting managers are
   unaffected; an integration that held only the view permission and relied on it
   to write will now be refused.
 - `DELETE /api/employee/employee-bank-details/<pk>/` now also admits the record's
@@ -487,12 +487,12 @@ the same way.
 
 No migration or configuration change is required.
 
-If you drive Candour through the REST API, check the two permission changes
+If you drive Horilla through the REST API, check the two permission changes
 above before upgrading — an integration that wrote documents using only
-`candour_documents.view_document` will start receiving 403.
+`horilla_documents.view_document` will start receiving 403.
 
 ```bash
-docker pull candour/candour-hr:2.1.2
+docker pull horilla/horilla-hr:2.1.2
 ```
 
 ## [2.1.1] — 2026-09-06
@@ -503,11 +503,11 @@ Security patch release. **Upgrading is recommended for all installations.**
 
 | Advisory | Severity | Issue |
 |---|---|---|
-| [GHSA-rf47-2qgf-qq4j](https://github.com/candour/candour-hr/security/advisories/GHSA-rf47-2qgf-qq4j) | High | Stored XSS leading to credential theft — XSS validation was bypassed on every REST and direct write |
-| [GHSA-cjr4-rrp6-g72j](https://github.com/candour/candour-hr/security/advisories/GHSA-cjr4-rrp6-g72j) | High | Local file read through PDF generation, via an XSS-filter bypass |
-| [GHSA-56x4-6268-vg4f](https://github.com/candour/candour-hr/security/advisories/GHSA-56x4-6268-vg4f) | High | Reimbursement approval could rewrite the claimed payout amount |
-| [GHSA-p745-9729-g8jw](https://github.com/candour/candour-hr/security/advisories/GHSA-p745-9729-g8jw) | Medium | A candidate could read any other candidate's uploaded documents |
-| [GHSA-mpw3-7c6v-vfjp](https://github.com/candour/candour-hr/security/advisories/GHSA-mpw3-7c6v-vfjp) | Medium | An employee could read any other employee's leave requests |
+| [GHSA-rf47-2qgf-qq4j](https://github.com/horilla/horilla-hr/security/advisories/GHSA-rf47-2qgf-qq4j) | High | Stored XSS leading to credential theft — XSS validation was bypassed on every REST and direct write |
+| [GHSA-cjr4-rrp6-g72j](https://github.com/horilla/horilla-hr/security/advisories/GHSA-cjr4-rrp6-g72j) | High | Local file read through PDF generation, via an XSS-filter bypass |
+| [GHSA-56x4-6268-vg4f](https://github.com/horilla/horilla-hr/security/advisories/GHSA-56x4-6268-vg4f) | High | Reimbursement approval could rewrite the claimed payout amount |
+| [GHSA-p745-9729-g8jw](https://github.com/horilla/horilla-hr/security/advisories/GHSA-p745-9729-g8jw) | Medium | A candidate could read any other candidate's uploaded documents |
+| [GHSA-mpw3-7c6v-vfjp](https://github.com/horilla/horilla-hr/security/advisories/GHSA-mpw3-7c6v-vfjp) | Medium | An employee could read any other employee's leave requests |
 
 With thanks to **@je-lv** and **@Pig-Tail** for reporting these responsibly.
 
@@ -526,19 +526,19 @@ With thanks to **@je-lv** and **@Pig-Tail** for reporting these responsibly.
 No migration or configuration change is required by this release.
 
 If you are upgrading from **2.0.x** and use the WhatsApp integration, note that
-[2.1.0](https://github.com/candour/candour-hr/releases/tag/2.1.0) requires a Meta App
+[2.1.0](https://github.com/horilla/horilla-hr/releases/tag/2.1.0) requires a Meta App
 Secret — message delivery stops until it is set.
 
 ```bash
-docker pull candour/candour-hr:2.1.1
+docker pull horilla/horilla-hr:2.1.1
 ```
 
-[Unreleased]: https://github.com/candour/candour-hr/compare/2.1.8...HEAD
-[2.1.8]: https://github.com/candour/candour-hr/compare/2.1.7...2.1.8
-[2.1.7]: https://github.com/candour/candour-hr/compare/2.1.6...2.1.7
-[2.1.6]: https://github.com/candour/candour-hr/compare/2.1.5...2.1.6
-[2.1.5]: https://github.com/candour/candour-hr/compare/2.1.4...2.1.5
-[2.1.4]: https://github.com/candour/candour-hr/compare/2.1.3...2.1.4
-[2.1.3]: https://github.com/candour/candour-hr/compare/2.1.2...2.1.3
-[2.1.2]: https://github.com/candour/candour-hr/compare/2.1.1...2.1.2
-[2.1.1]: https://github.com/candour/candour-hr/releases/tag/2.1.1
+[Unreleased]: https://github.com/horilla/horilla-hr/compare/2.1.8...HEAD
+[2.1.8]: https://github.com/horilla/horilla-hr/compare/2.1.7...2.1.8
+[2.1.7]: https://github.com/horilla/horilla-hr/compare/2.1.6...2.1.7
+[2.1.6]: https://github.com/horilla/horilla-hr/compare/2.1.5...2.1.6
+[2.1.5]: https://github.com/horilla/horilla-hr/compare/2.1.4...2.1.5
+[2.1.4]: https://github.com/horilla/horilla-hr/compare/2.1.3...2.1.4
+[2.1.3]: https://github.com/horilla/horilla-hr/compare/2.1.2...2.1.3
+[2.1.2]: https://github.com/horilla/horilla-hr/compare/2.1.1...2.1.2
+[2.1.1]: https://github.com/horilla/horilla-hr/releases/tag/2.1.1

@@ -9,15 +9,15 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 
 from base.methods import has_export_access
-from candour_views.cbv_methods import (
+from horilla_views.cbv_methods import (
     hx_request_required,
     login_required,
     permission_required,
 )
-from candour_views.generic.cbv.views import (
-    CandourDetailedView,
-    CandourListView,
-    CandourNavView,
+from horilla_views.generic.cbv.views import (
+    HorillaDetailedView,
+    HorillaListView,
+    HorillaNavView,
     TemplateView,
 )
 from payroll.filters import ContractFilter
@@ -37,7 +37,7 @@ class ContractsView(TemplateView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="payroll.view_contract"), name="dispatch")
-class ContractsList(CandourListView):
+class ContractsList(HorillaListView):
     """
     List view
     """
@@ -166,7 +166,7 @@ class ContractsList(CandourListView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="payroll.view_contract"), name="dispatch")
-class ContractsNav(CandourNavView):
+class ContractsNav(HorillaNavView):
     """
     Nav bar
     """
@@ -219,7 +219,7 @@ class ContractsNav(CandourNavView):
     filter_instance = ContractFilter()
     filter_form_context_name = "form"
     search_swap_target = "#listContainer"
-    # Modern slide-over filter panel (generic/candour_nav.html's own
+    # Modern slide-over filter panel (generic/horilla_nav.html's own
     # {% if modern_filter %} branch) -- same treatment as every other
     # panel this session. ContractFilter.ajax_fields carries the
     # AJAX-loaded comboboxes this needs.
@@ -269,7 +269,7 @@ class ContractsExportView(TemplateView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="payroll.view_contract"), name="dispatch")
-class ContractsDetailView(CandourDetailedView):
+class ContractsDetailView(HorillaDetailedView):
     """
     Detail View
     """

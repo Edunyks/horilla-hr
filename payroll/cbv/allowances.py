@@ -11,13 +11,13 @@ from django.utils.decorators import method_decorator
 from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 
-from candour_views.cbv_methods import login_required, permission_required
-from candour_views.generic.cbv.views import (
-    CandourCardView,
-    CandourDetailedView,
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
+from horilla_views.cbv_methods import login_required, permission_required
+from horilla_views.generic.cbv.views import (
+    HorillaCardView,
+    HorillaDetailedView,
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
     TemplateView,
 )
 from payroll.filters import AllowanceFilter
@@ -27,7 +27,7 @@ from payroll.models.models import Allowance
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("payroll.add_allowance"), name="dispatch")
-class AllowanceFormView(CandourFormView):
+class AllowanceFormView(HorillaFormView):
     """
     Form view for Allowance creation and update.
     """
@@ -61,7 +61,7 @@ class AllowanceViewPage(TemplateView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="payroll.view_allowance"), name="dispatch")
-class AllowanceListView(CandourListView):
+class AllowanceListView(HorillaListView):
     """
     list view of the page
     """
@@ -189,7 +189,7 @@ class AllowanceListView(CandourListView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="payroll.view_allowance"), name="dispatch")
-class AllowanceNavView(CandourNavView):
+class AllowanceNavView(HorillaNavView):
     """
     nav bar of the page
     """
@@ -230,7 +230,7 @@ class AllowanceNavView(CandourNavView):
     filter_body_template = "cbv/allowances/allowance_filter.html"
     filter_form_context_name = "form"
     search_swap_target = "#listContainer"
-    # Modern slide-over filter panel (generic/candour_nav.html's own
+    # Modern slide-over filter panel (generic/horilla_nav.html's own
     # {% if modern_filter %} branch) -- same treatment as every other
     # panel this session. AllowanceFilter has no FK/M2M fields, so no
     # ajax_fields are needed here.
@@ -240,7 +240,7 @@ class AllowanceNavView(CandourNavView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="payroll.view_allowance"), name="dispatch")
-class AllowancesCardView(CandourCardView):
+class AllowancesCardView(HorillaCardView):
     """
     card view for the page
     """
@@ -357,7 +357,7 @@ class AllowancesCardView(CandourCardView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="payroll.view_allowance"), name="dispatch")
-class AllowanceDetailView(CandourDetailedView):
+class AllowanceDetailView(HorillaDetailedView):
     """
     detail view for allowances
     """

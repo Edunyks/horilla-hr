@@ -9,7 +9,7 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 
 from base.cbv.shift_request import ShitRequestNav
-from candour_views.cbv_methods import login_required
+from horilla_views.cbv_methods import login_required
 
 
 @method_decorator(login_required, name="dispatch")
@@ -19,7 +19,7 @@ class RequestsShiftNav(ShitRequestNav):
     nav_title = _("Shift Requests")
     template_name = "generic/inline_nav.html"
     # Modern slide-over filter panel (generic/inline_nav.html's own
-    # {% if modern_filter %} branch, mirroring candour_nav.html's
+    # {% if modern_filter %} branch, mirroring horilla_nav.html's
     # .oh-filter-modern styles) -- same treatment as every other panel
     # this session. ShiftRequestFilter.ajax_fields carries the AJAX-loaded
     # comboboxes this needs.

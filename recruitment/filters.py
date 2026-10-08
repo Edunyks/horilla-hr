@@ -36,7 +36,7 @@ def _filter_recruitment_by_obj_id(qs, name, value):
 from base.filters import FilterSet
 from base.models import Company, Department, JobPosition
 from employee.models import Employee
-from candour.filters import CandourFilterSet, filter_by_name
+from horilla.filters import HorillaFilterSet, filter_by_name
 from recruitment.models import (
     Candidate,
     CandidateDocument,
@@ -56,7 +56,7 @@ from recruitment.models import (
 # from django.forms.widgets import Boo
 
 
-class CandidateFilter(CandourFilterSet):
+class CandidateFilter(HorillaFilterSet):
     """
     Filter set class for Candidate model
 
@@ -177,7 +177,7 @@ class CandidateFilter(CandourFilterSet):
         widget=django_filters.widgets.BooleanWidget(),
     )
 
-    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
+    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
     # -- Job Position, Department, and Rejection Reason opt into
     # AJAX-searched comboboxes instead of pre-rendering their whole
     # queryset as <option> tags.
@@ -379,7 +379,7 @@ class CandidateFilter(CandourFilterSet):
             {
                 "data-placeholder": _("Select survey answers..."),
                 # Was "survey-select" -- that class was never targeted by
-                # any select2 init handler (candour_theme's htmxSelect2.js
+                # any select2 init handler (horilla_theme's htmxSelect2.js
                 # only auto-initializes ".oh-select"/".oh-select-ajax"),
                 # so this field always rendered as a bare unstyled
                 # <select multiple> regardless of how many choices it had.
@@ -440,7 +440,7 @@ class CandidateFilter(CandourFilterSet):
     def _build_custom_filter_fields(self):
         """
         Registry backing the Advanced section's "+ Add filter" builder
-        (see CandourFilterSet._build_custom_filter_fields's docstring
+        (see HorillaFilterSet._build_custom_filter_fields's docstring
         for the two supported entry shapes) -- same "choose field, then
         lookup, then value" pattern used by AttendanceFilters/
         EmployeeFilter/AssetFilter. This model already has several
@@ -499,7 +499,7 @@ class CandidateFilter(CandourFilterSet):
 
     def filter_queryset(self, queryset):
         """
-        CandourFilterSet._apply_custom_filters isn't wired into the base
+        HorillaFilterSet._apply_custom_filters isn't wired into the base
         filter_queryset automatically -- this is the minimal "call it at
         the end" hookup, same as AttendanceFilters/FeedbackFilter/
         AssetFilter.
@@ -508,7 +508,7 @@ class CandidateFilter(CandourFilterSet):
         return self._apply_custom_filters(queryset)
 
 
-class CandidateDocumentFilter(CandourFilterSet):
+class CandidateDocumentFilter(HorillaFilterSet):
     """
     Filter set class for CandidateDocument model
     """
@@ -520,7 +520,7 @@ class CandidateDocumentFilter(CandourFilterSet):
         fields = ["title", "status"]
 
 
-class SkillZoneCandidateFilter(CandourFilterSet):
+class SkillZoneCandidateFilter(HorillaFilterSet):
     """
     Filter set class for SkillZoneCandidate model
     """
@@ -539,7 +539,7 @@ BOOLEAN_CHOICES = (
 )
 
 
-class RecruitmentFilter(CandourFilterSet):
+class RecruitmentFilter(HorillaFilterSet):
     """
     Filter set class for Recruitment model
 
@@ -574,8 +574,8 @@ class RecruitmentFilter(CandourFilterSet):
     )
     obj_id = django_filters.CharFilter(method=_filter_recruitment_by_obj_id)
 
-    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism,
-    # see candour.filters.CandourFilterSet for the full explanation) --
+    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism,
+    # see horilla.filters.HorillaFilterSet for the full explanation) --
     # Recruitment Managers and Company opt into AJAX-searched comboboxes
     # instead of pre-rendering their whole queryset as <option> tags.
     ajax_fields = {
@@ -681,7 +681,7 @@ class RecruitmentFilter(CandourFilterSet):
     def _build_custom_filter_fields(self):
         """
         Registry backing the Advanced section's "+ Add filter" builder
-        (see CandourFilterSet._build_custom_filter_fields's docstring
+        (see HorillaFilterSet._build_custom_filter_fields's docstring
         for the two supported entry shapes) -- same "choose field, then
         lookup, then value" pattern used by AttendanceFilters/
         EmployeeFilter/AssetFilter. Start Date/End Date used to each
@@ -718,7 +718,7 @@ class RecruitmentFilter(CandourFilterSet):
 
     def filter_queryset(self, queryset):
         """
-        CandourFilterSet._apply_custom_filters isn't wired into the base
+        HorillaFilterSet._apply_custom_filters isn't wired into the base
         filter_queryset automatically -- this is the minimal "call it at
         the end" hookup, same as AttendanceFilters/FeedbackFilter/
         AssetFilter.
@@ -757,7 +757,7 @@ class RejectReasonFilter(FilterSet):
         )
 
 
-class StageFilter(CandourFilterSet):
+class StageFilter(HorillaFilterSet):
     """
     Filter set class for Stage model
 
@@ -768,7 +768,7 @@ class StageFilter(CandourFilterSet):
     search = django_filters.CharFilter(method="filter_by_name")
     candidate_name = django_filters.CharFilter(method="pipeline_search")
 
-    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
+    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
     # -- Recruitment and Stage Managers opt into AJAX-searched comboboxes
     # instead of pre-rendering their whole queryset as <option> tags.
     ajax_fields = {
@@ -881,7 +881,7 @@ class StageFilter(CandourFilterSet):
     def _build_custom_filter_fields(self):
         """
         Registry backing the Advanced section's "+ Add filter" builder
-        (see CandourFilterSet._build_custom_filter_fields's docstring
+        (see HorillaFilterSet._build_custom_filter_fields's docstring
         for the two supported entry shapes) -- same "choose field, then
         lookup, then value" pattern used by AttendanceFilters/
         EmployeeFilter/AssetFilter. Created At is the only real date
@@ -904,7 +904,7 @@ class StageFilter(CandourFilterSet):
 
     def filter_queryset(self, queryset):
         """
-        CandourFilterSet._apply_custom_filters isn't wired into the base
+        HorillaFilterSet._apply_custom_filters isn't wired into the base
         filter_queryset automatically -- this is the minimal "call it at
         the end" hookup, same as AttendanceFilters/FeedbackFilter/
         AssetFilter.
@@ -913,7 +913,7 @@ class StageFilter(CandourFilterSet):
         return self._apply_custom_filters(queryset)
 
 
-class SurveyFilter(CandourFilterSet):
+class SurveyFilter(HorillaFilterSet):
     """
     SurveyFIlter
     """
@@ -935,7 +935,7 @@ class SurveyFilter(CandourFilterSet):
         field_name="question",
     )
 
-    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
+    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
     # -- Recruitment opts into an AJAX-searched combobox instead of
     # pre-rendering its whole queryset as <option> tags.
     ajax_fields = {
@@ -1018,7 +1018,7 @@ class SkillZoneFilter(FilterSet):
         ]
 
 
-class SkillZoneCandFilter(CandourFilterSet):
+class SkillZoneCandFilter(HorillaFilterSet):
     """
     Skillzone Candidate FIlter
     """
@@ -1083,7 +1083,7 @@ class SkillZoneCandFilter(CandourFilterSet):
         label=_("Joining Set"),
     )
 
-    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
+    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
     # -- Candidate, Recruitment, Job Position, and Rejection Reason opt
     # into AJAX-searched comboboxes instead of pre-rendering their whole
     # queryset as <option> tags.
@@ -1173,7 +1173,7 @@ class SkillZoneCandFilter(CandourFilterSet):
         ).distinct()
 
 
-class InterviewFilter(CandourFilterSet):
+class InterviewFilter(HorillaFilterSet):
     """
     Filter set class for Candidate model
 
@@ -1196,7 +1196,7 @@ class InterviewFilter(CandourFilterSet):
         widget=forms.DateInput(attrs={"type": "date"}),
     )
 
-    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
+    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
     # -- Candidate and Interviewer opt into AJAX-searched comboboxes
     # instead of pre-rendering their whole queryset as <option> tags.
     ajax_fields = {
@@ -1240,7 +1240,7 @@ class InterviewFilter(CandourFilterSet):
     def _build_custom_filter_fields(self):
         """
         Registry backing the Advanced section's "+ Add filter" builder
-        (see CandourFilterSet._build_custom_filter_fields's docstring
+        (see HorillaFilterSet._build_custom_filter_fields's docstring
         for the two supported entry shapes) -- same "choose field, then
         lookup, then value" pattern used by AttendanceFilters/
         EmployeeFilter/AssetFilter. Interview Date is a plain DateField
@@ -1272,7 +1272,7 @@ class InterviewFilter(CandourFilterSet):
 
     def filter_queryset(self, queryset):
         """
-        CandourFilterSet._apply_custom_filters isn't wired into the base
+        HorillaFilterSet._apply_custom_filters isn't wired into the base
         filter_queryset automatically -- this is the minimal "call it at
         the end" hookup, same as AttendanceFilters/FeedbackFilter/
         AssetFilter.

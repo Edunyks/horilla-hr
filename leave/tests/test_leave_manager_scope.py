@@ -19,7 +19,7 @@ from django.test import Client, TestCase
 from django.urls import NoReverseMatch, reverse
 
 from employee.models import EmployeeWorkInformation
-from candour.testkit import make_company, make_employee, make_user
+from horilla.testkit import make_company, make_employee, make_user
 from leave.models import (
     AvailableLeave,
     LeaveRequest,
@@ -38,7 +38,7 @@ class LeaveManagerScopeTests(TestCase):
         def person(name):
             user = make_user(name, password="secret123")
             emp = make_employee(
-                company=company, email=f"{name}@test.candour", user=user
+                company=company, email=f"{name}@test.horilla", user=user
             )
             return user, emp
 
@@ -86,7 +86,7 @@ class LeaveManagerScopeTests(TestCase):
             reverse("request-approve", args=[self.leave.pk]), **HX
         )
         self.assertEqual(self.refreshed_status(), "requested")
-        message = json.loads(response["HX-Trigger"])["candourMessage"]
+        message = json.loads(response["HX-Trigger"])["horillaMessage"]
         self.assertEqual(message["level"], "error")
 
     def test_other_manager_cannot_approve_from_the_address_bar(self):

@@ -2,7 +2,7 @@
 The tenancy system check must actually catch an unscoped model.
 
 Tenancy is opt-in per model: isolation exists only where someone remembered a
-CandourCompanyManager. Across 233 models that is 233 chances to forget, and
+HorillaCompanyManager. Across 233 models that is 233 chances to forget, and
 forgetting is silent. This check turns the omission into a failed
 `manage.py check`; these tests make sure it would.
 """
@@ -12,7 +12,7 @@ from django.db import models
 from django.test import SimpleTestCase
 
 from base.checks import EXEMPT, check_company_scoped_managers
-from base.candour_company_manager import CandourCompanyManager
+from base.horilla_company_manager import HorillaCompanyManager
 
 
 class TenancyCheckTests(SimpleTestCase):
@@ -58,7 +58,7 @@ class TenancyCheckTests(SimpleTestCase):
 
         self.assertEqual(len(problems), 1)
         self.assertIsInstance(problems[0], CheckWarning)
-        self.assertEqual(problems[0].id, "candour.tenancy.W001")
+        self.assertEqual(problems[0].id, "horilla.tenancy.W001")
 
     def test_a_scoped_company_model_is_not_reported(self):
         class Meta:
@@ -73,7 +73,7 @@ class TenancyCheckTests(SimpleTestCase):
                 "company_id": models.ForeignKey(
                     "base.Company", on_delete=models.CASCADE, null=True
                 ),
-                "objects": CandourCompanyManager(),
+                "objects": HorillaCompanyManager(),
             },
         )
 

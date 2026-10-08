@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from candour.scheduling import register_job
-from candour.signals import post_scheduler, pre_scheduler
+from horilla.scheduling import register_job
+from horilla.signals import post_scheduler, pre_scheduler
 
 
 def leave_reset():

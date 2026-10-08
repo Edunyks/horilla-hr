@@ -11,7 +11,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
     volumes:
-      - candour-staging-postgres:/var/lib/postgresql/data
+      - horilla-staging-postgres:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
@@ -30,7 +30,7 @@ services:
       # Coolify does not reliably preserve Compose $$ escapes.
       REDISCLI_AUTH: ${REDIS_PASSWORD:?set REDIS_PASSWORD}
     volumes:
-      - candour-staging-redis:/data
+      - horilla-staging-redis:/data
     healthcheck:
       # Plain `redis-cli ping` exits 0 on a NOAUTH error, so check for PONG.
       test: ["CMD-SHELL", "redis-cli ping | grep -q PONG"]
@@ -52,7 +52,7 @@ services:
     command: ["true"]
     environment: &app-env
       DEBUG: "0"
-      CANDOUR_ENV: ${CANDOUR_ENV:-staging}
+      HORILLA_ENV: ${HORILLA_ENV:-staging}
       SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY}
       ALLOWED_HOSTS: ${ALLOWED_HOSTS:?set ALLOWED_HOSTS}
       CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS:?set CSRF_TRUSTED_ORIGINS}
@@ -68,10 +68,10 @@ services:
       SENTRY_DSN: ${SENTRY_DSN:-}
       DJANGO_LOG_LEVEL: ${DJANGO_LOG_LEVEL:-INFO}
     volumes:
-      - candour-staging-staticfiles:/app/staticfiles
-      - candour-staging-media:/app/media
+      - horilla-staging-staticfiles:/app/staticfiles
+      - horilla-staging-media:/app/media
     labels:
-      com.candour.service: migration-runner
+      com.horilla.service: migration-runner
     # The image HEALTHCHECK curls :8000, which this container never serves.
     healthcheck:
       disable: true
@@ -89,14 +89,14 @@ services:
     restart: unless-stopped
     environment:
       <<: *app-env
-      CANDOUR_SKIP_RELEASE_TASKS: "1"
+      HORILLA_SKIP_RELEASE_TASKS: "1"
       GUNICORN_WORKERS: ${GUNICORN_WORKERS:-}
       GUNICORN_LOG_LEVEL: ${GUNICORN_LOG_LEVEL:-info}
     volumes:
-      - candour-staging-staticfiles:/app/staticfiles
-      - candour-staging-media:/app/media
+      - horilla-staging-staticfiles:/app/staticfiles
+      - horilla-staging-media:/app/media
     labels:
-      com.candour.service: web
+      com.horilla.service: web
     depends_on:
       migrate:
         condition: service_completed_successfully
@@ -119,11 +119,11 @@ services:
     command: ["python", "manage.py", "run_scheduler"]
     environment:
       <<: *app-env
-      CANDOUR_SKIP_RELEASE_TASKS: "1"
+      HORILLA_SKIP_RELEASE_TASKS: "1"
     volumes:
-      - candour-staging-media:/app/media
+      - horilla-staging-media:/app/media
     labels:
-      com.candour.service: scheduler
+      com.horilla.service: scheduler
     # Binds no port, so the image's :8000 HEALTHCHECK can never pass.
     healthcheck:
       disable: true
@@ -134,7 +134,7 @@ services:
         condition: service_healthy
 
 volumes:
-  candour-staging-postgres:
-  candour-staging-redis:
-  candour-staging-staticfiles:
-  candour-staging-media:
+  horilla-staging-postgres:
+  horilla-staging-redis:
+  horilla-staging-staticfiles:
+  horilla-staging-media:

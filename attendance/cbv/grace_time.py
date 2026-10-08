@@ -16,11 +16,11 @@ from attendance.filters import GraceTimeFilter
 from attendance.forms import GraceTimeForm
 from attendance.models import GraceTime
 from base.cbv.employee_shift import EmployeeShiftListView
-from candour_views.cbv_methods import login_required, permission_required
-from candour_views.generic.cbv.views import (
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
+from horilla_views.cbv_methods import login_required, permission_required
+from horilla_views.generic.cbv.views import (
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
 )
 
 
@@ -29,7 +29,7 @@ from candour_views.generic.cbv.views import (
     permission_required(perm="attendance.view_attendancevalidationcondition"),
     name="dispatch",
 )
-class GenericGraceTimeListView(CandourListView):
+class GenericGraceTimeListView(HorillaListView):
     """
     List view of the page
     """
@@ -110,7 +110,7 @@ class GraceTimeList(GenericGraceTimeListView):
     permission_required(perm="attendance.view_attendancevalidationcondition"),
     name="dispatch",
 )
-class DefaultGraceTimeNav(CandourNavView):
+class DefaultGraceTimeNav(HorillaNavView):
     """
     Nav bar
     """
@@ -140,7 +140,7 @@ class DefaultGraceTimeNav(CandourNavView):
     permission_required(perm="attendance.view_attendancevalidationcondition"),
     name="dispatch",
 )
-class GraceTimeNav(CandourNavView):
+class GraceTimeNav(HorillaNavView):
     """
     Nav bar
     """
@@ -166,7 +166,7 @@ class GraceTimeNav(CandourNavView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="attendance.add_gracetime"), name="dispatch")
-class GraceTimeFormView(CandourFormView):
+class GraceTimeFormView(HorillaFormView):
     """
     Create and edit form
     """

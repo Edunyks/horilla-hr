@@ -14,16 +14,16 @@ from base.filters import HolidayFilter
 from base.forms import HolidayForm, HolidaysColumnExportForm
 from base.methods import has_export_access
 from base.models import Holidays
-from candour_views.cbv_methods import (
+from horilla_views.cbv_methods import (
     hx_request_required,
     login_required,
     permission_required,
 )
-from candour_views.generic.cbv.views import (
-    CandourDetailedView,
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
+from horilla_views.generic.cbv.views import (
+    HorillaDetailedView,
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
     TemplateView,
 )
 
@@ -38,7 +38,7 @@ class HolidaysView(TemplateView):
 
 
 @method_decorator(login_required, name="dispatch")
-class HolidayListView(CandourListView):
+class HolidayListView(HorillaListView):
     """
     list view
     """
@@ -85,7 +85,7 @@ class HolidayListView(CandourListView):
 
 
 @method_decorator(login_required, name="dispatch")
-class HolidayNavView(CandourNavView):
+class HolidayNavView(HorillaNavView):
     """
     nav bar
     """
@@ -151,7 +151,7 @@ class HolidayNavView(CandourNavView):
 
 
 @method_decorator(login_required, name="dispatch")
-class HolidayDetailView(CandourDetailedView):
+class HolidayDetailView(HorillaDetailedView):
     """
     detail view of the page
     """
@@ -196,7 +196,7 @@ class HolidayExport(TemplateView):
 
 
 @method_decorator(login_required, name="dispatch")
-class HolidayFormView(CandourFormView):
+class HolidayFormView(HorillaFormView):
     """
     form view for create button
     """

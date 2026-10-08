@@ -26,17 +26,17 @@ from employee.forms import BulkUpdateFieldForm, EmployeeExportExcelForm
 from employee.models import Employee, EmployeeBankDetails, EmployeeWorkInformation
 from employee.templatetags.employee_filter import edit_accessibility
 from employee.views import _check_reporting_manager
-from candour.candour_middlewares import _thread_locals
-from candour.signals import post_generic_delete, post_generic_import
-from candour_auth.models import CandourUser
-from candour_views.cbv_methods import hx_request_required, login_required
-from candour_views.forms import DynamicBulkUpdateForm
-from candour_views.generic.cbv.views import (
-    CandourCardView,
-    CandourDetailedView,
-    CandourListView,
-    CandourNavView,
-    CandourTabView,
+from horilla.horilla_middlewares import _thread_locals
+from horilla.signals import post_generic_delete, post_generic_import
+from horilla_auth.models import HorillaUser
+from horilla_views.cbv_methods import hx_request_required, login_required
+from horilla_views.forms import DynamicBulkUpdateForm
+from horilla_views.generic.cbv.views import (
+    HorillaCardView,
+    HorillaDetailedView,
+    HorillaListView,
+    HorillaNavView,
+    HorillaTabView,
     TemplateView,
 )
 
@@ -109,7 +109,7 @@ from base import models as base_models
     ),
     name="dispatch",
 )
-class EmployeesList(CandourListView):
+class EmployeesList(HorillaListView):
     """
     List view of employees
     """
@@ -237,7 +237,7 @@ class EmployeesList(CandourListView):
     }
 
     import_related_model_column_mapping = {
-        "employee_user_id": base_models.CandourUser,
+        "employee_user_id": base_models.HorillaUser,
         # "test": base_models.Department,
         "employee_work_info": EmployeeWorkInformation,
         "employee_bank_details": EmployeeBankDetails,
@@ -446,7 +446,7 @@ Employee.get_detailed_work_url = get_detailed_work_url
 
 
 @method_decorator(login_required, name="dispatch")
-class TabEmployeeWorkList(CandourListView):
+class TabEmployeeWorkList(HorillaListView):
     """
     Self Employee Work List
     """
@@ -494,7 +494,7 @@ class TabEmployeeWorkList(CandourListView):
 
 
 @method_decorator(login_required, name="dispatch")
-class EmployeeWorkDetails(CandourDetailedView):
+class EmployeeWorkDetails(HorillaDetailedView):
     """
     Employee Detail View
     """
@@ -532,7 +532,7 @@ class EmployeeWorkDetails(CandourDetailedView):
 
 
 @method_decorator(login_required, name="dispatch")
-class WorkTab(CandourTabView):
+class WorkTab(HorillaTabView):
     """
     Work Tab
     """
@@ -570,7 +570,7 @@ class WorkTab(CandourTabView):
     ),
     name="dispatch",
 )
-class EmployeeNav(CandourNavView):
+class EmployeeNav(HorillaNavView):
     """
     For nav bar
     """
@@ -728,7 +728,7 @@ class EmployeeNav(CandourNavView):
     ]
 
 
-@receiver(post_generic_import, sender=CandourUser)
+@receiver(post_generic_import, sender=HorillaUser)
 def user_generic_import_or_update(sender, **kwargs):
     """
     Handle bulk user imports
@@ -752,7 +752,7 @@ def user_generic_import_or_update(sender, **kwargs):
         if users_to_update:
             # Bulk update only the users that were changed
             with transaction.atomic():
-                CandourUser.objects.bulk_update(users_to_update, ["password"])
+                HorillaUser.objects.bulk_update(users_to_update, ["password"])
                 logger.info(
                     f"{len(users_to_update)} user passwords were successfully updated."
                 )
@@ -797,7 +797,7 @@ class ExportView(TemplateView):
     ),
     name="dispatch",
 )
-class EmployeeCard(CandourCardView):
+class EmployeeCard(HorillaCardView):
     """
     For card view
     """

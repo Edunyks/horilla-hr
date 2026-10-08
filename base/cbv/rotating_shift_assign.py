@@ -26,12 +26,12 @@ from base.methods import (
 )
 from base.models import RotatingShiftAssign
 from employee.models import Employee
-from candour_views.cbv_methods import hx_request_required, login_required
-from candour_views.generic.cbv.views import (
-    CandourDetailedView,
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
+from horilla_views.cbv_methods import hx_request_required, login_required
+from horilla_views.generic.cbv.views import (
+    HorillaDetailedView,
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
     TemplateView,
 )
 from notifications.signals import notify
@@ -48,7 +48,7 @@ class RotatingShiftAssignView(TemplateView):
 
 
 @method_decorator(login_required, name="dispatch")
-class RotatingShiftListParent(CandourListView):
+class RotatingShiftListParent(HorillaListView):
     """
     Parent class
     """
@@ -136,7 +136,7 @@ class RotatingShiftList(RotatingShiftListParent):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(manager_can_enter("base.view_rotatingshiftassign"), name="dispatch")
-class RotatingShiftAssignNav(CandourNavView):
+class RotatingShiftAssignNav(HorillaNavView):
     """
     Nav bar
     """
@@ -227,7 +227,7 @@ class RotatingShiftAssignNav(CandourNavView):
     filter_form_context_name = "form"
     search_swap_target = "#listContainer"
     # Modern slide-over filter panel (generic/inline_nav.html's own
-    # {% if modern_filter %} branch, mirroring candour_nav.html's
+    # {% if modern_filter %} branch, mirroring horilla_nav.html's
     # .oh-filter-modern styles) -- same treatment as every other panel
     # this session. RotatingShiftAssignFilters.ajax_fields carries the
     # AJAX-loaded comboboxes this needs.
@@ -248,7 +248,7 @@ class RotatingShiftAssignNav(CandourNavView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(manager_can_enter("base.view_rotatingshiftassign"), name="dispatch")
-class RotatingShiftDetailview(CandourDetailedView):
+class RotatingShiftDetailview(HorillaDetailedView):
     """
     Detail View
     """
@@ -312,7 +312,7 @@ class RotatingExportView(TemplateView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(manager_can_enter("base.add_rotatingshiftassign"), name="dispatch")
-class RotatingShiftFormView(CandourFormView):
+class RotatingShiftFormView(HorillaFormView):
     """
     Create and edit form
     """
@@ -388,7 +388,7 @@ class RotatingShiftFormView(CandourFormView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(manager_can_enter("base.view_rotatingshiftassign"), name="dispatch")
-class RotatingShiftAssignDuplicate(CandourFormView):
+class RotatingShiftAssignDuplicate(HorillaFormView):
     """
     Duplicate form view
     """

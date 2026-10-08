@@ -26,12 +26,12 @@ from base.methods import (
     is_reportingmanager,
 )
 from base.models import PenaltyAccounts
-from candour_views.cbv_methods import hx_request_required, login_required
-from candour_views.generic.cbv.views import (
-    CandourDetailedView,
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
+from horilla_views.cbv_methods import hx_request_required, login_required
+from horilla_views.generic.cbv.views import (
+    HorillaDetailedView,
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
     TemplateView,
 )
 from leave.filters import LeaveRequestFilter
@@ -55,7 +55,7 @@ class LeaveRequestsView(TemplateView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(manager_can_enter("leave.view_leaverequest"), name="dispatch")
-class LeaveRequestsListView(CandourListView):
+class LeaveRequestsListView(HorillaListView):
     """
     Lits view of the page
     """
@@ -294,7 +294,7 @@ class LeaveRequestsListView(CandourListView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(manager_can_enter("leave.view_leaverequest"), name="dispatch")
-class LeaveRequestsNavView(CandourNavView):
+class LeaveRequestsNavView(HorillaNavView):
     """
     nav bar
     """
@@ -358,7 +358,7 @@ class LeaveRequestsNavView(CandourNavView):
     filter_body_template = "cbv/leave_requests/filter.html"
     filter_form_context_name = "form"
     search_swap_target = "#listContainer"
-    # Modern slide-over filter panel (candour_nav.html's .oh-filter-modern
+    # Modern slide-over filter panel (horilla_nav.html's .oh-filter-modern
     # styles) -- same treatment as every other panel this session.
     # LeaveRequestFilter.ajax_fields carries the AJAX-loaded comboboxes
     # this needs.
@@ -430,7 +430,7 @@ class LeaveRequestsExportNav(TemplateView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(manager_can_enter("leave.view_leaverequest"), name="dispatch")
-class LeaveRequestsDetailView(CandourDetailedView):
+class LeaveRequestsDetailView(HorillaDetailedView):
     """
     detail view of page
     """
@@ -491,7 +491,7 @@ class LeaveRequestsDetailView(CandourDetailedView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(manager_can_enter("leave.add_leaverequest"), name="dispatch")
-class LeaveRequestFormView(CandourFormView):
+class LeaveRequestFormView(HorillaFormView):
     """
     form view
     """
@@ -711,7 +711,7 @@ class LeaveClashListView(LeaveRequestsListView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        queryset = CandourListView.get_queryset(self)
+        queryset = HorillaListView.get_queryset(self)
         pk = self.kwargs.get("pk")
         record = LeaveRequest.objects.filter(id=pk).first()
         if not record:

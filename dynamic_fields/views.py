@@ -10,15 +10,15 @@ from django.views.generic import View
 
 from dynamic_fields import forms, models
 from dynamic_fields.methods import structured
-from candour.decorators import login_required, permission_required
-from candour_views.generic.cbv.views import CandourFormView
+from horilla.decorators import login_required, permission_required
+from horilla_views.generic.cbv.views import HorillaFormView
 
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(
-    permission_required("candour_automations.change_mailautomation"), name="dispatch"
+    permission_required("horilla_automations.change_mailautomation"), name="dispatch"
 )
-class ChoiceFormView(CandourFormView):
+class ChoiceFormView(HorillaFormView):
     """
     ChoiceFormView
     """
@@ -30,9 +30,9 @@ class ChoiceFormView(CandourFormView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(
-    permission_required("candour_automations.change_mailautomation"), name="dispatch"
+    permission_required("horilla_automations.change_mailautomation"), name="dispatch"
 )
-class DynamicFieldFormView(CandourFormView):
+class DynamicFieldFormView(HorillaFormView):
     """
     DynamicFieldFormView
     """
@@ -63,7 +63,7 @@ class DynamicFieldFormView(CandourFormView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(
-    permission_required("candour_automations.change_mailautomation"), name="dispatch"
+    permission_required("horilla_automations.change_mailautomation"), name="dispatch"
 )
 class RemoveDf(View):
     """

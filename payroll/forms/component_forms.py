@@ -22,12 +22,12 @@ from base.methods import reload_queryset
 from base.models import Company
 from employee.filters import EmployeeFilter
 from employee.models import BonusPoint, Employee
-from candour import candour_middlewares
-from candour.candour_middlewares import _thread_locals
-from candour.methods import get_candour_model_class
-from candour_widgets.forms import CandourForm, default_select_option_template
-from candour_widgets.widgets.candour_multi_select_field import CandourMultiSelectField
-from candour_widgets.widgets.select_widgets import CandourMultiSelectWidget
+from horilla import horilla_middlewares
+from horilla.horilla_middlewares import _thread_locals
+from horilla.methods import get_horilla_model_class
+from horilla_widgets.forms import HorillaForm, default_select_option_template
+from horilla_widgets.widgets.horilla_multi_select_field import HorillaMultiSelectField
+from horilla_widgets.widgets.select_widgets import HorillaMultiSelectWidget
 from notifications.signals import notify
 from payroll.models import tax_models as models
 from payroll.models.models import (
@@ -266,10 +266,10 @@ class SalaryStructureForm(ModelForm):
     Form for SalaryStructure model
     """
 
-    employees = CandourMultiSelectField(
+    employees = HorillaMultiSelectField(
         queryset=Employee.objects.all(),
         required=False,
-        widget=CandourMultiSelectWidget(
+        widget=HorillaMultiSelectWidget(
             filter_route_name="employee-widget-filter",
             filter_class=EmployeeFilter,
             filter_instance_context_name="f",
@@ -481,7 +481,7 @@ class PayslipForm(ModelForm):
         }
 
 
-class GeneratePayslipForm(CandourForm):
+class GeneratePayslipForm(HorillaForm):
     """
     Form for Payslip
     """
@@ -491,9 +491,9 @@ class GeneratePayslipForm(CandourForm):
         required=False,
         # help_text="Enter +-something if you want to generate payslips by batches",
     )
-    employee_id = CandourMultiSelectField(
+    employee_id = HorillaMultiSelectField(
         queryset=Employee.objects.none(),
-        widget=CandourMultiSelectWidget(
+        widget=HorillaMultiSelectWidget(
             filter_route_name="employee-widget-filter",
             filter_class=EmployeeFilter,
             filter_instance_context_name="f",
@@ -920,7 +920,7 @@ class ReimbursementForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.request = getattr(candour_middlewares._thread_locals, "request", None)
+        self.request = getattr(horilla_middlewares._thread_locals, "request", None)
         self.employee = self.get_employee()  # 819
 
         if not self.instance.pk:
@@ -962,7 +962,7 @@ class ReimbursementForm(ModelForm):
         return employee_qs.first()
 
     def get_encashable_leaves(self, employee):
-        LeaveType = get_candour_model_class(app_label="leave", model="leavetype")
+        LeaveType = get_horilla_model_class(app_label="leave", model="leavetype")
         return LeaveType.objects.filter(
             employee_available_leave__employee_id=employee,
             employee_available_leave__total_leave_days__gte=1,
@@ -1004,7 +1004,7 @@ class ReimbursementForm(ModelForm):
         if not apps.is_installed("leave") or not self.employee:
             return
 
-        AvailableLeave = get_candour_model_class(
+        AvailableLeave = get_horilla_model_class(
             app_label="leave", model="availableleave"
         )
         assigned_leaves = self.get_encashable_leaves(self.employee)
@@ -1102,7 +1102,7 @@ class ReimbursementForm(ModelForm):
                 if leave_type not in encashable:
                     self.add_error("leave_type_id", "This leave type is not encashable")
                 else:
-                    AvailableLeave = get_candour_model_class("leave", "availableleave")
+                    AvailableLeave = get_horilla_model_class("leave", "availableleave")
                     available_leave = AvailableLeave.objects.filter(
                         leave_type_id=leave_type, employee_id=employee
                     ).first()
@@ -1191,7 +1191,7 @@ class PayslipAutoGenerateForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        active_company_id = candour_middlewares.get_selected_company()
+        active_company_id = horilla_middlewares.get_selected_company()
         if active_company_id and active_company_id != "all":
             self.fields["company_id"].queryset = Company.objects.filter(
                 id=active_company_id

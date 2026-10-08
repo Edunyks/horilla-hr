@@ -4,7 +4,7 @@ from datetime import timedelta
 from django.utils import timezone
 
 from base.backends import logger
-from candour.scheduling import register_job
+from horilla.scheduling import register_job
 
 
 def auto_punch_out():

@@ -11,17 +11,17 @@ from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 
-from candour.methods import handle_no_permission
-from candour_views.cbv_methods import (
+from horilla.methods import handle_no_permission
+from horilla_views.cbv_methods import (
     check_feature_enabled,
     login_required,
     permission_required,
 )
-from candour_views.generic.cbv.views import (
-    CandourDetailedView,
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
+from horilla_views.generic.cbv.views import (
+    HorillaDetailedView,
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
     TemplateView,
 )
 from offboarding.filters import LetterFilter
@@ -59,7 +59,7 @@ class ResignationLettersView(TemplateView):
     check_feature_enabled("resignation_request", OffboardingGeneralSetting),
     name="dispatch",
 )
-class ResignationListView(CandourListView):
+class ResignationListView(HorillaListView):
     """
     list view
     """
@@ -160,7 +160,7 @@ class ResignationListView(CandourListView):
     check_feature_enabled("resignation_request", OffboardingGeneralSetting),
     name="dispatch",
 )
-class ResinationLettersNav(CandourNavView):
+class ResinationLettersNav(HorillaNavView):
     """
     Nav bar
     """
@@ -202,7 +202,7 @@ class ResinationLettersNav(CandourNavView):
     filter_body_template = "cbv/resignation/filter.html"
     search_swap_target = "#listContainer"
     apply_first_filter = False
-    # Modern slide-over filter panel (generic/candour_nav.html's own
+    # Modern slide-over filter panel (generic/horilla_nav.html's own
     # {% if modern_filter %} branch) -- same treatment as every other
     # panel this session. LetterFilter.ajax_fields carries the
     # AJAX-loaded comboboxes this needs.
@@ -225,7 +225,7 @@ class ResinationLettersNav(CandourNavView):
 
 
 @method_decorator(login_required, name="dispatch")
-class ResignationLettersFormView(CandourFormView):
+class ResignationLettersFormView(HorillaFormView):
     """
     Create and edit form for resignations
     """
@@ -291,7 +291,7 @@ class ResignationLettersFormView(CandourFormView):
     check_feature_enabled("resignation_request", OffboardingGeneralSetting),
     name="dispatch",
 )
-class ResignationLetterDetailView(CandourDetailedView):
+class ResignationLetterDetailView(HorillaDetailedView):
     """
     detail view of resignations
     """

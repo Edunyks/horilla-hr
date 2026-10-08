@@ -24,13 +24,13 @@ from base.methods import (
 )
 from base.models import RotatingWorkTypeAssign
 from employee.models import Employee
-from candour.http.response import CandourRedirect
-from candour_views.cbv_methods import hx_request_required, login_required
-from candour_views.generic.cbv.views import (
-    CandourDetailedView,
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
+from horilla.http.response import HorillaRedirect
+from horilla_views.cbv_methods import hx_request_required, login_required
+from horilla_views.generic.cbv.views import (
+    HorillaDetailedView,
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
     TemplateView,
 )
 from notifications.signals import notify
@@ -50,7 +50,7 @@ class RotatingWorkRequestView(TemplateView):
 
 
 @method_decorator(login_required, name="dispatch")
-class GeneralParent(CandourListView):
+class GeneralParent(HorillaListView):
     """
     main parent class for list view
     """
@@ -140,7 +140,7 @@ class RotatingWorkListView(GeneralParent):
 @method_decorator(
     manager_can_enter("base.view_rotatingworktypeassign"), name="dispatch"
 )
-class RotatingWorkNavView(CandourNavView):
+class RotatingWorkNavView(HorillaNavView):
     """
     Nav view of the page
     """
@@ -219,7 +219,7 @@ class RotatingWorkNavView(CandourNavView):
     filter_form_context_name = "form"
     search_swap_target = "#listContainer"
     # Modern slide-over filter panel (generic/inline_nav.html's own
-    # {% if modern_filter %} branch, mirroring candour_nav.html's
+    # {% if modern_filter %} branch, mirroring horilla_nav.html's
     # .oh-filter-modern styles) -- same treatment as every other panel
     # this session. RotatingWorkTypeAssignFilter.ajax_fields carries the
     # AJAX-loaded comboboxes this needs.
@@ -243,7 +243,7 @@ class RotatingWorkNavView(CandourNavView):
 @method_decorator(
     manager_can_enter("base.view_rotatingworktypeassign"), name="dispatch"
 )
-class RotatingWorkDetailView(CandourDetailedView):
+class RotatingWorkDetailView(HorillaDetailedView):
     """
     Detail view of page
     """
@@ -309,7 +309,7 @@ class RotatingWorkExport(TemplateView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(manager_can_enter("base.add_rotatingworktypeassign"), name="dispatch")
-class RotatingWorkTypeFormView(CandourFormView):
+class RotatingWorkTypeFormView(HorillaFormView):
     """
     form view
     """
@@ -386,7 +386,7 @@ class RotatingWorkTypeFormView(CandourFormView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(manager_can_enter("base.add_rotatingworktypeassign"), name="dispatch")
-class RotatingWorkTypeDuplicateForm(CandourFormView):
+class RotatingWorkTypeDuplicateForm(HorillaFormView):
     """
     duplicate from view
     """
@@ -422,6 +422,6 @@ class RotatingWorkTypeDuplicateForm(CandourFormView):
             message = _("Rotating Work Assign Created")
             messages.success(self.request, message)
             form.save()
-            return CandourRedirect(self.request)
+            return HorillaRedirect(self.request)
 
         return self.form_invalid(form)

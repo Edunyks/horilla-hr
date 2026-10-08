@@ -40,8 +40,8 @@ jobs:
 
       - name: Ensure local_settings stub exists
         run: |
-          if [ ! -f candour/settings/local_settings.py ]; then
-            printf '%s\n' '# Ephemeral for CI' > candour/settings/local_settings.py
+          if [ ! -f horilla/settings/local_settings.py ]; then
+            printf '%s\n' '# Ephemeral for CI' > horilla/settings/local_settings.py
           fi
 
       # Ruff runs over the whole repo, unlike the Black/isort steps below --
@@ -52,20 +52,20 @@ jobs:
         run: ruff check .
 
       - name: Black (settings + urls)
-        run: black --check candour/settings candour/urls.py
+        run: black --check horilla/settings horilla/urls.py
 
       - name: isort (settings + urls)
-        run: isort --check-only --profile black candour/settings candour/urls.py
+        run: isort --check-only --profile black horilla/settings horilla/urls.py
 
       - name: Django system checks (SQLite defaults)
         env:
-          DJANGO_SETTINGS_MODULE: candour.settings
+          DJANGO_SETTINGS_MODULE: horilla.settings
           DEBUG: "True"
           SECRET_KEY: ci-dev-not-for-production
           ALLOWED_HOSTS: localhost,127.0.0.1
         run: |
           python manage.py check
-          python manage.py check --fail-level WARNING --tag candour.tenancy
+          python manage.py check --fail-level WARNING --tag horilla.tenancy
 
   dependency-audit:
     # Dependency CVEs were only ever caught by the container image scan, which
@@ -112,7 +112,7 @@ jobs:
 
       # The gitleaks BINARY is MIT-licensed and free; it is the
       # gitleaks-action wrapper that requires a paid key for organization repos
-      # ("[candour] is an organization. License key is required."), which is
+      # ("[horilla] is an organization. License key is required."), which is
       # what failed the first time this job ran. Running the binary directly
       # keeps the scan, and pinning the version means a new upstream release
       # cannot change what blocks a PR without us choosing it.
@@ -174,13 +174,13 @@ jobs:
 
       - name: Ensure local_settings stub exists
         run: |
-          if [ ! -f candour/settings/local_settings.py ]; then
-            printf '%s\n' '# Ephemeral for CI' > candour/settings/local_settings.py
+          if [ ! -f horilla/settings/local_settings.py ]; then
+            printf '%s\n' '# Ephemeral for CI' > horilla/settings/local_settings.py
           fi
 
       - name: Reject insecure production defaults
         env:
-          DJANGO_SETTINGS_MODULE: candour.settings
+          DJANGO_SETTINGS_MODULE: horilla.settings
           DEBUG: "False"
           SECRET_KEY: django-insecure-default-key
           ALLOWED_HOSTS: "*"

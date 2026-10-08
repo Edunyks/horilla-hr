@@ -26,14 +26,14 @@ from base.methods import (
     is_reportingmanager,
 )
 from employee.models import Employee
-from candour_views.cbv_methods import login_required
-from candour_views.generic.cbv.views import (
-    CandourDetailedView,
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
-    CandourTabContentShell,
-    CandourTabView,
+from horilla_views.cbv_methods import login_required
+from horilla_views.generic.cbv.views import (
+    HorillaDetailedView,
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
+    HorillaTabContentShell,
+    HorillaTabView,
     TemplateView,
 )
 from notifications.signals import notify
@@ -49,7 +49,7 @@ class AttendancesRequestView(TemplateView):
 
 
 @method_decorator(login_required, name="dispatch")
-class AttendancesRequestTabView(CandourTabView):
+class AttendancesRequestTabView(HorillaTabView):
     """
     tabview of attendance request page
     """
@@ -88,7 +88,7 @@ Attendance.request_approved_by = request_approved_by
 
 
 @method_decorator(login_required, name="dispatch")
-class AttendancesRequestListView(CandourListView):
+class AttendancesRequestListView(HorillaListView):
     """
     list view
     """
@@ -309,7 +309,7 @@ class AttendanceListTab(AttendancesRequestListView):
 
 
 def _request_tab_badge_count(request, view_cls):
-    """Same queryset rules as the tab's CandourListView (filters, subordinates)."""
+    """Same queryset rules as the tab's HorillaListView (filters, subordinates)."""
     view = view_cls()
     view.request = request
     view.args = ()
@@ -349,7 +349,7 @@ def _attendance_request_common_actions(request):
     return actions
 
 
-class _AttendanceRequestTabNavBase(CandourNavView):
+class _AttendanceRequestTabNavBase(HorillaNavView):
     """
     Shared Search/Filter/Create wiring for each Attendance Requests tab's own Nav.
     """
@@ -439,20 +439,20 @@ class AllAttendanceRequestNav(_AttendanceRequestTabNavBase):
         self.actions = _attendance_request_common_actions(self.request)
 
 
-class RequestedAttendanceTabShell(CandourTabContentShell):
+class RequestedAttendanceTabShell(HorillaTabContentShell):
     nav_url_name = "requested-attendance-nav"
     container_id = "requestedAttendanceListContainer"
     tabs_root_id = "attendance-container"
 
 
-class AllAttendanceTabShell(CandourTabContentShell):
+class AllAttendanceTabShell(HorillaTabContentShell):
     nav_url_name = "all-attendance-request-nav"
     container_id = "allAttendanceListContainer"
     tabs_root_id = "attendance-container"
 
 
 @method_decorator(login_required, name="dispatch")
-class AttendanceListTabDetailView(CandourDetailedView):
+class AttendanceListTabDetailView(HorillaDetailedView):
     """
     Detail view of page
     """
@@ -488,7 +488,7 @@ class AttendanceListTabDetailView(CandourDetailedView):
 
 
 @method_decorator(login_required, name="dispatch")
-class NewAttendanceRequestFormView(CandourFormView):
+class NewAttendanceRequestFormView(HorillaFormView):
     """
     form view for create  attendance request
     """
@@ -534,7 +534,7 @@ class NewAttendanceRequestFormView(CandourFormView):
 
 
 @method_decorator(login_required, name="dispatch")
-class BulkAttendanceRequestFormView(CandourFormView):
+class BulkAttendanceRequestFormView(HorillaFormView):
     """
     form view for create bulk  attendance request
     """
@@ -584,7 +584,7 @@ class BulkAttendanceRequestFormView(CandourFormView):
 
 
 @method_decorator(login_required, name="dispatch")
-class UpdateAttendanceRequestFormView(CandourFormView):
+class UpdateAttendanceRequestFormView(HorillaFormView):
     """
     form view for update attendance request
     """

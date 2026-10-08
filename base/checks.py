@@ -2,7 +2,7 @@
 Build-time guard against unscoped tenant models.
 
 Tenancy is opt-in: a model is isolated only if someone remembered to give it a
-``CandourCompanyManager``. Across 233 models that is 233 chances to forget, and
+``HorillaCompanyManager``. Across 233 models that is 233 chances to forget, and
 forgetting is silent -- the model works fine and leaks across tenants. EmailLog
 had a ``company_id`` FK and a plain ``Manager()`` for exactly this reason.
 
@@ -19,9 +19,9 @@ from django.core.checks import register
 # "<app_label>.<ModelName>": why it is intentionally not company-scoped.
 EXEMPT = {
     "base.Company": "It is the tenant root; scoping it by itself is circular.",
-    "candour_audit.AuditTag": "Global audit vocabulary, shared across tenants.",
-    "candour_audit.AccountBlockUnblock": "Global account-level switch.",
-    "candour_dbtemplate.TemplateVersion": "Versions inherit their template's scope.",
+    "horilla_audit.AuditTag": "Global audit vocabulary, shared across tenants.",
+    "horilla_audit.AccountBlockUnblock": "Global account-level switch.",
+    "horilla_dbtemplate.TemplateVersion": "Versions inherit their template's scope.",
     "biometric.BiometricDevices": "Device registry is deployment-wide.",
     "biometric.BiometricEmployees": "Rows are reached via a scoped device.",
     "base.RosterPublishLog": "Audit trail reached via a scoped roster.",
@@ -34,7 +34,7 @@ EXEMPT = {
         "Attachment reached via its scoped parent claim."
     ),
     "pms.AnonymousFeedback": "Anonymity is the point; scoping would deanonymise.",
-    "candour.CandourModel": "Abstract base.",
+    "horilla.HorillaModel": "Abstract base.",
     # Per-company settings singletons. These are always looked up by an
     # explicit company_id (a settings row for company X, fetched deliberately),
     # never listed under ambient scope, so the manager filter would add nothing.
@@ -44,10 +44,10 @@ EXEMPT = {
     "base.DynamicEmailConfiguration": "Per-company mail-server singleton.",
     "base.IntegrationApps": "Per-company integration toggle.",
     "base.SetupChecklistDismissal": "Per-user, per-company UI dismissal flag.",
-    "candour_theme.CompanyTheme": "Per-company theme singleton.",
+    "horilla_theme.CompanyTheme": "Per-company theme singleton.",
     "facedetection.FaceDetection": "Per-company OneToOne settings row.",
     "geofencing.GeoFencing": "Per-company OneToOne settings row.",
-    "candour_audit.HistoryTrackingFields": "Per-company audit configuration.",
+    "horilla_audit.HistoryTrackingFields": "Per-company audit configuration.",
     # django-simple-history shadow tables. They mirror a scoped model and are
     # only ever read through that model's history manager.
     "employee.HistoricalEmployeeWorkInformation": "simple_history shadow table.",
@@ -56,12 +56,12 @@ EXEMPT = {
 }
 
 
-@register("candour.tenancy")
+@register("horilla.tenancy")
 def check_company_scoped_managers(app_configs, **kwargs):
     """Warn when a model has a company FK but no company-scoped manager."""
     from django.apps import apps
 
-    from base.candour_company_manager import CandourCompanyManager
+    from base.horilla_company_manager import HorillaCompanyManager
 
     problems = []
     models = (
@@ -83,7 +83,7 @@ def check_company_scoped_managers(app_configs, **kwargs):
             # warns rather than errors.
             continue
 
-        if isinstance(model._default_manager, CandourCompanyManager):
+        if isinstance(model._default_manager, HorillaCompanyManager):
             continue
 
         problems.append(
@@ -92,11 +92,11 @@ def check_company_scoped_managers(app_configs, **kwargs):
                 f"{type(model._default_manager).__name__}, so queries are not "
                 f"company-scoped.",
                 hint=(
-                    "Set `objects = CandourCompanyManager()` on the model, or "
+                    "Set `objects = HorillaCompanyManager()` on the model, or "
                     "add it to base.checks.EXEMPT with the reason it is global."
                 ),
                 obj=model,
-                id="candour.tenancy.W001",
+                id="horilla.tenancy.W001",
             )
         )
 

@@ -5,8 +5,8 @@ this page is handling the cbv methods of the candidate documents tab
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 
-from candour_views.cbv_methods import login_required
-from candour_views.generic.cbv.views import CandourListView
+from horilla_views.cbv_methods import login_required
+from horilla_views.generic.cbv.views import HorillaListView
 from recruitment.cbv_decorators import all_manager_can_enter
 from recruitment.filters import CandidateDocumentFilter
 from recruitment.models import Candidate, CandidateDocument
@@ -16,7 +16,7 @@ from recruitment.models import Candidate, CandidateDocument
 @method_decorator(
     all_manager_can_enter(perm="recruitment.view_candidate"), name="dispatch"
 )
-class CandidateDocumentListView(CandourListView):
+class CandidateDocumentListView(HorillaListView):
     """
     Documents list view for the candidate profile tab
     """
@@ -51,7 +51,7 @@ class CandidateDocumentListView(CandourListView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # Fixed (not auto-random) so pagination/sort/search requests -
-        # which all hx-target="#{{view_id}}" from generic/candour_list_table.html -
+        # which all hx-target="#{{view_id}}" from generic/horilla_list_table.html -
         # can be recognized below and answered with just that fragment. Without
         # this, every such request re-renders the full tab (header + Create
         # button included) and htmx's outerHTML swap dumps that whole response
@@ -60,7 +60,7 @@ class CandidateDocumentListView(CandourListView):
 
     def get_template_names(self):
         if self.request.headers.get("HX-Target") == self.view_id:
-            return ["generic/candour_list_table.html"]
+            return ["generic/horilla_list_table.html"]
         return [self.template_name]
 
     def get_queryset(self):

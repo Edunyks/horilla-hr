@@ -13,8 +13,8 @@ from base.forms import Form, ModelForm
 from employee.filters import EmployeeFilter
 from employee.forms import MultipleFileField
 from employee.models import Employee
-from candour_widgets.widgets.candour_multi_select_field import CandourMultiSelectField
-from candour_widgets.widgets.select_widgets import CandourMultiSelectWidget
+from horilla_widgets.widgets.horilla_multi_select_field import HorillaMultiSelectField
+from horilla_widgets.widgets.select_widgets import HorillaMultiSelectWidget
 from payroll.context_processors import get_active_employees
 from payroll.models.models import (
     Contract,
@@ -187,10 +187,10 @@ class EncashmentEligibilityForm(ModelForm):
     redeem-unit amounts and the enable/disable toggle.
     """
 
-    employees = CandourMultiSelectField(
+    employees = HorillaMultiSelectField(
         queryset=Employee.objects.all(),
         required=False,
-        widget=CandourMultiSelectWidget(
+        widget=HorillaMultiSelectWidget(
             filter_route_name="employee-widget-filter",
             filter_class=EmployeeFilter,
             filter_instance_context_name="f",

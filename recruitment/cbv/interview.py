@@ -12,12 +12,12 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import gettext_noop
 
-from candour_views.cbv_methods import login_required
-from candour_views.generic.cbv.views import (
-    CandourDetailedView,
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
+from horilla_views.cbv_methods import login_required
+from horilla_views.generic.cbv.views import (
+    HorillaDetailedView,
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
     TemplateView,
 )
 from notifications.signals import notify
@@ -43,7 +43,7 @@ class InterviewViewPage(TemplateView):
 @method_decorator(
     recruitment_manager_can_enter(perm="recruitment.view_recruitment"), name="dispatch"
 )
-class InterviewNavView(CandourNavView):
+class InterviewNavView(HorillaNavView):
     """
     nav bar of the page
     """
@@ -67,7 +67,7 @@ class InterviewNavView(CandourNavView):
     filter_body_template = "cbv/interview/interview_filter.html"
     filter_form_context_name = "form"
     search_swap_target = "#listContainer"
-    # Modern slide-over filter panel (generic/candour_nav.html's own
+    # Modern slide-over filter panel (generic/horilla_nav.html's own
     # {% if modern_filter %} branch) -- same treatment as every other
     # panel this session. InterviewFilter.ajax_fields carries the
     # AJAX-loaded comboboxes this needs.
@@ -90,7 +90,7 @@ class InterviewNavView(CandourNavView):
 @method_decorator(
     recruitment_manager_can_enter(perm="recruitment.view_recruitment"), name="dispatch"
 )
-class InterviewLIstView(CandourListView):
+class InterviewLIstView(HorillaListView):
     """
     list view of the page
     """
@@ -175,7 +175,7 @@ class InterviewLIstView(CandourListView):
 @method_decorator(
     recruitment_manager_can_enter(perm="recruitment.view_recruitment"), name="dispatch"
 )
-class InterviewDetailView(CandourDetailedView):
+class InterviewDetailView(HorillaDetailedView):
     """
     detailed view
     """
@@ -202,7 +202,7 @@ class InterviewDetailView(CandourDetailedView):
 @method_decorator(
     manager_can_enter(perm="recruitment.add_interviewschedule"), name="dispatch"
 )
-class InterviewForm(CandourFormView):
+class InterviewForm(HorillaFormView):
     """
     form view
     """

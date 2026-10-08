@@ -18,22 +18,22 @@ from django.views import View
 from django.views.generic import TemplateView
 
 from base.methods import eval_validate
-from candour.candour_middlewares import _thread_locals
-from candour.http.response import CandourRedirect
-from candour_views.cbv_methods import (
+from horilla.horilla_middlewares import _thread_locals
+from horilla.http.response import HorillaRedirect
+from horilla_views.cbv_methods import (
     hx_request_required,
     login_required,
     render_template,
 )
-from candour_views.generic.cbv.kanban import CandourKanbanView
-from candour_views.generic.cbv.pipeline import Pipeline
-from candour_views.generic.cbv.views import (
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
-    CandourTabView,
+from horilla_views.generic.cbv.kanban import HorillaKanbanView
+from horilla_views.generic.cbv.pipeline import Pipeline
+from horilla_views.generic.cbv.views import (
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
+    HorillaTabView,
 )
-from candour_views.models import ActiveView
+from horilla_views.models import ActiveView
 from onboarding import filters as onboarding_filters
 from onboarding import forms
 from onboarding import models as onboarding_models
@@ -60,9 +60,9 @@ class PipelineView(TemplateView):
 @method_decorator(
     all_manager_can_enter(perm="recruitment.view_recruitment"), name="dispatch"
 )
-class PipelineNav(CandourNavView):
+class PipelineNav(HorillaNavView):
     """
-    CandourNavView
+    HorillaNavView
     """
 
     search_url = reverse_lazy("cbv-pipeline-tab-onboarding")
@@ -73,7 +73,7 @@ class PipelineNav(CandourNavView):
     filter_instance = onboarding_filters.RecruitmentFilter()
     # filter_instance_context_name = "filter"
     filter_form_context_name = "form"
-    # Modern slide-over filter panel (generic/candour_nav.html's own
+    # Modern slide-over filter panel (generic/horilla_nav.html's own
     # {% if modern_filter %} branch) -- same treatment as every other
     # panel this session. onboarding_filters.RecruitmentFilter inherits
     # recruitment.filters.RecruitmentFilter.ajax_fields (Managers,
@@ -185,7 +185,7 @@ def recruitment_pipeline_actions_onboarding(request, rec):
 @method_decorator(
     all_manager_can_enter(perm="recruitment.view_recruitment"), name="dispatch"
 )
-class RecruitmentTabView(CandourTabView):
+class RecruitmentTabView(HorillaTabView):
     """
     RecruitmentTabView
     """
@@ -214,7 +214,7 @@ class RecruitmentTabView(CandourTabView):
 @method_decorator(
     all_manager_can_enter(perm="recruitment.view_recruitment"), name="dispatch"
 )
-class RecruitmentCandidateNav(CandourNavView):
+class RecruitmentCandidateNav(HorillaNavView):
     """
     Per-job-tab Search+Filter for the Onboarding pipeline page, mirroring
     recruitment.cbv.pipeline.RecruitmentCandidateNav: one instance per job
@@ -231,7 +231,7 @@ class RecruitmentCandidateNav(CandourNavView):
     # Modern slide-over filter panel (generic/inline_nav.html's own
     # {% if modern_filter %} branch) -- same treatment as the page-level
     # PipelineNav/filters.html and the sibling recruitment/offboarding
-    # per-tab panels. PipelineCandidateFilter is now a CandourFilterSet
+    # per-tab panels. PipelineCandidateFilter is now a HorillaFilterSet
     # subclass so it gets the Advanced "+ Add filter" builder too.
     modern_filter = True
 
@@ -322,7 +322,7 @@ class RecruitmentPipelineContentShell(TemplateView):
         # defaults to the list endpoint in that case, so the Nav's view-type
         # toggle must resolve to the same "list" here too. Passing a falsy
         # view_type through left nav_url without a `?view=`, so on a user's
-        # very first visit (no saved choice yet) CandourNavView never marked
+        # very first visit (no saved choice yet) HorillaNavView never marked
         # either toggle button active even though list content was already
         # on screen - and inline_nav.html's onload script then read "no
         # button active" as "no filter has run yet" and fired an extra,
@@ -533,7 +533,7 @@ class CandidateOnboardingDetail(CandidateDetail):
 @method_decorator(
     all_manager_can_enter(perm="recruitment.view_recruitment"), name="dispatch"
 )
-class CandidateList(CandourListView):
+class CandidateList(HorillaListView):
     """
     CandidateList
     """
@@ -709,7 +709,7 @@ class CandidateList(CandourListView):
 
         if not request.user.is_authenticated:
             messages.error(request, _("You are not logged in."))
-            return CandourRedirect(request)
+            return HorillaRedirect(request)
 
         self.ordered_ids_key = (
             f"ordered_ids_{recruitment_models.Candidate.__name__.lower()}"
@@ -739,7 +739,7 @@ class CandidateList(CandourListView):
         stage_id = request.GET.get("onboarding_stage_id")
 
         if not stage_id:
-            return CandourRedirect(
+            return HorillaRedirect(
                 request, message=_("No stage found matching the query.")
             )
         return super().dispatch(request, *args, **kwargs)
@@ -756,7 +756,7 @@ class CandidateList(CandourListView):
         # added after self.visible_column's hidden-column filtering too)
         # couldn't be hidden even if they had one. Building these tuples
         # and folding them into self.columns/self.default_columns BEFORE
-        # calling super() makes the base CandourListView machinery treat
+        # calling super() makes the base HorillaListView machinery treat
         # them exactly like any other column, `columns` is a plain class
         # attribute (not a queryset), and ListView.as_view() gives each
         # request its own view instance, so this reassignment is
@@ -843,7 +843,7 @@ class CandidateList(CandourListView):
 
 
 @method_decorator(login_required, name="dispatch")
-class CandidateKanbanView(CandourKanbanView):
+class CandidateKanbanView(HorillaKanbanView):
     """
     CandidateKanbanView
     """
@@ -958,7 +958,7 @@ class CandidateKanbanView(CandourKanbanView):
 @method_decorator(
     stage_manager_can_enter(perm="recruitment.view_recruitment"), name="dispatch"
 )
-class ChangeStage(CandourFormView):
+class ChangeStage(HorillaFormView):
     """
     Change Candidate stage
     """
@@ -1043,7 +1043,7 @@ class AssignTask(View):
             return super().dispatch(request, *args, **kwargs)
         except ObjectDoesNotExist:
             messages.error(request, _("Requested object does not exist"))
-            return CandourRedirect(
+            return HorillaRedirect(
                 request, message=_("Requested object does not exist")
             )
 

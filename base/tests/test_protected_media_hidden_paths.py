@@ -10,7 +10,7 @@ import tempfile
 from django.test import TestCase, override_settings
 
 from base.models import Company
-from candour.testkit import make_employee, make_user
+from horilla.testkit import make_employee, make_user
 
 
 class HiddenMediaPathsTests(TestCase):
@@ -25,7 +25,7 @@ class HiddenMediaPathsTests(TestCase):
             fh.write("visible")
         company = Company.objects.create(company="Acme", hq=True)
         user = make_user("emp", password="pw-not-real")
-        make_employee(company=company, email="emp@test.candour", user=user)
+        make_employee(company=company, email="emp@test.horilla", user=user)
         self.client.force_login(user)
 
     def test_dot_paths_are_not_served_even_when_authenticated(self):

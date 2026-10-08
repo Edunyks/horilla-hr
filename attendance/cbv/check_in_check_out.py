@@ -5,12 +5,12 @@ from django.utils.translation import gettext_lazy as _
 
 from attendance.filters import AttendanceGeneralSettingFilter
 from attendance.models import AttendanceGeneralSetting
-from candour_views.cbv_methods import login_required
-from candour_views.generic.cbv.views import CandourListView, CandourNavView
+from horilla_views.cbv_methods import login_required
+from horilla_views.generic.cbv.views import HorillaListView, HorillaNavView
 
 
 @method_decorator(login_required, name="dispatch")
-class CheckInCheckOutListView(CandourListView):
+class CheckInCheckOutListView(HorillaListView):
     """
     List view of the page
     """
@@ -32,7 +32,7 @@ class CheckInCheckOutListView(CandourListView):
 
 
 @method_decorator(login_required, name="dispatch")
-class CheckInCheckOutNavBar(CandourNavView):
+class CheckInCheckOutNavBar(HorillaNavView):
     """
     Nav bar
     """

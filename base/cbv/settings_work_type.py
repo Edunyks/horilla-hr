@@ -10,18 +10,18 @@ from django.utils.translation import gettext_lazy as _
 
 from base.filters import WorkTypeFilter
 from base.models import WorkType
-from candour.decorators import permission_required
-from candour_views.cbv_methods import login_required
-from candour_views.generic.cbv.views import (
-    CandourDetailedView,
-    CandourListView,
-    CandourNavView,
+from horilla.decorators import permission_required
+from horilla_views.cbv_methods import login_required
+from horilla_views.generic.cbv.views import (
+    HorillaDetailedView,
+    HorillaListView,
+    HorillaNavView,
 )
 
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("base.view_worktype"), name="dispatch")
-class WorkTypeList(CandourListView):
+class WorkTypeList(HorillaListView):
     """
     list view of work types in settings
     """
@@ -78,7 +78,7 @@ class WorkTypeList(CandourListView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("base.view_worktype"), name="dispatch")
-class WorkTypeDetailView(CandourDetailedView):
+class WorkTypeDetailView(HorillaDetailedView):
     """
     detail view for work type, also registered as the related-object-link
     target for WorkType via detail_view_url_name
@@ -102,7 +102,7 @@ class WorkTypeDetailView(CandourDetailedView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("base.view_worktype"), name="dispatch")
-class WorkTypeNav(CandourNavView):
+class WorkTypeNav(HorillaNavView):
     """
     navbar of worktype
     """

@@ -1,5 +1,5 @@
 """
-Enterprise demo-data seeder for Candour HR.
+Enterprise demo-data seeder for Horilla HR.
 
 Keeps the people layer (users/employees/avatars) from fixtures and
 standardizes org taxonomy, module catalogs, media, and dynamic copy.

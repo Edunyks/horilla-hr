@@ -6,9 +6,9 @@ from django.contrib import messages
 from django.utils.translation import gettext as _
 
 from employee.models import EmployeeWorkInformation
-from candour.candour_middlewares import _thread_locals
-from candour.http.response import CandourRedirect
-from candour.methods import handle_no_permission
+from horilla.horilla_middlewares import _thread_locals
+from horilla.http.response import HorillaRedirect
+from horilla.methods import handle_no_permission
 
 from .models import MultipleApprovalManagers, ShiftRequest, WorkTypeRequest
 
@@ -39,7 +39,7 @@ def shift_request_change_permission(function=None, *args, **kwargs):
         ):
             return function(request, *args, shift_request_id=shift_request_id, **kwargs)
         messages.info(request, _("You don't have permission."))
-        return CandourRedirect(request)
+        return HorillaRedirect(request)
         # return function(request, *args, **kwargs)
 
     return check_permission
@@ -67,7 +67,7 @@ def work_type_request_change_permission(function=None, *args, **kwargs):
                 request, *args, work_type_request_id=work_type_request_id, **kwargs
             )
         messages.info(request, _("You don't have permission."))
-        return CandourRedirect(request)
+        return HorillaRedirect(request)
         # return function(request, *args, **kwargs)
 
     return check_permission

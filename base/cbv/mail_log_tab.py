@@ -14,10 +14,10 @@ from accessibility.cbv_decorators import enter_if_accessible
 from base.filters import MailLogFilter
 from base.models import EmailLog
 from employee.models import Employee
-from candour.decorators import check_manager
-from candour.http.response import CandourRedirect
-from candour_views.cbv_methods import login_required
-from candour_views.generic.cbv.views import CandourDetailedView, CandourListView
+from horilla.decorators import check_manager
+from horilla.http.response import HorillaRedirect
+from horilla_views.cbv_methods import login_required
+from horilla_views.generic.cbv.views import HorillaDetailedView, HorillaListView
 
 
 def _can_view_mail_log(request, employee):
@@ -40,7 +40,7 @@ def _employee_for_log(log):
 
 
 @method_decorator(login_required, name="dispatch")
-class MailLogTabList(CandourListView):
+class MailLogTabList(HorillaListView):
     """
     list view for mail log  tab
     """
@@ -66,10 +66,10 @@ class MailLogTabList(CandourListView):
         employee = Employee.objects.filter(id=pk).first()
         if not employee:
             messages.error(request, _("Employee not found."))
-            return CandourRedirect(request)
+            return HorillaRedirect(request)
         if not _can_view_mail_log(request, employee):
             messages.info(request, _("You don't have access to the feature"))
-            return CandourRedirect(request)
+            return HorillaRedirect(request)
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
@@ -105,7 +105,7 @@ class MailLogTabList(CandourListView):
 
 
 @method_decorator(login_required, name="dispatch")
-class MailLogDetailView(CandourDetailedView):
+class MailLogDetailView(HorillaDetailedView):
     """
     detail view for mail log tab
     """
@@ -117,7 +117,7 @@ class MailLogDetailView(CandourDetailedView):
         log = EmailLog.objects.filter(id=kwargs.get("pk")).first()
         if not _can_view_mail_log(request, _employee_for_log(log)):
             messages.info(request, _("You don't have access to the feature"))
-            return CandourRedirect(request)
+            return HorillaRedirect(request)
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs: Any):

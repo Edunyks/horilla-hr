@@ -19,7 +19,7 @@
         </button>
     {% endif %}
 
-    {% if perms.candour_documents.change_documentrequest %}
+    {% if perms.horilla_documents.change_documentrequest %}
         {% if not instance.document or instance.status == "approved" %}
             <button class="oh-btn oh-btn--light-bkg oh-btn--sq-sm" disabled title="{% trans 'Approve' %}">
                 <ion-icon name="checkmark-outline"></ion-icon>
@@ -54,7 +54,7 @@
         {% endif %}
     {% endif %}
 
-    {% if not instance.document_request_id or perms.candour_documents.change_documentrequest %}
+    {% if not instance.document_request_id or perms.horilla_documents.change_documentrequest %}
         <form
             hx-confirm="{% trans 'Are you sure you want to delete this Document Request?' %}"
             hx-post="{% url 'document-delete' instance.id %}"

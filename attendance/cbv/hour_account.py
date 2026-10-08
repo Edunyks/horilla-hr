@@ -21,12 +21,12 @@ from base.methods import (
     has_export_access,
     is_reportingmanager,
 )
-from candour_views.cbv_methods import hx_request_required, login_required
-from candour_views.generic.cbv.views import (
-    CandourDetailedView,
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
+from horilla_views.cbv_methods import hx_request_required, login_required
+from horilla_views.generic.cbv.views import (
+    HorillaDetailedView,
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
     TemplateView,
 )
 
@@ -41,7 +41,7 @@ class HourAccount(TemplateView):
 
 
 @method_decorator(login_required, name="dispatch")
-class HourAccountList(CandourListView):
+class HourAccountList(HorillaListView):
     """
     List view
     """
@@ -116,7 +116,7 @@ class HourAccountList(CandourListView):
 
 
 @method_decorator(login_required, name="dispatch")
-class HourAccountNav(CandourNavView):
+class HourAccountNav(HorillaNavView):
     """
     Nav bar
     """
@@ -212,7 +212,7 @@ class HourExportView(TemplateView):
 
 
 @method_decorator(login_required, name="dispatch")
-class HourAccountDetailView(CandourDetailedView):
+class HourAccountDetailView(HorillaDetailedView):
     """
     Detail View
     """
@@ -241,7 +241,7 @@ class HourAccountDetailView(CandourDetailedView):
 @method_decorator(
     manager_can_enter("attendance.add_attendanceovertime"), name="dispatch"
 )
-class HourAccountFormView(CandourFormView):
+class HourAccountFormView(HorillaFormView):
     """
     Form View
     """

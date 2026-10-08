@@ -41,7 +41,7 @@ def queue_export_email(
 
     ``company_id`` is the caller's selected company. It has to be passed in
     explicitly: the worker runs outside the request, so neither the session
-    nor the ``current_company_id`` ContextVar that CandourCompanyManager
+    nor the ``current_company_id`` ContextVar that HorillaCompanyManager
     scopes on is available to it. Without it the emailed workbook spans every
     company while its letterhead names one.
     """
@@ -50,7 +50,7 @@ def queue_export_email(
         try:
             import report.metrics  # noqa: F401
             from base.backends import ConfiguredEmailBackend
-            from candour.candour_middlewares import set_selected_company
+            from horilla.horilla_middlewares import set_selected_company
             from report.engine import filters_from_dict
             from report.export import export_csv, export_pdf, export_xlsx
             from report.registry import get_report, run_report
@@ -98,7 +98,7 @@ def queue_export_email(
                 )
                 return
 
-            subject = _("Candour report ready: %(name)s") % {
+            subject = _("Horilla report ready: %(name)s") % {
                 "name": str(definition.name)
             }
             body = _(
@@ -153,7 +153,7 @@ def _notify_failure(to_email: str, slug: str) -> None:
         definition = get_report(slug)
         name = str(definition.name) if definition else slug
         EmailMessage(
-            subject=_("Candour report export failed: %(name)s") % {"name": name},
+            subject=_("Horilla report export failed: %(name)s") % {"name": name},
             body=_(
                 "Your requested export could not be generated.\n\n"
                 "Report: %(name)s\n\n"

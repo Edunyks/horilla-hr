@@ -1,1 +1,0 @@
-# candour_auth tests

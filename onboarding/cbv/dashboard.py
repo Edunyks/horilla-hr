@@ -10,8 +10,8 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 
-from candour_views.cbv_methods import login_required
-from candour_views.generic.cbv.views import CandourListView
+from horilla_views.cbv_methods import login_required
+from horilla_views.generic.cbv.views import HorillaListView
 from onboarding.cbv_decorators import all_manager_can_enter
 from onboarding.filters import OnboardingTaskFilter
 from onboarding.models import CandidateTask, OnboardingTask
@@ -21,7 +21,7 @@ from onboarding.models import CandidateTask, OnboardingTask
 @method_decorator(
     all_manager_can_enter("onboarding.change_onboardingtask"), name="dispatch"
 )
-class MyOnboardingTaskList(CandourListView):
+class MyOnboardingTaskList(HorillaListView):
     """
     List view for onboarding tasks in dashboard
     """
@@ -125,7 +125,7 @@ class MyOnboardingTaskList(CandourListView):
 @method_decorator(
     all_manager_can_enter("onboarding.view_candidatetask"), name="dispatch"
 )
-class MyOnboardingCandidatesSingleView(CandourListView):
+class MyOnboardingCandidatesSingleView(HorillaListView):
     """
     Single view of my onboarding task in dashboard
     """

@@ -3,7 +3,7 @@
 `PassWordResetForm.save()` built the link from `get_current_site(request)`.
 That resolves through django.contrib.sites, and the only row a normal install
 has is the one the framework's own migration creates -- domain
-``example.com``. Nothing in Candour ever updates it, so every reset mail sent
+``example.com``. Nothing in Horilla ever updates it, so every reset mail sent
 a link to
 
     http://example.com/reset/<uid>/<token>/
@@ -16,13 +16,13 @@ These drive the real `save()` and capture the context handed to `send_mail`,
 rather than re-deriving the logic in the test -- a test that reimplements the
 branch it is checking would pass against the broken code too.
 
-Reported as https://github.com/candour/candour-hr/issues/1241 by @KerelOlivier.
+Reported as https://github.com/horilla/horilla-hr/issues/1241 by @KerelOlivier.
 """
 
 from django.test import RequestFactory, TestCase, override_settings
 
 from base.forms import PassWordResetForm
-from candour.testkit import make_company, make_employee
+from horilla.testkit import make_company, make_employee
 
 
 class _CapturingResetForm(PassWordResetForm):
@@ -65,7 +65,7 @@ class PasswordResetDomainTests(TestCase):
         cls.company = make_company("Reset Co")
         cls.employee = make_employee(
             company=cls.company,
-            email="resetme@test.candour",
+            email="resetme@test.horilla",
             first_name="Reset",
             last_name="Me",
         )

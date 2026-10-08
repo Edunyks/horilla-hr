@@ -14,11 +14,11 @@ from django.utils.translation import gettext_lazy as _
 from base.forms import EmployeeTagForm
 from employee.filters import EmployeeTagFilter
 from employee.models import EmployeeTag
-from candour_views.cbv_methods import login_required, permission_required
-from candour_views.generic.cbv.views import (
-    CandourFormView,
-    CandourListView,
-    CandourNavView,
+from horilla_views.cbv_methods import login_required, permission_required
+from horilla_views.generic.cbv.views import (
+    HorillaFormView,
+    HorillaListView,
+    HorillaNavView,
 )
 
 
@@ -26,7 +26,7 @@ from candour_views.generic.cbv.views import (
 @method_decorator(
     permission_required(perm="employee.view_employeetag"), name="dispatch"
 )
-class EmployeeTagListView(CandourListView):
+class EmployeeTagListView(HorillaListView):
     """
     list view for employee tag in settings
     """
@@ -85,7 +85,7 @@ class EmployeeTagListView(CandourListView):
 @method_decorator(
     permission_required(perm="employee.view_employeetag"), name="dispatch"
 )
-class EmployeetagNavView(CandourNavView):
+class EmployeetagNavView(HorillaNavView):
     """
     nav bar of the department view
     """
@@ -111,7 +111,7 @@ class EmployeetagNavView(CandourNavView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="employee.add_employeetag"), name="dispatch")
-class EmployeeTagCreateForm(CandourFormView):
+class EmployeeTagCreateForm(HorillaFormView):
     """
     form view for creating and update employee tags in settings
     """

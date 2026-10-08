@@ -2,7 +2,7 @@
 
 from django.test import TestCase
 
-from candour.testkit import make_company
+from horilla.testkit import make_company
 from onboarding.models import OnboardingStage
 from recruitment.models import Recruitment
 
