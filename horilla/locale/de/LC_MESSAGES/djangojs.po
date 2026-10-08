@@ -173,7 +173,7 @@ msgstr "Phasenreihenfolge aktualisiert"
 msgid "Dashboard"
 msgstr "Dashboard"
 
-msgid "Horilla dashboard section"
+msgid "Candour dashboard section"
 msgstr "Horilla-Dashboard-Bereich"
 
 msgid "Mark Attendance"
@@ -215,7 +215,7 @@ msgstr "Profil- und Passwortänderungsoptionen"
 msgid "Dashboard Tiles"
 msgstr "Dashboard-Kacheln"
 
-msgid "Horilla Dashboard Tiles"
+msgid "Candour Dashboard Tiles"
 msgstr "Horilla-Dashboard-Kacheln"
 
 msgid "Dashboard Actions"
@@ -245,7 +245,7 @@ msgstr "Ihr aktueller Unternehmenszugriff"
 msgid "App"
 msgstr "App"
 
-msgid "Horilla Hr Apps. eg Dashboard"
+msgid "Candour Hr Apps. eg Dashboard"
 msgstr "Horilla-HR-Apps, z. B. Dashboard"
 
 msgid "Pipeline"
