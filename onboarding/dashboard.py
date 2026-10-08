@@ -12,7 +12,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils.translation import gettext_lazy as _
 
-from horilla.methods import handle_no_permission
+from candour.methods import handle_no_permission
 
 
 def _has_onboarding_permission(request):
@@ -143,7 +143,7 @@ def onboarding_stage_distribution(request):
 
     This also sidesteps a second, sneakier bug: a plain
     .values_list("onboarding_stage_id__stage_title", flat=True) is NOT
-    safe here either. HorillaCompanyManager.get_queryset() forces
+    safe here either. CandourCompanyManager.get_queryset() forces
     .distinct() under company scoping, which Django compiles as a real SQL
     `SELECT DISTINCT title`, silently deduplicating by VALUE rather than
     by row the moment two different CandidateStage rows share a title --

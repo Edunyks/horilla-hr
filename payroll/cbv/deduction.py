@@ -6,12 +6,12 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 
-from horilla_views.cbv_methods import login_required, permission_required
-from horilla_views.generic.cbv.views import (
-    HorillaCardView,
-    HorillaFormView,
-    HorillaListView,
-    HorillaNavView,
+from candour_views.cbv_methods import login_required, permission_required
+from candour_views.generic.cbv.views import (
+    CandourCardView,
+    CandourFormView,
+    CandourListView,
+    CandourNavView,
     TemplateView,
 )
 from payroll.filters import DeductionFilter
@@ -28,7 +28,7 @@ class DeductionView(TemplateView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="payroll.view_deduction"), name="dispatch")
-class DeductionNav(HorillaNavView):
+class DeductionNav(CandourNavView):
     """
     Nav bar
     """
@@ -78,7 +78,7 @@ class DeductionNav(HorillaNavView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="payroll.view_deduction"), name="dispatch")
-class DeductionListView(HorillaListView):
+class DeductionListView(CandourListView):
     """
     list view for deduction tab
     """
@@ -184,7 +184,7 @@ class DeductionListView(HorillaListView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="payroll.view_deduction"), name="dispatch")
-class DeductionCardView(HorillaCardView):
+class DeductionCardView(CandourCardView):
     """
     card view
     """
@@ -289,7 +289,7 @@ class DeductionCardView(HorillaCardView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("payroll.add_deduction"), name="dispatch")
-class DeductionFormView(HorillaFormView):
+class DeductionFormView(CandourFormView):
     """
     Form view for Deduction creation and update.
     """

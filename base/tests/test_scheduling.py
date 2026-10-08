@@ -12,7 +12,7 @@ from django.core.management import call_command
 from django.test import SimpleTestCase
 from django.utils.module_loading import module_has_submodule
 
-from horilla.scheduling import (
+from candour.scheduling import (
     ScheduledJob,
     clear_registry,
     get_registered_jobs,
@@ -21,7 +21,7 @@ from horilla.scheduling import (
 
 # Reconfigured at runtime rather than statically registered, so they still own a
 # live scheduler. See the ponytail: comments in those modules.
-RUNTIME_CONFIGURED = {"horilla_backup", "pg_backup"}
+RUNTIME_CONFIGURED = {"candour_backup", "pg_backup"}
 
 
 class RegistryTests(SimpleTestCase):
@@ -107,7 +107,7 @@ class NoSchedulerStartsAtImportTests(SimpleTestCase):
             offenders,
             [],
             "Scheduler started at import time -- this runs once per gunicorn "
-            "worker. Register the job with horilla.scheduling.register_job "
+            "worker. Register the job with candour.scheduling.register_job "
             "instead; run_scheduler owns execution.",
         )
 
@@ -155,7 +155,7 @@ class DeploymentWiringTests(SimpleTestCase):
         container."""
         for name in ("docker-compose.yml", "docker-compose.prod.yml"):
             with self.subTest(compose=name):
-                self.assertIn("HORILLA_SKIP_RELEASE_TASKS", self._compose(name))
+                self.assertIn("CANDOUR_SKIP_RELEASE_TASKS", self._compose(name))
 
     def test_prod_scheduler_is_single_replica(self):
         """Two schedulers reintroduce the duplicate-run problem."""

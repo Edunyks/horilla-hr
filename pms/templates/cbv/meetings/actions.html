@@ -1,7 +1,7 @@
-{% load i18n horillafilters %}
+{% load i18n candourfilters %}
 <div>
     <div class="flex items-center justify-center gap-1" onclick="event.stopPropagation()">
-        {% if "horilla_meet"|app_installed and "horilla_meet"|integration_installed %}
+        {% if "candour_meet"|app_installed and "candour_meet"|integration_installed %}
             {% if instance.google_meeting.google_meeting.meet_url %}
                 <a
                     class="oh-btn oh-btn--light-bkg oh-btn--sq-sm"
@@ -17,7 +17,7 @@
                 </a>
             {% endif %}
 
-            {% if perms.horilla_meet.add_googlemeeting and request.user.employee_get in instance.manager.all %}
+            {% if perms.candour_meet.add_googlemeeting and request.user.employee_get in instance.manager.all %}
                 <a
                     class="oh-btn oh-btn--light-bkg oh-btn--sq-sm createMeeting"
                     href="#"
@@ -180,7 +180,7 @@
 </div>
 <script>
     $(document).ready(function(){
-        {% if "horilla_meet"|app_installed and "horilla_meet"|integration_installed %}
+        {% if "candour_meet"|app_installed and "candour_meet"|integration_installed %}
             $(".createMeeting").on("click", function(){
                 var meetingID = $(this).data("id");
                 var meetingDate = $(this).data("date");

@@ -1,8 +1,8 @@
 # Security Policy
 
-Horilla takes security seriously. This document explains how to report vulnerabilities, which versions we support, what is in or out of scope, and how we handle disclosure and CVE assignment.
+Candour takes security seriously. This document explains how to report vulnerabilities, which versions we support, what is in or out of scope, and how we handle disclosure and CVE assignment.
 
-This policy applies to Horilla HR ([`horilla/horilla-hr`](https://github.com/horilla/horilla-hr)).
+This policy applies to Candour HR ([`candour/candour-hr`](https://github.com/candour/candour-hr)).
 
 ## Supported versions
 
@@ -11,7 +11,7 @@ This policy applies to Horilla HR ([`horilla/horilla-hr`](https://github.com/hor
 | v2 | `2.0` (default), `dev/v2.0` (active development) | **Yes** — actively maintained |
 | v1 | `1.0`, `master` | **Deprioritized** — fixes considered case-by-case at maintainer discretion; no guaranteed patch schedule. Prefer upgrading to v2. |
 
-See [Discussion #1127](https://github.com/horilla/horilla-hr/discussions/1127) for background on this policy.
+See [Discussion #1127](https://github.com/candour/candour-hr/discussions/1127) for background on this policy.
 
 After v2 GA, we intend to treat v1 as **EOL for security** except for extraordinary cases (e.g. critical issues affecting customers we still host on v1). Reports that only affect unsupported lines will normally be closed with guidance to upgrade.
 
@@ -24,7 +24,7 @@ After v2 GA, we intend to treat v1 as **EOL for security** except for extraordin
 
 Use **GitHub Private Vulnerability Reporting** only:
 
-1. Open a [private vulnerability report](https://github.com/horilla/horilla-hr/security/advisories/new) on this repository.
+1. Open a [private vulnerability report](https://github.com/candour/candour-hr/security/advisories/new) on this repository.
 2. Include enough detail for us to reproduce the issue (see below).
 
 We do **not** accept or triage security vulnerability reports by email. General support inboxes are for product help, not vulnerability disclosure.
@@ -33,7 +33,7 @@ We aim to **acknowledge** valid reports within **72 hours**. Resolution time dep
 
 ### What to include
 
-- Affected Horilla HR **version** or commit / Docker tag
+- Affected Candour HR **version** or commit / Docker tag
 - Environment notes (self-hosted Compose, reverse proxy, auth mode) — use variable *names* and redacted examples only
 - Step-by-step reproduction (minimal PoC preferred)
 - Impact (who can exploit it, and what they gain)
@@ -49,23 +49,23 @@ Please avoid dumping large batches of unverified findings without waiting for tr
 
 ### In scope
 
-- Vulnerabilities in **Horilla application code** shipped in this repository
+- Vulnerabilities in **Candour application code** shipped in this repository
 - Unsafe **default configuration** that we ship (for example a publicly known default `SECRET_KEY` in production paths)
 - Issues that are **authentically exploitable** with realistic privileges on a **supported** version
 
 ### Out of scope
 
-We will normally **not** treat the following as Horilla product CVEs. We may still harden or document them when useful.
+We will normally **not** treat the following as Candour product CVEs. We may still harden or document them when useful.
 
 | Class | Notes |
 |-------|--------|
-| CSV / Excel formula injection | Spreadsheet clients interpret cell content; not a Horilla application bug |
+| CSV / Excel formula injection | Spreadsheet clients interpret cell content; not a Candour application bug |
 | Privilege escalation by users who already administer users/roles | Trusted-admin capability by design |
-| Issues only on EOL Python or EOL Horilla versions | Upgrade to a supported line |
+| Issues only on EOL Python or EOL Candour versions | Upgrade to a supported line |
 | Pure deployment misconfiguration | Operator responsibility (`DEBUG=True`, open admin, weak secrets you set yourself). **Exception:** shipping an insecure default that works out of the box |
 | Media / static XSS when files are served outside documented secure paths | Follow Docker / deployment docs; do not bypass Django `protected_media` with a raw `/media/` alias |
-| Dependency CVEs with **no reachable path** in Horilla | Tracked via Dependabot when applicable |
-| Third-party plugins or custom code not shipped by Horilla | Report to that project’s maintainers |
+| Dependency CVEs with **no reachable path** in Candour | Tracked via Dependabot when applicable |
+| Third-party plugins or custom code not shipped by Candour | Report to that project’s maintainers |
 | Compromise of marketing sites, email, or social accounts | Operational incident response — not a product advisory |
 | Demands for cash payment (“beg bounties”) | Credit only (see Rewards) |
 
@@ -93,13 +93,13 @@ Final severity is decided by maintainers:
 4. Publish a GitHub Security Advisory and **request a CVE ID via GitHub** when the issue meets our publish criteria
 5. Credit the reporter in the advisory (unless anonymity is requested)
 
-We use **GitHub as the CVE Numbering Authority** for Horilla HR advisories. We do not require reporters to self-request CVEs from MITRE; unsupported self-requests may be disputed.
+We use **GitHub as the CVE Numbering Authority** for Candour HR advisories. We do not require reporters to self-request CVEs from MITRE; unsupported self-requests may be disputed.
 
 **We publish a CVE when all of the following are true:**
 
 - Affects a **supported** release
 - Is **authentically exploitable** with realistic privileges
-- Is in **Horilla code** or an unsafe default we ship
+- Is in **Candour code** or an unsafe default we ship
 - Is **not** a duplicate of an already-published advisory for the same root cause
 
 Historical issues that only affected v1 and are fixed (or EOL) in v2 are generally **closed without a new CVE**, with a short disposition note.
@@ -120,9 +120,9 @@ These are operational controls for maintainers; they do not replace private repo
 
 ## Contact
 
-- Security reports: [GitHub Private Vulnerability Reporting](https://github.com/horilla/horilla-hr/security/advisories/new) only — see [Reporting a vulnerability](#reporting-a-vulnerability)
+- Security reports: [GitHub Private Vulnerability Reporting](https://github.com/candour/candour-hr/security/advisories/new) only — see [Reporting a vulnerability](#reporting-a-vulnerability)
 - Non-security questions about this policy: open a GitHub Discussion, or contact the maintainers through the project’s normal channels
 
 ## Disclaimer
 
-The Horilla project and its maintainers assume no liability for security vulnerabilities reported or discovered. We greatly appreciate responsible disclosure that helps keep users safe.
+The Candour project and its maintainers assume no liability for security vulnerabilities reported or discovered. We greatly appreciate responsible disclosure that helps keep users safe.

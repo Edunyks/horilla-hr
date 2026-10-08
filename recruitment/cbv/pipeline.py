@@ -13,19 +13,19 @@ from django.utils.decorators import method_decorator
 from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 
-from horilla.decorators import hx_request_required
-from horilla.http.response import HorillaRedirect
-from horilla_views.cbv_methods import login_required
-from horilla_views.generic.cbv.kanban import HorillaKanbanView
-from horilla_views.generic.cbv.views import (
-    HorillaFormView,
-    HorillaListView,
-    HorillaNavView,
-    HorillaTabView,
+from candour.decorators import hx_request_required
+from candour.http.response import CandourRedirect
+from candour_views.cbv_methods import login_required
+from candour_views.generic.cbv.kanban import CandourKanbanView
+from candour_views.generic.cbv.views import (
+    CandourFormView,
+    CandourListView,
+    CandourNavView,
+    CandourTabView,
     TemplateView,
     get_short_uuid,
 )
-from horilla_views.models import ActiveView
+from candour_views.models import ActiveView
 from recruitment import filters, forms, models
 from recruitment.cbv_decorators import manager_can_enter
 from recruitment.templatetags.recruitmentfilters import (
@@ -196,7 +196,7 @@ def recruitment_pipeline_actions(request, rec):
 @method_decorator(
     manager_can_enter(perm="recruitment.view_recruitment"), name="dispatch"
 )
-class RecruitmentTabView(HorillaTabView):
+class RecruitmentTabView(CandourTabView):
     """
     RecruitmentTabView
     """
@@ -289,7 +289,7 @@ class RecruitmentTabView(HorillaTabView):
     # here would sit above/outside all of them - not any one job's own
     # filter state. Each job tab's own content (CandidateCard/GetStages)
     # already renders its own chips next to its own Search+Filter
-    # (RecruitmentCandidateNav), inside that tab. Base HorillaTabView
+    # (RecruitmentCandidateNav), inside that tab. Base CandourTabView
     # default is already False; kept explicit since this used to override
     # it to True.
     show_filter_tags = False
@@ -312,7 +312,7 @@ class RecruitmentPipelineContentShell(TemplateView):
     def dispatch(self, request, *args, **kwargs):
         rec_id = kwargs.get("rec_id")
         if not models.Recruitment.objects.entire().filter(id=rec_id).exists():
-            return HorillaRedirect(
+            return CandourRedirect(
                 request, message=_("No recruitment found matching the query.")
             )
         return super().dispatch(request, *args, **kwargs)
@@ -326,7 +326,7 @@ class RecruitmentPipelineContentShell(TemplateView):
         the board came up as cards while the Nav's toggle rendered the SAVED
         type as highlighted. The two disagreed on first load.
 
-        Read from the same ActiveView row the toggle writes: horilla_nav /
+        Read from the same ActiveView row the toggle writes: candour_nav /
         inline_nav post `path={{request.path}}`, and for this per-tab Nav
         that path is `recruitment-pipeline-tab-nav/<rec_id>/`. The
         page-level PipelineNav that used to own this toggle wrote to
@@ -362,7 +362,7 @@ class RecruitmentPipelineContentShell(TemplateView):
         # defaults to the card endpoint in that case, so the Nav's view-type
         # toggle must resolve to the same "card" here too. Passing a falsy
         # view_type through left nav_url without a `?view=`, so on a user's
-        # very first visit (no saved choice yet) HorillaNavView never marked
+        # very first visit (no saved choice yet) CandourNavView never marked
         # either toggle button active even though card content was already
         # on screen - and inline_nav.html's onload script then read "no
         # button active" as "no filter has run yet" and fired an extra,
@@ -389,7 +389,7 @@ class RecruitmentPipelineContentShell(TemplateView):
 @method_decorator(
     manager_can_enter(perm="recruitment.view_recruitment"), name="dispatch"
 )
-class RecruitmentCandidateNav(HorillaNavView):
+class RecruitmentCandidateNav(CandourNavView):
     """
     Per-job-tab Search+Filter for the Pipeline page.
 
@@ -404,7 +404,7 @@ class RecruitmentCandidateNav(HorillaNavView):
 
     filter_form_context_name = "form"
     filter_body_template = "cbv/candidates/filter.html"
-    # Modern slide-over filter panel (generic/horilla_nav.html's own
+    # Modern slide-over filter panel (generic/candour_nav.html's own
     # {% if modern_filter %} branch) -- same treatment as the page-level
     # PipelineNav/pipeline_filter.html. CandidateFilter already carries
     # ajax_fields for the FK/M2M pickers this panel renders.
@@ -422,7 +422,7 @@ class RecruitmentCandidateNav(HorillaNavView):
     # page's look, it ids its search form per swap-target
     # (filterForm{{search_swap_target}}) rather than a bare #filterForm, so
     # two job tabs' Navs can coexist without the id collision the default
-    # horilla_nav.html has.
+    # candour_nav.html has.
     template_name = "generic/inline_nav.html"
     # Mirrors the settings page (SkillsNavView et al), where each tab's own
     # Nav - not a page-level one - carries the title, Create button and
@@ -456,7 +456,7 @@ class RecruitmentCandidateNav(HorillaNavView):
         # search_url picks between above), never at `cbv-pipeline-tab`.
         # PipelineNav could use the tab-view URL because it sat OUTSIDE the
         # tabs, so re-rendering them was the intended effect. This Nav lives
-        # INSIDE a tab, and horilla_nav.html both rewrites its search form to
+        # INSIDE a tab, and candour_nav.html both rewrites its search form to
         # the active view type's url (the inline script by `active_view.type`)
         # and swaps the result into search_swap_target - so a tab-view url
         # here made the form fetch the whole tab view on load and swap it
@@ -600,7 +600,7 @@ class GetStages(TemplateView):
 @method_decorator(
     manager_can_enter(perm="recruitment.view_recruitment"), name="dispatch"
 )
-class CandidateList(HorillaListView):
+class CandidateList(CandourListView):
     """
     CandidateList
     """
@@ -776,7 +776,7 @@ class CandidateList(HorillaListView):
         ).first()
         # `context["queryset"]` is a Django `Page` (from `paginator_qry`),
         # and templates read `queryset.paginator.count` off it
-        # (horilla_list_table.html's `data-total-count`, which the
+        # (candour_list_table.html's `data-total-count`, which the
         # stage-count badge's refresh script reads back via
         # htmx:afterSettle) -- replacing `context["queryset"]` itself with a
         # plain list silently blanked that badge everywhere this list
@@ -884,7 +884,7 @@ class CandidateList(HorillaListView):
 @method_decorator(
     manager_can_enter(perm="recruitment.view_recruitment"), name="dispatch"
 )
-class CandidateCard(HorillaKanbanView):
+class CandidateCard(CandourKanbanView):
     model = models.Candidate
     filter_class = filters.CandidateFilter
     group_filter_class = filters.StageFilter
@@ -910,7 +910,7 @@ class CandidateCard(HorillaKanbanView):
     # inside each stage's own body (cbv/pipeline/candidate_list.html /
     # empty.html) rather than a kebab in the column header. This kanban
     # view hasn't been given that same per-column control yet. Leaving this
-    # empty is what makes horilla_kanban_view.html skip the in-column
+    # empty is what makes candour_kanban_view.html skip the in-column
     # kebab entirely.
     group_actions = []
 
@@ -1033,9 +1033,9 @@ class CandidateCard(HorillaKanbanView):
 @method_decorator(
     manager_can_enter(perm="recruitment.view_recruitment"), name="dispatch"
 )
-class PipelineNav(HorillaNavView):
+class PipelineNav(CandourNavView):
     """
-    HorillaNavView
+    CandourNavView
     """
 
     # No longer rendered by the Pipeline page itself, which now follows the
@@ -1049,7 +1049,7 @@ class PipelineNav(HorillaNavView):
     filter_instance = filters.RecruitmentFilter()
     filter_form_context_name = "form"
     apply_first_filter = False
-    # Modern slide-over filter panel (generic/horilla_nav.html's own
+    # Modern slide-over filter panel (generic/candour_nav.html's own
     # {% if modern_filter %} branch) -- same treatment as every other
     # panel this session. The three underlying filters
     # (RecruitmentFilter/StageFilter/CandidateFilter) each carry their own
@@ -1105,7 +1105,7 @@ class PipelineNav(HorillaNavView):
 @method_decorator(
     manager_can_enter(perm="recruitment.view_recruitment"), name="dispatch"
 )
-class ChangeStage(HorillaFormView):
+class ChangeStage(CandourFormView):
     """
     Change Candidate stage
     """
@@ -1133,7 +1133,7 @@ class ChangeStage(HorillaFormView):
         """
         Refetch only the stages whose candidate list actually changed.
 
-        HorillaFormView.HttpResponse hardcodes a page-wide
+        CandourFormView.HttpResponse hardcodes a page-wide
         `$('.reload-record').click()`, and on this pipeline EVERY stage that
         has loaded its table renders its own `.reload-record` (see
         cbv/pipeline/candidate_list.html) - so moving one candidate kicked
@@ -1149,7 +1149,7 @@ class ChangeStage(HorillaFormView):
         id. Other forms keep using the shared helper untouched.
 
         Django's HttpResponse is aliased on import here because
-        HorillaFormView has a nested `class HttpResponse`, which shadows the
+        CandourFormView has a nested `class HttpResponse`, which shadows the
         plain name for anything inside this subclass.
         """
         selectors = ",".join(

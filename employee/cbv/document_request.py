@@ -24,23 +24,23 @@ from base.methods import (
 )
 from employee.filters import DocumentPipelineFilter, DocumentRequestFilter
 from employee.models import Employee
-from horilla.decorators import manager_can_enter
-from horilla.http.response import HorillaRedirect
-from horilla_documents.forms import DocumentForm
-from horilla_documents.forms import DocumentRejectCbvForm as RejectForm
-from horilla_documents.forms import DocumentRequestForm, DocumentUpdateForm
-from horilla_documents.models import Document, DocumentRequest
-from horilla_views import models as horilla_views_models
-from horilla_views.cbv_methods import (
+from candour.decorators import manager_can_enter
+from candour.http.response import CandourRedirect
+from candour_documents.forms import DocumentForm
+from candour_documents.forms import DocumentRejectCbvForm as RejectForm
+from candour_documents.forms import DocumentRequestForm, DocumentUpdateForm
+from candour_documents.models import Document, DocumentRequest
+from candour_views import models as candour_views_models
+from candour_views.cbv_methods import (
     hx_request_required,
     login_required,
     saved_filter_path_query,
 )
-from horilla_views.generic.cbv.pipeline import Pipeline
-from horilla_views.generic.cbv.views import (
-    HorillaFormView,
-    HorillaListView,
-    HorillaNavView,
+from candour_views.generic.cbv.pipeline import Pipeline
+from candour_views.generic.cbv.views import (
+    CandourFormView,
+    CandourListView,
+    CandourNavView,
 )
 from notifications.signals import notify
 
@@ -91,9 +91,9 @@ def htmx_refresh_document_request_container(request) -> Optional[HttpResponse]:
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(
-    manager_can_enter("horilla_documents.add_documentrequest"), name="dispatch"
+    manager_can_enter("candour_documents.add_documentrequest"), name="dispatch"
 )
-class DocumentRequestCreateForm(HorillaFormView):
+class DocumentRequestCreateForm(CandourFormView):
     """
     form view for create and update document request
     """
@@ -105,7 +105,7 @@ class DocumentRequestCreateForm(HorillaFormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         self.form = choosesubordinates(
-            self.request, self.form, "horilla_documents.add_documentrequest"
+            self.request, self.form, "candour_documents.add_documentrequest"
         )
         if self.form.instance.pk:
             self.form_class.verbose_name = _("Update Document Request")
@@ -143,13 +143,13 @@ class DocumentRequestCreateForm(HorillaFormView):
             refreshed = htmx_refresh_document_request_container(self.request)
             if refreshed is not None:
                 return refreshed
-            return HorillaRedirect(self.request)
+            return CandourRedirect(self.request)
 
         return super().form_valid(form)
 
 
 @method_decorator(login_required, name="dispatch")
-class DocumentCreateForm(HorillaFormView):
+class DocumentCreateForm(CandourFormView):
     """
     form view for upload document
     """
@@ -176,19 +176,19 @@ class DocumentCreateForm(HorillaFormView):
                 refreshed = htmx_refresh_document_request_container(self.request)
                 if refreshed is not None:
                     return refreshed
-                return HorillaRedirect(self.request)
+                return CandourRedirect(self.request)
 
         form.save()
         messages.success(self.request, _("Document Uploaded Successfully"))
         refreshed = htmx_refresh_document_request_container(self.request)
         if refreshed is not None:
             return refreshed
-        return HorillaRedirect(self.request)
+        return CandourRedirect(self.request)
 
 
 @method_decorator(login_required, name="dispatch")
-@method_decorator(manager_can_enter("horilla_documents.add_document"), name="dispatch")
-class DocumentRejectCbvForm(HorillaFormView):
+@method_decorator(manager_can_enter("candour_documents.add_document"), name="dispatch")
+class DocumentRejectCbvForm(CandourFormView):
     """
     form view for rejecting document on document request and employee individual view
     """
@@ -214,13 +214,13 @@ class DocumentRejectCbvForm(HorillaFormView):
             refreshed = htmx_refresh_document_request_container(self.request)
             if refreshed is not None:
                 return refreshed
-            return HorillaRedirect(self.request)
+            return CandourRedirect(self.request)
 
         return super().form_valid(form)
 
 
 @method_decorator(login_required, name="dispatch")
-class DocumentUploadForm(HorillaFormView):
+class DocumentUploadForm(CandourFormView):
     """
     form view for upload documents on document request and employee individual view
     """
@@ -254,7 +254,7 @@ class DocumentUploadForm(HorillaFormView):
                 refreshed = htmx_refresh_document_request_container(self.request)
                 if refreshed is not None:
                     return refreshed
-                return HorillaRedirect(self.request)
+                return CandourRedirect(self.request)
 
         if form.is_valid():
             if form.instance.pk:
@@ -280,13 +280,13 @@ class DocumentUploadForm(HorillaFormView):
             refreshed = htmx_refresh_document_request_container(self.request)
             if refreshed is not None:
                 return refreshed
-            return HorillaRedirect(self.request)
+            return CandourRedirect(self.request)
 
         return super().form_valid(form)
 
 
 @method_decorator(login_required, name="dispatch")
-class DocumentRequestNav(HorillaNavView):
+class DocumentRequestNav(CandourNavView):
     """
     For nav bar
     """
@@ -305,7 +305,7 @@ class DocumentRequestNav(HorillaNavView):
             "employee.change_employee"
         ) or is_reportingmanager(self.request):
             if self.request.user.has_perm(
-                "horilla_documents.change_documentrequest"
+                "candour_documents.change_documentrequest"
             ) or is_reportingmanager(self.request):
                 self.actions = [
                     {
@@ -397,7 +397,7 @@ class DocumentRequestPipelineView(Pipeline):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Pipeline never builds filter_dict itself (unlike HorillaListView), so build it here
+        # Pipeline never builds filter_dict itself (unlike CandourListView), so build it here
         # the same way, or the nav's "remove filter" tags would render empty.
         data_dict = parse_qs(self.request.GET.urlencode())
         data_dict = {
@@ -409,7 +409,7 @@ class DocumentRequestPipelineView(Pipeline):
         context["filter_dict"] = data_dict
 
         context["saved_filters"] = self.request.GET
-        context["stored_filters"] = horilla_views_models.SavedFilter.objects.filter(
+        context["stored_filters"] = candour_views_models.SavedFilter.objects.filter(
             saved_filter_path_query(self.request), created_by=self.request.user
         ).distinct()
 
@@ -434,7 +434,7 @@ class DocumentRequestPipelineView(Pipeline):
 
 
 @method_decorator(login_required, name="dispatch")
-class DocumentListView(HorillaListView):
+class DocumentListView(CandourListView):
     """
     List view for document request
     """
@@ -473,7 +473,7 @@ class DocumentListView(HorillaListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["stored_filters"] = horilla_views_models.SavedFilter.objects.none()
+        context["stored_filters"] = candour_views_models.SavedFilter.objects.none()
         return context
 
     row_attrs = """
@@ -534,4 +534,4 @@ class DocumentIndividualTabList(DocumentListView):
         if queryset is None:
             pk = self.kwargs.get("pk")
             queryset = self.model.objects.filter(employee_id=pk)
-        return HorillaListView.get_queryset(self, queryset, filtered, *args, **kwargs)
+        return CandourListView.get_queryset(self, queryset, filtered, *args, **kwargs)

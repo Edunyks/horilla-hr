@@ -1,5 +1,5 @@
 """
-This module provides Horilla ModelForms for creating and managing leave-related data,
+This module provides Candour ModelForms for creating and managing leave-related data,
 including leave type, leave request, leave allocation request, holidays and company leaves.
 """
 
@@ -21,12 +21,12 @@ from base.models import CompanyLeaves, Holidays
 from employee.filters import EmployeeFilter
 from employee.forms import MultipleFileField
 from employee.models import Employee
-from horilla import horilla_middlewares
-from horilla.horilla_middlewares import _thread_locals
-from horilla_views.generic.cbv.views import HorillaFormView
-from horilla_widgets.forms import HorillaForm, HorillaModelForm
-from horilla_widgets.widgets.horilla_multi_select_field import HorillaMultiSelectField
-from horilla_widgets.widgets.select_widgets import HorillaMultiSelectWidget
+from candour import candour_middlewares
+from candour.candour_middlewares import _thread_locals
+from candour_views.generic.cbv.views import CandourFormView
+from candour_widgets.forms import CandourForm, CandourModelForm
+from candour_widgets.widgets.candour_multi_select_field import CandourMultiSelectField
+from candour_widgets.widgets.select_widgets import CandourMultiSelectWidget
 from leave.methods import get_leave_day_attendance
 from leave.models import (
     AvailableLeave,
@@ -104,7 +104,7 @@ class LeaveTypeConditionForm(forms.ModelForm):
 class ConditionForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        request = getattr(horilla_middlewares._thread_locals, "request", None)
+        request = getattr(candour_middlewares._thread_locals, "request", None)
         reload_queryset(self.fields)
         for field_name, field in self.fields.items():
             widget = field.widget
@@ -159,7 +159,7 @@ class LeaveTypeAdminForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         if f := self.fields.get("company_id"):
-            from horilla_widgets.forms import default_select_option_template
+            from candour_widgets.forms import default_select_option_template
 
             w = getattr(f.widget, "widget", f.widget)
             if isinstance(w, forms.Select):
@@ -349,7 +349,7 @@ class LeaveRequestCreationForm(BaseModelForm):
         Render the form fields as HTML table rows with Bootstrap styling.
         """
         context = {"form": self}
-        table_html = render_to_string("horilla_form.html", context)
+        table_html = render_to_string("candour_form.html", context)
         return table_html
 
     class Meta:
@@ -434,7 +434,7 @@ class LeaveRequestUpdationForm(BaseModelForm):
         Render the form fields as HTML table rows with Bootstrap styling.
         """
         context = {"form": self}
-        table_html = render_to_string("horilla_form.html", context)
+        table_html = render_to_string("candour_form.html", context)
         return table_html
 
     class Meta:
@@ -479,7 +479,7 @@ class AvailableLeaveForm(BaseModelForm):
         fields = ["leave_type_id", "employee_id", "is_active"]
 
 
-class LeaveOneAssignForm(HorillaModelForm):
+class LeaveOneAssignForm(CandourModelForm):
     """
     Form for assigning available leave to employees.
 
@@ -487,14 +487,14 @@ class LeaveOneAssignForm(HorillaModelForm):
     by specifying the employee and setting the is_active flag.
 
     Attributes:
-        - employee_id: A HorillaMultiSelectField representing the employee to assign leave to.
+        - employee_id: A CandourMultiSelectField representing the employee to assign leave to.
     """
 
     cols = {"employee_id": 12}
 
-    employee_id = HorillaMultiSelectField(
+    employee_id = CandourMultiSelectField(
         queryset=Employee.objects.all(),
-        widget=HorillaMultiSelectWidget(
+        widget=CandourMultiSelectWidget(
             filter_route_name="employee-widget-filter",
             filter_class=EmployeeFilter,
             filter_instance_context_name="f",
@@ -603,7 +603,7 @@ class UserLeaveRequestForm(BaseModelForm):
         Render the form fields as HTML table rows with Bootstrap styling.
         """
         context = {"form": self}
-        table_html = render_to_string("horilla_form.html", context)
+        table_html = render_to_string("candour_form.html", context)
         return table_html
 
     class Meta:
@@ -706,7 +706,7 @@ class UserLeaveRequestCreationForm(BaseModelForm):
         Render the form fields as HTML table rows with Bootstrap styling.
         """
         context = {"form": self}
-        table_html = render_to_string("horilla_form.html", context)
+        table_html = render_to_string("candour_form.html", context)
         return table_html
 
     def __init__(self, *args, **kwargs):
@@ -779,7 +779,7 @@ class LeaveAllocationRequestForm(BaseModelForm):
         Render the form fields as HTML table rows with Bootstrap styling.
         """
         context = {"form": self}
-        table_html = render_to_string("horilla_form.html", context)
+        table_html = render_to_string("candour_form.html", context)
         return table_html
 
     class Meta:
@@ -805,9 +805,9 @@ class LeaveAllocationBulkForm(BaseModelForm):
 
     verbose_name = _("Bulk Allocate Leave")
 
-    employee_id = HorillaMultiSelectField(
+    employee_id = CandourMultiSelectField(
         queryset=Employee.objects.all(),
-        widget=HorillaMultiSelectWidget(
+        widget=CandourMultiSelectWidget(
             filter_route_name="employee-widget-filter",
             filter_class=EmployeeFilter,
             filter_instance_context_name="f",
@@ -978,7 +978,7 @@ class LeaveRequestExportForm(forms.Form):
     )
 
 
-class AssignLeaveForm(HorillaForm):
+class AssignLeaveForm(CandourForm):
     """
     Form for Payslip
     """
@@ -992,9 +992,9 @@ class AssignLeaveForm(HorillaForm):
         label="Leave Type",
         required=False,
     )
-    employee_id = HorillaMultiSelectField(
+    employee_id = CandourMultiSelectField(
         queryset=Employee.objects.all(),
-        widget=HorillaMultiSelectWidget(
+        widget=CandourMultiSelectWidget(
             filter_route_name="employee-widget-filter",
             filter_class=EmployeeFilter,
             filter_instance_context_name="f",
@@ -1240,7 +1240,7 @@ if apps.is_installed("attendance"):
         def __init__(self, *args, **kwargs):
             super(CompensatoryLeaveForm, self).__init__(*args, **kwargs)
 
-            request = getattr(horilla_middlewares._thread_locals, "request", None)
+            request = getattr(candour_middlewares._thread_locals, "request", None)
             instance_id = None
             if self.instance:
                 instance_id = self.instance.id
@@ -1285,7 +1285,7 @@ if apps.is_installed("attendance"):
             Render the form fields as HTML table rows with Bootstrap styling.
             """
             context = {"form": self}
-            table_html = render_to_string("horilla_form.html", context)
+            table_html = render_to_string("candour_form.html", context)
             return table_html
 
         def clean(self):

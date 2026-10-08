@@ -4076,7 +4076,7 @@ $(document).on("htmx:afterSwap", async function (evt) {
     } else {
         // Fetch the data via AJAX if not cached or cache is invalid
         $.ajax({
-            url: '/get-horilla-installed-apps/',
+            url: '/get-candour-installed-apps/',
             method: 'GET',
             success: async function (response) {
                 cachedInstalledApps = response.installed_apps;

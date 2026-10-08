@@ -1,14 +1,14 @@
 """
 Standard report subscription job.
 
-Registered with horilla.scheduling; executed by `manage.py run_scheduler`.
+Registered with candour.scheduling; executed by `manage.py run_scheduler`.
 """
 
 from __future__ import annotations
 
 import logging
 
-from horilla.scheduling import register_job
+from candour.scheduling import register_job
 
 logger = logging.getLogger(__name__)
 

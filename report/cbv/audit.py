@@ -6,10 +6,10 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 
-from horilla_views.cbv_methods import login_required, permission_required
-from horilla_views.generic.cbv.views import (
-    HorillaListView,
-    HorillaNavView,
+from candour_views.cbv_methods import login_required, permission_required
+from candour_views.generic.cbv.views import (
+    CandourListView,
+    CandourNavView,
     TemplateView,
 )
 from report.filters import ReportAuditFilter
@@ -26,7 +26,7 @@ class ReportAuditView(TemplateView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="employee.view_employee"), name="dispatch")
-class ReportAuditNav(HorillaNavView):
+class ReportAuditNav(CandourNavView):
     nav_title = _("Report Audit")
     filter_instance = ReportAuditFilter()
     filter_body_template = "cbv/audit/audit_filter.html"
@@ -40,7 +40,7 @@ class ReportAuditNav(HorillaNavView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="employee.view_employee"), name="dispatch")
-class ReportAuditListView(HorillaListView):
+class ReportAuditListView(CandourListView):
     """Read-only — no bulk select, no row actions, no create."""
 
     model = ReportRunLog

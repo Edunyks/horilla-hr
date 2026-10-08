@@ -17,16 +17,16 @@ from base.decorators import manager_can_enter
 from base.methods import choosesubordinates, is_reportingmanager
 from employee.cbv.employee_profile import EmployeeProfileView
 from employee.models import Employee
-from horilla.http.response import HorillaRedirect
-from horilla_auth.models import HorillaUser
-from horilla_views.cbv_methods import login_required
-from horilla_views.generic.cbv.views import (
-    HorillaDetailedView,
-    HorillaFormView,
-    HorillaListView,
-    HorillaNavView,
-    HorillaTabContentShell,
-    HorillaTabView,
+from candour.http.response import CandourRedirect
+from candour_auth.models import CandourUser
+from candour_views.cbv_methods import login_required
+from candour_views.generic.cbv.views import (
+    CandourDetailedView,
+    CandourFormView,
+    CandourListView,
+    CandourNavView,
+    CandourTabContentShell,
+    CandourTabView,
     TemplateView,
 )
 from notifications.signals import notify
@@ -46,7 +46,7 @@ class FeedbackViewPage(TemplateView):
 
 
 @method_decorator(login_required, name="dispatch")
-class FeedbackListView(HorillaListView):
+class FeedbackListView(CandourListView):
     """
     list view
     """
@@ -189,7 +189,7 @@ class FeedbackListView(HorillaListView):
 
 
 @method_decorator(login_required, name="dispatch")
-class FeedbackGenericTabView(HorillaTabView):
+class FeedbackGenericTabView(CandourTabView):
     """
     tab view of the page
     """
@@ -367,7 +367,7 @@ class AllFeedbackTab(FeedbackListView):
 
 
 @method_decorator(login_required, name="dispatch")
-class AnonymousFeedbackTab(HorillaListView):
+class AnonymousFeedbackTab(CandourListView):
     """
     anonymous feedback tab
     """
@@ -431,7 +431,7 @@ class AnonymousFeedbackTab(HorillaListView):
                 """
 
 
-class _FeedbackTabNavBase(HorillaNavView):
+class _FeedbackTabNavBase(CandourNavView):
     """
     Shared Search/Filter/Create/Actions wiring for each 360 Feedback tab's
     own, independent Nav - only search_url/search_swap_target differ per
@@ -503,7 +503,7 @@ class _FeedbackTabNavBase(HorillaNavView):
     filter_body_template = "cbv/360_feedback/feedback_filter.html"
     filter_instance = FeedbackFilter()
     filter_form_context_name = "feedback_filter_form"
-    # Modern slide-over filter panel (generic/horilla_nav.html's own
+    # Modern slide-over filter panel (generic/candour_nav.html's own
     # {% if modern_filter %} branch) -- same treatment as every other
     # panel this session. FeedbackFilter.ajax_fields carries the
     # AJAX-loaded comboboxes this needs.
@@ -565,25 +565,25 @@ class AnonymousFeedbackNav(_FeedbackTabNavBase):
         """
 
 
-class SelfFeedbackTabShell(HorillaTabContentShell):
+class SelfFeedbackTabShell(CandourTabContentShell):
     nav_url_name = "self-feedback-nav"
     container_id = "selfFeedbackListContainer"
     tabs_root_id = "feedbackTabs"
 
 
-class RequestedFeedbackTabShell(HorillaTabContentShell):
+class RequestedFeedbackTabShell(CandourTabContentShell):
     nav_url_name = "requested-feedback-nav"
     container_id = "requestedFeedbackListContainer"
     tabs_root_id = "feedbackTabs"
 
 
-class AllFeedbackTabShell(HorillaTabContentShell):
+class AllFeedbackTabShell(CandourTabContentShell):
     nav_url_name = "all-feedback-nav"
     container_id = "allFeedbackListContainer"
     tabs_root_id = "feedbackTabs"
 
 
-class AnonymousFeedbackTabShell(HorillaTabContentShell):
+class AnonymousFeedbackTabShell(CandourTabContentShell):
     nav_url_name = "anonymous-feedback-nav"
     container_id = "anonymousFeedbackListContainer"
     tabs_root_id = "feedbackTabs"
@@ -603,7 +603,7 @@ class AnonymousFeedbackTabShell(HorillaTabContentShell):
 
 
 @method_decorator(login_required, name="dispatch")
-class AddAnonymousFeedbackForm(HorillaFormView):
+class AddAnonymousFeedbackForm(CandourFormView):
     """
     form view
     """
@@ -644,7 +644,7 @@ class AddAnonymousFeedbackForm(HorillaFormView):
                 message = _("Feedback Created Successfully")
                 if feedback.based_on == "employee":
                     notify.send(
-                        HorillaUser.objects.filter(username="Horilla Bot").first(),
+                        CandourUser.objects.filter(username="Candour Bot").first(),
                         recipient=feedback.employee_id.employee_user_id,
                         verb=gettext_noop("You received anonymous feedback!"),
                         redirect=reverse("feedback-view"),
@@ -652,7 +652,7 @@ class AddAnonymousFeedbackForm(HorillaFormView):
                     )
             feedback.save()
             messages.success(self.request, message)
-            return HorillaRedirect(self.request)
+            return CandourRedirect(self.request)
         return super().form_valid(form)
 
 
@@ -666,7 +666,7 @@ class PerformanceTab(SelfFeedbacktab):
         super().__init__(**kwargs)
         pk = self.request.resolver_match.kwargs.get("pk")
         self.search_url = reverse("individual-performance-tab-list", kwargs={"pk": pk})
-        # HorillaListView defaults selected_instances_key_id to the shared
+        # CandourListView defaults selected_instances_key_id to the shared
         # "selectedInstances" bucket, so a bulk-select made on any other list
         # using that same default (most don't override it) leaked into this
         # tab's "Select"/"Unselect" count. Scope it to this tab instead.
@@ -692,7 +692,7 @@ EmployeeProfileView.add_tab(
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(manager_can_enter("pms.change_feedback"), name="dispatch")
-class FeedbackUpdateFormView(HorillaFormView):
+class FeedbackUpdateFormView(CandourFormView):
     """
     Form View for update feedback
     """
@@ -747,7 +747,7 @@ class FeedbackUpdateFormView(HorillaFormView):
 
 
 @method_decorator(login_required, name="dispatch")
-class AnounyFeedbackDetailView(HorillaDetailedView):
+class AnounyFeedbackDetailView(CandourDetailedView):
 
     model = AnonymousFeedback
 

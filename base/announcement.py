@@ -23,9 +23,9 @@ from base.models import (
     Attachment,
 )
 from employee.models import Employee
-from horilla.decorators import hx_request_required, login_required, permission_required
-from horilla.http.response import HorillaRedirect
-from horilla_auth.models import HorillaUser
+from candour.decorators import hx_request_required, login_required, permission_required
+from candour.http.response import CandourRedirect
+from candour_auth.models import CandourUser
 from notifications.signals import notify
 
 
@@ -119,7 +119,7 @@ def create_announcement(request):
             announcement.employees.add(*all_employees)
 
             all_emps = employees_from_dept | employees_from_job | employees
-            user_map = HorillaUser.objects.filter(employee_get__in=all_emps).distinct()
+            user_map = CandourUser.objects.filter(employee_get__in=all_emps).distinct()
 
             dept_emp_ids = set(employees_from_dept.values_list("id", flat=True))
             job_emp_ids = set(employees_from_job.values_list("id", flat=True))
@@ -156,10 +156,10 @@ def create_announcement(request):
             messages.success(request, _("Announcement created successfully."))
             form = AnnouncementForm()  # Reset the form
 
-            emp_dep = HorillaUser.objects.filter(
+            emp_dep = CandourUser.objects.filter(
                 employee_get__employee_work_info__department_id__in=departments
             )
-            emp_jobs = HorillaUser.objects.filter(
+            emp_jobs = CandourUser.objects.filter(
                 employee_get__employee_work_info__job_position_id__in=job_positions
             )
             employees = employees | Employee.objects.filter(
@@ -197,7 +197,7 @@ def delete_announcement(request, anoun_id):
     """
     This method is used to delete announcements.
     """
-    from horilla.horilla_middlewares import _thread_locals
+    from candour.candour_middlewares import _thread_locals
 
     announcement = Announcement.find(anoun_id)
     if announcement:
@@ -216,13 +216,13 @@ def delete_announcement(request, anoun_id):
 
     if not instance_ids_list:
         # Last announcement deleted — refresh the page to show empty state
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
 
     if next_instance_id and next_instance_id != anoun_id:
         url = reverse("announcement-single-view", kwargs={"pk": next_instance_id})
         return redirect(f"{url}?instance_ids={json.dumps(instance_ids_list)}")
 
-    return HorillaRedirect(request)
+    return CandourRedirect(request)
 
 
 @login_required
@@ -260,10 +260,10 @@ def update_announcement(request, anoun_id):
             anou.company_id.set(company)
             messages.success(request, _("Announcement updated successfully."))
 
-            emp_dep = HorillaUser.objects.filter(
+            emp_dep = CandourUser.objects.filter(
                 employee_get__employee_work_info__department_id__in=departments
             )
-            emp_jobs = HorillaUser.objects.filter(
+            emp_jobs = CandourUser.objects.filter(
                 employee_get__employee_work_info__job_position_id__in=job_positions
             )
             employees = employees | Employee.objects.filter(
@@ -366,7 +366,7 @@ def comment_view(request, anoun_id):
     announcement = Announcement.objects.filter(id=anoun_id).first()
     if not announcement:
         messages.error(request, _("Announcement not found."))
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
     comments = AnnouncementComment.objects.filter(announcement_id=anoun_id).order_by(
         "-created_at"
     )
@@ -419,7 +419,7 @@ def announcement_single_view(request, anoun_id=None):
         # announcement.id %}), which fails with NoReverseMatch on an empty
         # id rather than rendering blank.
         messages.error(request, _("Announcement not found."))
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
     instance_ids = request.GET.get("instance_ids")
     instance_ids_list = json.loads(instance_ids) if instance_ids else []
     previous_instance_id, next_instance_id = (

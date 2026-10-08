@@ -1,8 +1,8 @@
 from django.contrib import messages
 from django.utils.translation import gettext as _
 
-from horilla.horilla_middlewares import _thread_locals
-from horilla.http import HorillaRedirect
+from candour.candour_middlewares import _thread_locals
+from candour.http import CandourRedirect
 from project.methods import (
     any_project_manager,
     any_task_manager,
@@ -38,6 +38,6 @@ def is_projectmanager_or_member_or_perms(function, perm):
         ):
             return function(self, *args, **kwargs)
         messages.info(request, _("You don't have permission."))
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
 
     return _function

@@ -37,7 +37,7 @@ function clearFilterFromTag(element) {
 	$(`[name=${field_id}]`).filter(':checkbox, :radio').prop('checked', false);
 	$(`[name=${field_id}]`).not(':checkbox, :radio').val("");
 	$(`[name=${field_id}]`).change();
-	// horilla_nav.html's "N filters applied" badge (updateFilterCountBadge)
+	// candour_nav.html's "N filters applied" badge (updateFilterCountBadge)
 	// recomputes on most field-level change events already, but a cleared
 	// text input fires "change" here while that badge listener only binds
 	// "input" for text fields (to debounce the actual filter submit) --

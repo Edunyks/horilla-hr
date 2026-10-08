@@ -33,9 +33,9 @@ from employee.models import (
     Policy,
     PolicyMultipleFile,
 )
-from horilla.decorators import hx_request_required, login_required, permission_required
-from horilla.http.response import HorillaRedirect
-from horilla_auth.models import HorillaUser
+from candour.decorators import hx_request_required, login_required, permission_required
+from candour.http.response import CandourRedirect
+from candour_auth.models import CandourUser
 from notifications.signals import notify
 
 
@@ -172,7 +172,7 @@ def view_policy(request):
     )
     if not policy:
         messages.error(request, _("Policy not found."))
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
     return render(
         request,
         "policies/view_policy.html",
@@ -230,7 +230,7 @@ def add_attachment(request):
     """
     policy = Policy.find(request.GET.get("policy_id"))
     if not policy:
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("No Policy found matching the query.")
         )
 
@@ -254,7 +254,7 @@ def remove_attachment(request):
     """
     policy = Policy.find(request.GET.get("policy_id"))
     if not policy:
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("No Policy found matching the query.")
         )
 
@@ -270,7 +270,7 @@ def get_attachments(request):
     """
     policy = Policy.find(request.GET.get("policy_id"))
     if not policy:
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("No Policy found matching the query.")
         )
 
@@ -361,7 +361,7 @@ def create_actions(request):
             )
         dis = DisciplinaryAction.objects.all()
         if len(dis) == 1:
-            return HorillaRedirect(request)
+            return CandourRedirect(request)
 
     return render(
         request, "disciplinary_actions/form.html", {"form": form, "dynamic": dynamic}
@@ -410,13 +410,13 @@ def remove_employee_disciplinary_action(request, action_id, emp_id):
     employee = Employee.objects.filter(id=emp_id).first()
     if not dis_action or not employee:
         messages.error(request, _("Record not found."))
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
 
     action_type = get_action_type_delete(dis_action.action)
 
     if action_type == "dismissal" or action_type == "suspension":
         emp = get_object_or_404(Employee, id=emp_id)
-        user = get_object_or_404(HorillaUser, id=emp.employee_user_id.id)
+        user = get_object_or_404(CandourUser, id=emp.employee_user_id.id)
         if user.is_active:
             pass
         else:
@@ -453,7 +453,7 @@ def delete_actions(request, action_id):
     dis = DisciplinaryAction.objects.filter(id=action_id).first()
     if not dis:
         messages.error(request, _("Disciplinary action not found."))
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
 
     action_type = get_action_type_delete(dis.action)
 
@@ -461,7 +461,7 @@ def delete_actions(request, action_id):
 
         if action_type == "dismissal" or action_type == "suspension":
             employee = get_object_or_404(Employee, id=dis_emp.id)
-            user = get_object_or_404(HorillaUser, id=employee.employee_user_id.id)
+            user = get_object_or_404(CandourUser, id=employee.employee_user_id.id)
             if user.is_active:
                 pass
             else:
@@ -490,7 +490,7 @@ def delete_actions(request, action_id):
 
     if dis_actions.exists():
         return redirect(reverse("disciplinary-actions-list"))
-    return HorillaRedirect(request)
+    return CandourRedirect(request)
 
 
 @login_required

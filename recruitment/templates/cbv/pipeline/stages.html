@@ -5,7 +5,7 @@
      onboarding/exit-process/skill-zone pipelines - scoped to this view's
      own id so only the recruitment pipeline changes. The candidate table
      each stage embeds (candidate-lists-cbv) already renders through the
-     same generic/horilla_list_table.html as /pms/objective-list-view/'s
+     same generic/candour_list_table.html as /pms/objective-list-view/'s
      table; dropping the card framing around it here lets it sit as
      plainly as it does there. The header (badge/title/chevron/actions)
      keeps its own border-bottom untouched. */
@@ -37,7 +37,7 @@
   <div id="selectedCandidateRecords{{ stage.id }}" data-ids="[]"></div>
   <div class="oh-tabs__movable-area mb-2">
     {# Tint/hover mirrors /onboarding/onboarding-view/'s stage accordion, as #}
-    {# in horilla_theme's copy of this template (the one that actually wins  #}
+    {# in candour_theme's copy of this template (the one that actually wins  #}
     {# template resolution for this view).                                   #}
     <div class="oh-tabs__movable group">
       <div class="oh-tabs__movable-header bg-primary-100 text-primary-600 group-hover:bg-primary-200"  onclick="$(this).parent().find('.oh-tabs__movable-body').toggleClass('d-none'); var foldIcon = this.querySelector('.oh-tabs__movable-fold-icon'); if(foldIcon){foldIcon.setAttribute('name', foldIcon.getAttribute('name') === 'chevron-up-outline' ? 'chevron-down-outline' : 'chevron-up-outline');}">

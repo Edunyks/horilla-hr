@@ -70,17 +70,17 @@ from base.methods import (
 )
 from base.models import Company
 from employee.models import Employee, EmployeeWorkInformation
-from horilla import settings
-from horilla.decorators import (
+from candour import settings
+from candour.decorators import (
     hx_request_required,
     login_required,
     manager_can_enter,
     owner_can_enter,
     permission_required,
 )
-from horilla.group_by import group_by_queryset
-from horilla.http.response import HorillaRedirect
-from horilla.methods import horilla_users_with_perms
+from candour.group_by import group_by_queryset
+from candour.http.response import CandourRedirect
+from candour.methods import candour_users_with_perms
 from notifications.signals import notify
 
 
@@ -151,7 +151,7 @@ def add_asset_report(request, asset_id=None):
     if asset_id:
         asset = Asset.find(asset_id)
         if not asset:
-            return HorillaRedirect(request, message=_("Asset not found"))
+            return CandourRedirect(request, message=_("Asset not found"))
         asset_report_form = AssetReportForm(initial={"asset_id": asset})
         if not request.GET.get("asset_list"):
             asset_assignment = AssetAssignment.objects.filter(
@@ -216,7 +216,7 @@ def asset_update(request, asset_id):
         asset_under = "asset_category"
     instance = Asset.find(asset_id)
     if not instance:
-        return HorillaRedirect(request, message=_("Asset not found"))
+        return CandourRedirect(request, message=_("Asset not found"))
     asset_form = AssetForm(instance=instance)
     previous_data = request.GET.urlencode()
 
@@ -258,7 +258,7 @@ def asset_information(request, asset_id):
 
     asset = Asset.find(asset_id)
     if not asset:
-        return HorillaRedirect(request, message=_("Asset not found"))
+        return CandourRedirect(request, message=_("Asset not found"))
     context = {"asset": asset}
     requests_ids_json = request.GET.get("requests_ids")
     if requests_ids_json:
@@ -286,7 +286,7 @@ def asset_item_bulk_edit(request, asset_id):
 
     asset = Asset.find(asset_id)
     if not asset:
-        return HorillaRedirect(request, message=_("Asset not found"))
+        return CandourRedirect(request, message=_("Asset not found"))
 
     queryset = asset.asset_items.all()
     formset = AssetItemFormSet(queryset=queryset)
@@ -356,7 +356,7 @@ def asset_delete(request, asset_id):
         asset = Asset.objects.get(id=asset_id)
     except Asset.DoesNotExist:
         messages.error(request, _("Asset not found"))
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
     asset_cat_id = asset.asset_category_id.id
     is_hx_request = bool(request.headers.get("HX-Request"))
     asset_list_filter = request.GET.get("asset_list")
@@ -386,7 +386,7 @@ def asset_delete(request, asset_id):
             messages.error(request, _("Asset is used in allocation!."))
         else:
             asset_del(request, asset)
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
 
     instances_ids = request.GET.get("requests_ids", "[]")
     instances_list = eval_validate(instances_ids)
@@ -428,7 +428,7 @@ def asset_delete(request, asset_id):
             )
 
         if len(eval_validate(instances_ids)) <= 1:
-            return HorillaRedirect(request)
+            return CandourRedirect(request)
 
         if Asset.find(asset.id):
             return redirect(
@@ -642,7 +642,7 @@ def asset_category_view(request):
     View function for rendering the Asset Category page shell.
 
     The grouped-by-category asset list itself is rendered through the
-    standard HorillaViews nav/list pair (asset.cbv.asset_category
+    standard CandourViews nav/list pair (asset.cbv.asset_category
     AssetCategoryNav / AssetCategoryListView), loaded via HTMX from the
     page shell template.
     Args:
@@ -797,7 +797,7 @@ def asset_request_approve(request, req_id):
                 )
 
                 messages.success(request, _("Asset request approved successfully!"))
-                return HorillaRedirect(request)
+                return CandourRedirect(request)
             except Exception as e:
                 messages.error(request, _("An error occurred: ") + str(e))
                 return HttpResponse(error_response)
@@ -811,7 +811,7 @@ def asset_request_approve(request, req_id):
 
 def reject_request_return(request, asset_request, req_id):
     if not request.META.get("HTTP_HX_REQUEST"):
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
 
     # Request & Allocation page uses tab/list container; refresh that container only.
     referrer = request.META.get("HTTP_REFERER", "")
@@ -867,7 +867,7 @@ def asset_request_reject(request, req_id):
         asset_request = AssetRequest.objects.get(id=req_id)
     except AssetRequest.DoesNotExist:
         messages.error(request, _("Asset request not found."))
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
 
     asset_request.asset_request_status = "Rejected"
     asset_request.save()
@@ -938,13 +938,13 @@ def asset_allocate_return_request(request, asset_id):
         asset_assign = AssetAssignment.objects.get(id=asset_id)
     except AssetAssignment.DoesNotExist:
         messages.error(request, _("Asset assignment not found."))
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
 
     asset_assign.return_request = True
     asset_assign.save()
     message = _("Return request for {} initiated.").format(asset_assign.asset_id)
     messages.success(request, message)
-    permed_users = horilla_users_with_perms("asset.change_assetassignment")
+    permed_users = candour_users_with_perms("asset.change_assetassignment")
     notify.send(
         request.user.employee_get,
         recipient=permed_users,
@@ -964,7 +964,7 @@ def asset_allocate_return_request(request, asset_id):
         url = reverse("asset-request-allocation-view-search-filter")
         return redirect(f"{url}?{previous_data}")
 
-    return HorillaRedirect(request)
+    return CandourRedirect(request)
 
 
 @login_required
@@ -984,7 +984,7 @@ def asset_allocate_return(request, assignment_id):
     asset_allocation = AssetAssignment.objects.filter(id=assignment_id).first()
     if not asset_allocation:
         messages.error(request, _("Asset assignment not found."))
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
     if request.method == "POST":
         asset_return_form = AssetReturnForm(request.POST, request.FILES)
 
@@ -1028,7 +1028,7 @@ def asset_allocate_return(request, assignment_id):
                     asset.asset_status = "In use"
                 asset.save()
                 messages.success(request, _("Asset Returned Successfully..."))
-                return HorillaRedirect(request)
+                return CandourRedirect(request)
             asset_allocation.return_date = asset_return_date
             asset_allocation.return_status = asset_return_status
             asset_allocation.return_condition = asset_return_condition
@@ -1056,7 +1056,7 @@ def asset_allocate_return(request, assignment_id):
                 asset.asset_status = "Not-Available"
             asset.save()
             messages.info(request, _("Asset Return Successful!."))
-            return HorillaRedirect(request)
+            return CandourRedirect(request)
     context = {
         "asset_return_form": asset_return_form,
         "assignment_id": assignment_id,
@@ -1254,7 +1254,7 @@ def own_asset_individual_view(request, asset_id):
     """
     asset_assignment = AssetAssignment.find(asset_id)
     if not asset_assignment:
-        return HorillaRedirect(request, message=_("Asset assignment not found"))
+        return CandourRedirect(request, message=_("Asset assignment not found"))
     asset = asset_assignment.asset_id
     context = {
         "asset": asset,
@@ -1511,7 +1511,7 @@ def asset_excel(_request):
 def asset_export_excel(request):
     """asset export view"""
     if not has_export_access(request, Asset):
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("You don't have access to export this data")
         )
 
@@ -1586,7 +1586,7 @@ def asset_export_excel(request):
                     for (
                         format_name,
                         format_string,
-                    ) in settings.HORILLA_DATE_FORMATS.items():
+                    ) in settings.CANDOUR_DATE_FORMATS.items():
                         if format_name == date_format:
                             value = start_date.strftime(format_string)
 
@@ -1971,7 +1971,7 @@ def asset_history_single_view(request, asset_id):
         asset_assignment = AssetAssignment.objects.get(id=asset_id)
     except AssetAssignment.DoesNotExist:
         messages.error(request, _("Asset assignment not found."))
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
 
     context = {"asset_assignment": asset_assignment}
     requests_ids_json = request.GET.get("requests_ids")
@@ -2057,7 +2057,7 @@ def asset_tab(request, pk):
         employee = Employee.objects.get(id=pk)
     except Employee.DoesNotExist:
         messages.error(request, _("Employee not found."))
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
 
     assets_requests = employee.requested_employee.all()
     assets = employee.allocated_employee.all()
@@ -2176,7 +2176,7 @@ def asset_service_request_add_note(request, pk):
     instance = AssetServiceRequest.objects.filter(pk=pk).first()
     if not instance:
         messages.error(request, _("Service request not found."))
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
     if request.method == "POST":
         note_text = request.POST.get("note", "").strip()
         if note_text:

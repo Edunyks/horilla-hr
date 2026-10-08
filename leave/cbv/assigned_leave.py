@@ -14,17 +14,17 @@ from django.utils.translation import gettext_lazy as _
 
 from base.decorators import manager_can_enter
 from base.methods import eval_validate, filtersubordinates, has_export_access
-from horilla_views.cbv_methods import (
+from candour_views.cbv_methods import (
     get_short_uuid,
     hx_request_required,
     login_required,
 )
-from horilla_views.forms import DynamicBulkUpdateForm
-from horilla_views.generic.cbv.views import (
-    HorillaDetailedView,
-    HorillaFormView,
-    HorillaListView,
-    HorillaNavView,
+from candour_views.forms import DynamicBulkUpdateForm
+from candour_views.generic.cbv.views import (
+    CandourDetailedView,
+    CandourFormView,
+    CandourListView,
+    CandourNavView,
     TemplateView,
 )
 from leave.filters import AssignedLeaveFilter
@@ -44,7 +44,7 @@ class AssignedLeaveViewPage(TemplateView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(manager_can_enter("leave.view_availableleave"), name="dispatch")
-class AssignedleaveList(HorillaListView):
+class AssignedleaveList(CandourListView):
     """
     list view of the page
     """
@@ -182,7 +182,7 @@ class AssignedleaveList(HorillaListView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(manager_can_enter("leave.view_availableleave"), name="dispatch")
-class AssignedLeaveNavView(HorillaNavView):
+class AssignedLeaveNavView(CandourNavView):
     """
     navbar of the page
     """
@@ -245,7 +245,7 @@ class AssignedLeaveNavView(HorillaNavView):
     filter_body_template = "cbv/assigned_leave/assigned_filter.html"
     search_swap_target = "#listContainer"
     # Modern slide-over filter panel -- nav_fixed_filter.html just
-    # includes generic/horilla_nav.html, which already has the
+    # includes generic/candour_nav.html, which already has the
     # {% if modern_filter %} branch, so no template change is needed
     # here. AssignedLeaveFilter.ajax_fields carries the AJAX-loaded
     # comboboxes this needs.
@@ -317,7 +317,7 @@ class AssignedLeaveExport(TemplateView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(manager_can_enter("leave.view_availableleave"), name="dispatch")
-class AssignedLeaveDetailView(HorillaDetailedView):
+class AssignedLeaveDetailView(CandourDetailedView):
     """
     detail view
     """
@@ -342,7 +342,7 @@ class AssignedLeaveDetailView(HorillaDetailedView):
 
 
 # not done
-class AssignedLeaveFormView(HorillaFormView):
+class AssignedLeaveFormView(CandourFormView):
     """
     form view
     """

@@ -11,7 +11,7 @@ from django.utils.translation import gettext_lazy as _
 
 from base.methods import is_reportingmanager
 from employee.models import Employee
-from horilla.decorators import hx_request_required, login_required
+from candour.decorators import hx_request_required, login_required
 from leave.cbv.my_leave_request import MainParentListView, MyLeaveRequestListView
 
 
@@ -68,7 +68,7 @@ class IndividualLeaveTab(MainParentListView):
         own generic tab container, not "#leave-tab") needs the full template.
         """
         if self.request.META.get("HTTP_HX_TARGET") == self.view_id:
-            return ["generic/horilla_list_table.html"]
+            return ["generic/candour_list_table.html"]
         return [self.template_name]
 
     def __init__(self, **kwargs: Any) -> None:

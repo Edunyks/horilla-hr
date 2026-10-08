@@ -34,7 +34,7 @@ OPTIONAL_DEMO_FIXTURES = (
 SIDE_DEMO_FIXTURES = (
     (None, "tags.json"),
     (None, "mail_templates.json"),
-    ("horilla_automations", "mail_automations.json"),
+    ("candour_automations", "mail_automations.json"),
 )
 
 

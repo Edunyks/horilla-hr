@@ -170,7 +170,7 @@ def deliver_subscription(
     # though it had already been delivered.
     #
     # Duplicate execution across workers is now prevented upstream: jobs
-    # register with horilla.scheduling and exactly one process
+    # register with candour.scheduling and exactly one process
     # (manage.py run_scheduler) owns execution, rather than every gunicorn
     # worker starting its own BackgroundScheduler at import.
     #
@@ -206,7 +206,7 @@ def deliver_subscription(
         )
         filters_pairs = filters.summary_pairs()
         meta = {
-            "product_name": "Horilla HR · Standard Reports",
+            "product_name": "Candour HR · Standard Reports",
             "company": company,
             "user": (
                 str(subscription.owner)
@@ -249,14 +249,14 @@ def deliver_subscription(
 
         report_title = str(definition.name)
         body = (
-            f"{_('Attached is your scheduled Horilla report:')}\n\n"
+            f"{_('Attached is your scheduled Candour report:')}\n\n"
             f"{report_title}\n"
             f"{_('Period')}: {filters.from_date} → {filters.to_date}\n"
             f"{_('Subscription')}: {subscription.name}\n"
             f"{_('Format')}: {fmt.upper()}\n"
         )
         email = EmailMessage(
-            subject=f"[Horilla] {subscription.name}",
+            subject=f"[Candour] {subscription.name}",
             body=body,
             from_email=from_email,
             to=recipients,

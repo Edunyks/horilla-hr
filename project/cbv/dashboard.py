@@ -13,8 +13,8 @@ from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
-from horilla_views.cbv_methods import login_required
-from horilla_views.generic.cbv.views import HorillaDetailedView, HorillaListView
+from candour_views.cbv_methods import login_required
+from candour_views.generic.cbv.views import CandourDetailedView, CandourListView
 from project.cbv.cbv_decorators import is_projectmanager_or_member_or_perms
 from project.filters import ProjectFilter
 from project.models import Project
@@ -24,7 +24,7 @@ from project.models import Project
 @method_decorator(
     is_projectmanager_or_member_or_perms("project.view_project"), name="dispatch"
 )
-class ProjectsDueInMonth(HorillaListView):
+class ProjectsDueInMonth(CandourListView):
 
     model = Project
     filter_class = ProjectFilter
@@ -64,7 +64,7 @@ class ProjectsDueInMonth(HorillaListView):
 
 
 @method_decorator(login_required, name="dispatch")
-class ProjectDetailView(HorillaDetailedView):
+class ProjectDetailView(CandourDetailedView):
     """
     detail view of the projects
     """

@@ -2,13 +2,13 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from base.horilla_company_manager import HorillaCompanyManager
+from base.candour_company_manager import CandourCompanyManager
 from base.models import Company
-from horilla.models import HorillaModel
-from horilla_views.cbv_methods import render_template
+from candour.models import CandourModel
+from candour_views.cbv_methods import render_template
 
 
-class WhatsappCredientials(HorillaModel):
+class WhatsappCredientials(CandourModel):
     meta_token = models.TextField()
     meta_business_id = models.CharField(max_length=255)
     meta_phone_number_id = models.CharField(max_length=255)
@@ -26,7 +26,7 @@ class WhatsappCredientials(HorillaModel):
         verbose_name=_("App Secret"),
         help_text=_(
             "Meta app secret, used to verify the X-Hub-Signature-256 header on "
-            "incoming webhook calls. Without it Horilla cannot tell a real "
+            "incoming webhook calls. Without it Candour cannot tell a real "
             "delivery from a forged one, so unsigned payloads are rejected. "
             "Find it under App Settings > Basic in the Meta developer console."
         ),
@@ -34,7 +34,7 @@ class WhatsappCredientials(HorillaModel):
     company_id = models.ManyToManyField(Company, blank=True, verbose_name="Company")
     is_primary = models.BooleanField(default=False)
 
-    objects = HorillaCompanyManager()
+    objects = CandourCompanyManager()
 
     def __str__(self):
         return f"WhatsApp Business {self.meta_business_id} ({self.meta_phone_number})"

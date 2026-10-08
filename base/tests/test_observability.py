@@ -12,7 +12,7 @@ import logging
 from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
 from django.urls import reverse
 
-from horilla.observability import (
+from candour.observability import (
     JSONFormatter,
     RequestIDFilter,
     RequestIDMiddleware,
@@ -169,7 +169,7 @@ class SentryScrubbingTests(SimpleTestCase):
         self.addCleanup(set_request_id, None)
 
     def test_sensitive_keys_are_replaced(self):
-        from horilla.observability import _before_send
+        from candour.observability import _before_send
 
         event = _before_send(
             {
@@ -193,7 +193,7 @@ class SentryScrubbingTests(SimpleTestCase):
         self.assertEqual(data["username"], "alice")
 
     def test_scrubbing_reaches_nested_stack_frame_locals(self):
-        from horilla.observability import _before_send
+        from candour.observability import _before_send
 
         event = _before_send(
             {
@@ -215,7 +215,7 @@ class SentryScrubbingTests(SimpleTestCase):
         self.assertEqual(frame["vars"]["count"], 3)
 
     def test_partial_key_matches_are_caught(self):
-        from horilla.observability import _before_send
+        from candour.observability import _before_send
 
         event = _before_send(
             {
@@ -232,7 +232,7 @@ class SentryScrubbingTests(SimpleTestCase):
             self.assertEqual(event["extra"][key], "[scrubbed]", key)
 
     def test_event_is_tagged_with_the_request_id(self):
-        from horilla.observability import _before_send
+        from candour.observability import _before_send
 
         set_request_id("req-99")
 
@@ -241,7 +241,7 @@ class SentryScrubbingTests(SimpleTestCase):
         self.assertEqual(event["tags"]["request_id"], "req-99")
 
     def test_recursion_is_bounded(self):
-        from horilla.observability import _before_send
+        from candour.observability import _before_send
 
         # A self-referential structure must not hang or blow the stack.
         node = {"salary": "1"}
@@ -252,7 +252,7 @@ class SentryScrubbingTests(SimpleTestCase):
 
 class SentryInitTests(SimpleTestCase):
     def test_no_dsn_means_no_initialisation(self):
-        from horilla.observability import init_sentry
+        from candour.observability import init_sentry
 
         # An open-source install must send nothing anywhere by default.
         self.assertFalse(init_sentry(dsn="", environment="test", release="0"))
@@ -270,16 +270,16 @@ class MetricsEndpointTests(TestCase):
 
     def setUp(self):
         from base.models import Company
-        from horilla.testkit import make_employee
-        from horilla_auth.models import HorillaUser
+        from candour.testkit import make_employee
+        from candour_auth.models import CandourUser
 
         company = Company.objects.create(company="Metrics Co", hq=True)
-        self.staff = HorillaUser.objects.create_user(
-            username="ops", email="ops@test.horilla", password="pw-not-real"
+        self.staff = CandourUser.objects.create_user(
+            username="ops", email="ops@test.candour", password="pw-not-real"
         )
         self.staff.is_staff = True
         self.staff.save(update_fields=["is_staff"])
-        make_employee(company=company, email="ops@test.horilla", user=self.staff)
+        make_employee(company=company, email="ops@test.candour", user=self.staff)
 
     def test_anonymous_callers_get_404(self):
         # Job counts and failure rates are operational detail, not public.
@@ -292,7 +292,7 @@ class MetricsEndpointTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response["Content-Type"].startswith("text/plain"))
-        self.assertIn("horilla_scheduler_jobs_registered", response.content.decode())
+        self.assertIn("candour_scheduler_jobs_registered", response.content.decode())
 
     def test_collection_failure_does_not_break_the_endpoint(self):
         from unittest.mock import patch
@@ -318,7 +318,7 @@ class ReadinessSchedulerTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["scheduler"], "missing")
 
-    @override_settings(HORILLA_REQUIRE_SCHEDULER=True)
+    @override_settings(CANDOUR_REQUIRE_SCHEDULER=True)
     def test_ready_fails_when_scheduler_is_required_and_missing(self):
         response = self.client.get("/ready/")
 

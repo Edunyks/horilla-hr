@@ -25,12 +25,12 @@ from base.methods import (
     sanitize_mail_template_body,
     sanitize_mail_template_placeholders,
 )
-from base.models import HorillaMailTemplate
+from base.models import CandourMailTemplate
 from employee.filters import EmployeeFilter
 from employee.models import Employee
-from horilla import settings
-from horilla.decorators import hx_request_required, login_required, manager_can_enter
-from horilla.http.response import HorillaRedirect
+from candour import settings
+from candour.decorators import hx_request_required, login_required, manager_can_enter
+from candour.http.response import CandourRedirect
 
 
 def paginator_qry(qryset, page_number):
@@ -94,11 +94,11 @@ def send_mail(request, emp_id=None):
         try:
             employee = Employee.objects.get(id=emp_id)
         except Employee.DoesNotExist:
-            return HorillaRedirect(
+            return CandourRedirect(
                 request, message=_("No Employee found matching the query.")
             )
     employees = Employee.objects.all()
-    templates = HorillaMailTemplate.objects.all()
+    templates = CandourMailTemplate.objects.all()
     return render(
         request,
         "employee/send_mail.html",
@@ -129,7 +129,7 @@ def employee_data_export(request, emp_id=None):
             try:
                 employee = Employee.objects.get(id=emp_id)
             except Employee.DoesNotExist:
-                return HorillaRedirect(
+                return CandourRedirect(
                     request, message=_("No Employee found matching the query.")
                 )
 
@@ -192,8 +192,8 @@ def get_template(request, emp_id):
     This method is used to return the mail template
     """
     body = (
-        HorillaMailTemplate.find(emp_id).body
-        if HorillaMailTemplate.find(emp_id)
+        CandourMailTemplate.find(emp_id).body
+        if CandourMailTemplate.find(emp_id)
         else ""
     )
     return JsonResponse({"body": body})
@@ -207,7 +207,7 @@ def get_mail_preview(request):
     body = request.POST.get("body")
     if not body:
         messages.error(request, _("No body provided for mail preview."))
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
 
     # Strip dangerous template constructs first.
     body = sanitize_mail_template_body(body)
@@ -280,7 +280,7 @@ def send_mail_to_employee(request):
     template_attachment_ids = request.POST.getlist("template_attachments")
     for employee in employees:
         bodys = list(
-            HorillaMailTemplate.objects.filter(
+            CandourMailTemplate.objects.filter(
                 id__in=template_attachment_ids
             ).values_list("body", flat=True)
         )
@@ -337,4 +337,4 @@ def send_mail_to_employee(request):
                 )
         except Exception as e:
             messages.error(request, _("Something went wrong"))
-    return HorillaRedirect(request)
+    return CandourRedirect(request)

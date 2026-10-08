@@ -9,8 +9,8 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 
-from horilla_views.cbv_methods import hx_request_required, login_required
-from horilla_views.generic.cbv.views import HorillaTabView, TemplateView
+from candour_views.cbv_methods import hx_request_required, login_required
+from candour_views.generic.cbv.views import CandourTabView, TemplateView
 
 
 @method_decorator(login_required, name="dispatch")
@@ -23,7 +23,7 @@ class LeaveSettingsView(TemplateView):
 
 
 @method_decorator(login_required, name="dispatch")
-class LeaveSettingsTabView(HorillaTabView):
+class LeaveSettingsTabView(CandourTabView):
     """
     tab view for leave settings, shows leave types and approval rules as tabs
     """

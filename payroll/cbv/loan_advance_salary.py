@@ -10,14 +10,14 @@ from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 
-from horilla_views.cbv_methods import login_required, permission_required
-from horilla_views.generic.cbv.views import (
-    HorillaDetailedView,
-    HorillaFormView,
-    HorillaListView,
-    HorillaNavView,
-    HorillaTabContentShell,
-    HorillaTabView,
+from candour_views.cbv_methods import login_required, permission_required
+from candour_views.generic.cbv.views import (
+    CandourDetailedView,
+    CandourFormView,
+    CandourListView,
+    CandourNavView,
+    CandourTabContentShell,
+    CandourTabView,
     TemplateView,
 )
 from payroll.filters import LoanAccountFilter
@@ -37,7 +37,7 @@ class AdvanceSalaryView(TemplateView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("payroll.view_loanaccount"), name="dispatch")
-class LoansGenericTab(HorillaTabView):
+class LoansGenericTab(CandourTabView):
     """
     Tab view for loans/advanced salary
     """
@@ -91,7 +91,7 @@ class LoansGenericTab(HorillaTabView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("payroll.view_loanaccount"), name="dispatch")
-class LoanListView(HorillaListView):
+class LoanListView(CandourListView):
     """
     List view for loan tab
     """
@@ -177,7 +177,7 @@ class AdvancedSalaryList(LoanListView):
         self.search_url = reverse("advanced-salary-list-view")
 
     def get_queryset(self):
-        queryset = HorillaListView.get_queryset(self)
+        queryset = CandourListView.get_queryset(self)
         queryset = queryset.filter(type="advanced_salary")
         return queryset
 
@@ -194,12 +194,12 @@ class FinesListView(LoanListView):
         self.search_url = reverse("fines-list-view")
 
     def get_queryset(self):
-        queryset = HorillaListView.get_queryset(self)
+        queryset = CandourListView.get_queryset(self)
         queryset = queryset.filter(type="fine")
         return queryset
 
 
-class _LoanTabNavBase(HorillaNavView):
+class _LoanTabNavBase(CandourNavView):
     """
     Shared Search/Filter wiring for each Loans & Salary Advances tab's own,
     independent Nav - nav_title/search_url/search_swap_target/create_attrs
@@ -220,7 +220,7 @@ class _LoanTabNavBase(HorillaNavView):
              data-toggle="oh-modal-toggle"
          """
 
-    # Modern slide-over filter panel (generic/horilla_nav.html's own
+    # Modern slide-over filter panel (generic/candour_nav.html's own
     # {% if modern_filter %} branch) -- same treatment as every other
     # panel this session. LoanAccountFilter.ajax_fields carries the
     # AJAX-loaded comboboxes this needs.
@@ -275,19 +275,19 @@ class FineNav(_LoanTabNavBase):
         self._set_create_attrs("fine-create-form")
 
 
-class LoanTabShell(HorillaTabContentShell):
+class LoanTabShell(CandourTabContentShell):
     nav_url_name = "loan-nav"
     container_id = "loanListContainer"
     tabs_root_id = "loan-generic-tab-view"
 
 
-class AdvancedSalaryTabShell(HorillaTabContentShell):
+class AdvancedSalaryTabShell(CandourTabContentShell):
     nav_url_name = "advanced-salary-nav"
     container_id = "advancedSalaryListContainer"
     tabs_root_id = "loan-generic-tab-view"
 
 
-class FineTabShell(HorillaTabContentShell):
+class FineTabShell(CandourTabContentShell):
     nav_url_name = "fine-nav"
     container_id = "fineListContainer"
     tabs_root_id = "loan-generic-tab-view"
@@ -319,7 +319,7 @@ class FineTabShell(HorillaTabContentShell):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("payroll.view_loanaccount"), name="dispatch")
-class LoanDetailView(HorillaDetailedView):
+class LoanDetailView(CandourDetailedView):
     """
     detail view for the loan page
     """
@@ -370,7 +370,7 @@ class LoanDetailView(HorillaDetailedView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("payroll.view_loanaccount"), name="dispatch")
-class LoanFormView(HorillaFormView):
+class LoanFormView(CandourFormView):
     """
     Form view for creating and editing loans. Also the base class for
     AdvancedSalaryFormView/FineFormView below, which reuse everything here

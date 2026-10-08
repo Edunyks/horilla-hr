@@ -1,4 +1,4 @@
-# Smoke unit tests for the Horilla unit-test coverage program.
+# Smoke unit tests for the Candour unit-test coverage program.
 # Expand UNIT_LABELS as more apps gain real suites.
 
 name: Unit Tests
@@ -22,15 +22,15 @@ jobs:
       postgres:
         image: postgres:16-alpine
         env:
-          POSTGRES_USER: horilla_ci
-          POSTGRES_PASSWORD: horilla_ci
-          POSTGRES_DB: horilla_ci
+          POSTGRES_USER: candour_ci
+          POSTGRES_PASSWORD: candour_ci
+          POSTGRES_DB: candour_ci
         ports:
           - 5432:5432
         # Without the healthcheck the job can start before Postgres accepts
         # connections and fail on a race rather than a real defect.
         options: >-
-          --health-cmd "pg_isready -U horilla_ci -d horilla_ci"
+          --health-cmd "pg_isready -U candour_ci -d candour_ci"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -60,8 +60,8 @@ jobs:
 
       - name: Ensure local_settings stub exists
         run: |
-          if [ ! -f horilla/settings/local_settings.py ]; then
-            printf '%s\n' '# Ephemeral for CI' > horilla/settings/local_settings.py
+          if [ ! -f candour/settings/local_settings.py ]; then
+            printf '%s\n' '# Ephemeral for CI' > candour/settings/local_settings.py
           fi
 
       # Catches a model change merged without its migration. `migrate` cannot
@@ -70,24 +70,24 @@ jobs:
       # only surfaces as a runtime column error on someone else's database.
       - name: Check for missing migrations
         env:
-          DJANGO_SETTINGS_MODULE: horilla.settings
+          DJANGO_SETTINGS_MODULE: candour.settings
           DEBUG: "True"
           SECRET_KEY: ci-dev-not-for-production
           ALLOWED_HOSTS: localhost,127.0.0.1
           # Takes the env.db() branch in settings/base.py, which avoids the
           # sqlite-only OPTIONS.timeout that Postgres rejects.
-          DATABASE_URL: postgres://horilla_ci:horilla_ci@localhost:5432/horilla_ci
+          DATABASE_URL: postgres://candour_ci:candour_ci@localhost:5432/candour_ci
         run: python manage.py makemigrations --check --dry-run
 
       - name: Run smoke unit tests with coverage floor
         env:
-          DJANGO_SETTINGS_MODULE: horilla.settings
+          DJANGO_SETTINGS_MODULE: candour.settings
           DEBUG: "True"
           SECRET_KEY: ci-dev-not-for-production
           ALLOWED_HOSTS: localhost,127.0.0.1
           # Takes the env.db() branch in settings/base.py, which avoids the
           # sqlite-only OPTIONS.timeout that Postgres rejects.
-          DATABASE_URL: postgres://horilla_ci:horilla_ci@localhost:5432/horilla_ci
+          DATABASE_URL: postgres://candour_ci:candour_ci@localhost:5432/candour_ci
         # No COV_FAIL_UNDER override: the Makefile's value is the gate, and
         # its comment explains why a floor below real coverage is worse than
         # none. Passing 5 here re-created exactly that.

@@ -1,7 +1,7 @@
 """
 Offboarding someone must take their login away, not just their employee row.
 
-Authentication reads ``HorillaUser.is_active``; ``Employee.is_active`` is a
+Authentication reads ``CandourUser.is_active``; ``Employee.is_active`` is a
 separate flag, and ``Employee.sync_login_access()`` is what mirrors one onto
 the other. Moving people into an "archived" offboarding stage did it with a
 queryset ``update()``, which never calls ``save()`` and so never calls that --
@@ -16,8 +16,8 @@ These drive the real view, not a reimplementation of it, so that reaching for
 from django.test import TestCase
 from django.urls import reverse
 
-from horilla.horilla_middlewares import set_selected_company
-from horilla.testkit import make_company, make_employee, make_user
+from candour.candour_middlewares import set_selected_company
+from candour.testkit import make_company, make_employee, make_user
 from offboarding.models import Offboarding, OffboardingEmployee, OffboardingStage
 
 
@@ -29,7 +29,7 @@ class ArchivedStageRevokesLoginTests(TestCase):
         self.leaver_user = make_user("leaver_user")
         self.leaver = make_employee(
             company=self.company,
-            email="leaver@test.horilla",
+            email="leaver@test.candour",
             first_name="Lee",
             user=self.leaver_user,
         )
@@ -37,7 +37,7 @@ class ArchivedStageRevokesLoginTests(TestCase):
         self.admin_user = make_user("offboard_admin", is_superuser=True)
         make_employee(
             company=self.company,
-            email="offboard_admin@test.horilla",
+            email="offboard_admin@test.candour",
             first_name="Ada",
             user=self.admin_user,
         )
@@ -76,7 +76,7 @@ class ArchivedStageRevokesLoginTests(TestCase):
         self.assertFalse(
             self.leaver_user.is_active,
             "an offboarded employee's login account must be disabled -- "
-            "authentication checks HorillaUser.is_active, not "
+            "authentication checks CandourUser.is_active, not "
             "Employee.is_active, so leaving it True keeps their password and "
             "any live refresh token working after their last day",
         )

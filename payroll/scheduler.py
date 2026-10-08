@@ -9,7 +9,7 @@ from datetime import date, timedelta
 
 from dateutil.relativedelta import relativedelta
 
-from horilla.scheduling import register_job
+from candour.scheduling import register_job
 from payroll.methods.methods import calculate_employer_contribution, save_payslip
 from payroll.views.component_views import payroll_calculation
 

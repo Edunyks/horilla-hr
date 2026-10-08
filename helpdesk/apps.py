@@ -14,7 +14,7 @@ class HelpdeskConfig(AppConfig):
     def ready(self):
         from django.urls import include, path
 
-        from horilla.urls import urlpatterns
+        from candour.urls import urlpatterns
 
         settings.APPS.append("helpdesk")
         urlpatterns.append(

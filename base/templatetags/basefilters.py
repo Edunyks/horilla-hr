@@ -10,7 +10,7 @@ from django.utils.safestring import mark_safe
 from base.methods import get_pagination
 from base.models import MultipleApprovalManagers
 from employee.models import Employee, EmployeeWorkInformation
-from horilla.menu.settings_menu import get_settings_menu
+from candour.menu.settings_menu import get_settings_menu
 
 register = template.Library()
 
@@ -154,11 +154,11 @@ def _get_employee_of_user(user):
     user object - this tag/filter is called once per row in list views, and
     without this cache each call re-issues the same lookup query.
     """
-    if not hasattr(user, "_horilla_employee_cache"):
-        user._horilla_employee_cache = Employee.objects.filter(
+    if not hasattr(user, "_candour_employee_cache"):
+        user._candour_employee_cache = Employee.objects.filter(
             employee_user_id=user
         ).first()
-    return user._horilla_employee_cache
+    return user._candour_employee_cache
 
 
 @register.simple_tag
@@ -167,9 +167,9 @@ def is_manager_of(user, instance, field_name="employee_id"):
 
     target_employee = getattr(instance, field_name, None)
 
-    if not hasattr(user, "_horilla_is_manager_of_cache"):
-        user._horilla_is_manager_of_cache = {}
-    cache = user._horilla_is_manager_of_cache
+    if not hasattr(user, "_candour_is_manager_of_cache"):
+        user._candour_is_manager_of_cache = {}
+    cache = user._candour_is_manager_of_cache
     key = (getattr(employee, "id", None), getattr(target_employee, "id", None))
     if key not in cache:
         cache[key] = EmployeeWorkInformation.objects.filter(
@@ -195,8 +195,8 @@ def is_leave_approval_manager(user):
     """
     This method will return true if the user is comes in MultipleApprovalCondition model as approving manager
     """
-    if hasattr(user, "_horilla_is_leave_approval_manager_cache"):
-        return user._horilla_is_leave_approval_manager_cache
+    if hasattr(user, "_candour_is_leave_approval_manager_cache"):
+        return user._candour_is_leave_approval_manager_cache
     employee = _get_employee_of_user(user)
     manager = (
         MultipleApprovalManagers.objects.entire()
@@ -205,7 +205,7 @@ def is_leave_approval_manager(user):
         if employee
         else False
     )
-    user._horilla_is_leave_approval_manager_cache = manager
+    user._candour_is_leave_approval_manager_cache = manager
     return manager
 
 
@@ -334,22 +334,22 @@ def general_section_main(context):
         [
             user.has_perm("base.change_announcementexpire"),
             user.has_perm("base.view_dynamicpagination"),
-            user.has_perm("horilla_audit.view_accountblockunblock"),
+            user.has_perm("candour_audit.view_accountblockunblock"),
             user.has_perm("offboarding.change_offboardinggeneralsetting"),
             user.has_perm("attendance.change_attendancegeneralsetting"),
             user.has_perm("payroll.change_payrollgeneralsetting"),
             user.has_perm("employee.change_employeegeneralsetting"),
             user.has_perm("payroll.change_encashmentgeneralsettings"),
-            user.has_perm("horilla_audit.view_historytrackingfields"),
+            user.has_perm("candour_audit.view_historytrackingfields"),
             user.has_perm("payroll.view_payrollsettings"),
             user.has_perm("auth.view_permission"),
             user.has_perm("auth.view_group"),
             user.has_perm("base.view_company"),
             user.has_perm("base.view_tags"),
             user.has_perm("employee.view_employeetag"),
-            user.has_perm("horilla_audit.view_audittag"),
+            user.has_perm("candour_audit.view_audittag"),
             user.has_perm("base.view_dynamicemailconfiguration"),
-            user.has_perm("horilla_backup.view_googledrivebackup"),
+            user.has_perm("candour_backup.view_googledrivebackup"),
         ]
     )
 
@@ -365,13 +365,13 @@ def general_section(context):
         [
             user.has_perm("base.change_announcementexpire"),
             user.has_perm("base.view_dynamicpagination"),
-            user.has_perm("horilla_audit.view_accountblockunblock"),
+            user.has_perm("candour_audit.view_accountblockunblock"),
             user.has_perm("offboarding.change_offboardinggeneralsetting"),
             user.has_perm("attendance.change_attendancegeneralsetting"),
             user.has_perm("payroll.change_payrollgeneralsetting"),
             user.has_perm("employee.change_employeegeneralsetting"),
             user.has_perm("payroll.change_encashmentgeneralsettings"),
-            user.has_perm("horilla_audit.view_historytrackingfields"),
+            user.has_perm("candour_audit.view_historytrackingfields"),
             user.has_perm("payroll.view_payrollsettings"),
         ]
     )
@@ -440,7 +440,7 @@ def show_section(context):
             user.has_perm("recruitment.view_rejectreason"),
             user.has_perm("recruitment.add_recruitment"),
             user.has_perm("recruitment.add_linkedinaccount"),
-            user.has_perm("horilla_audit.view_accountblockunblock"),
+            user.has_perm("candour_audit.view_accountblockunblock"),
             user.has_perm("offboarding.change_offboardinggeneralsetting"),
             user.has_perm("attendance.change_attendancegeneralsetting"),
             user.has_perm("payroll.change_payrollgeneralsetting"),
@@ -449,10 +449,10 @@ def show_section(context):
             user.has_perm("payroll.view_payrollsettings"),
             user.has_perm("auth.view_permission"),
             user.has_perm("auth.view_group"),
-            user.has_perm("horilla_audit.view_audittag"),
-            user.has_perm("horilla_backup.view_googledrivebackup"),
-            user.has_perm("horilla_ldap.add_ldapsettings"),
-            user.has_perm("horilla_ldap.update_ldapsettings"),
+            user.has_perm("candour_audit.view_audittag"),
+            user.has_perm("candour_backup.view_googledrivebackup"),
+            user.has_perm("candour_ldap.add_ldapsettings"),
+            user.has_perm("candour_ldap.update_ldapsettings"),
             user.has_perm("employee.view_actiontype"),
             user.has_perm("base.view_tags"),
             user.has_perm("whatsapp.view_whatsappcredientials"),
@@ -470,13 +470,13 @@ def show_section(context):
             user.has_perm("base.view_employeetype"),
             user.has_perm("base.change_announcementexpire"),
             user.has_perm("base.view_dynamicpagination"),
-            user.has_perm("horilla_backup.view_googledrivebackup"),
+            user.has_perm("candour_backup.view_googledrivebackup"),
             user.has_perm("recruitment.view_linkedinaccount"),
-            user.has_perm("horilla_ldap.add_ldapsettings"),
-            user.has_perm("horilla_ldap.update_ldapsettings"),
-            user.has_perm("horilla_meet.view_googlecloudcredential"),
+            user.has_perm("candour_ldap.add_ldapsettings"),
+            user.has_perm("candour_ldap.update_ldapsettings"),
+            user.has_perm("candour_meet.view_googlecloudcredential"),
             user.has_perm("whatsapp.add_whatsappcredientials"),
-            user.has_perm("horilla_theme.view_horillacolortheme"),
+            user.has_perm("candour_theme.view_candourcolortheme"),
         ]
     )
 
@@ -506,7 +506,7 @@ def settings_search_index():
     """
     import json
 
-    from horilla.menu.settings_menu import settings_registry
+    from candour.menu.settings_menu import settings_registry
 
     entries = []
     seen = set()  # (text_lower, url) pairs — prevents exact duplicates
@@ -571,8 +571,8 @@ def config_perms(user):
             "base.change_holidays",
             "base.add_companyleaves",
             "base.change_companyleaves",
-            "base.add_horillamailtemplates",
-            "base.view_horillamailtemplates",
+            "base.add_candourmailtemplates",
+            "base.view_candourmailtemplates",
         ],
     }
     for app, perms in app_permissions.items():

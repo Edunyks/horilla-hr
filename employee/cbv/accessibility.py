@@ -7,7 +7,7 @@ from django.contrib.auth.context_processors import PermWrapper
 
 from base.methods import check_manager
 from employee.models import Employee
-from horilla_audit.models import AccountBlockUnblock
+from candour_audit.models import AccountBlockUnblock
 
 
 def edit_accessibility(
@@ -150,7 +150,7 @@ def document_accessibility(
     """
     employee = Employee.objects.get(id=instance.pk)
     if (
-        request.user.has_perm("horilla_documents.view_document")
+        request.user.has_perm("candour_documents.view_document")
         or request.user == employee.employee_user_id
     ):
         return True

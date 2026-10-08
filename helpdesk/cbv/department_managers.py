@@ -13,11 +13,11 @@ from django.utils.translation import gettext_lazy as _
 from helpdesk.filter import DepartmentManagerFilter
 from helpdesk.forms import DepartmentManagerCreateForm
 from helpdesk.models import DepartmentManager
-from horilla_views.cbv_methods import login_required, permission_required
-from horilla_views.generic.cbv.views import (
-    HorillaFormView,
-    HorillaListView,
-    HorillaNavView,
+from candour_views.cbv_methods import login_required, permission_required
+from candour_views.generic.cbv.views import (
+    CandourFormView,
+    CandourListView,
+    CandourNavView,
 )
 
 
@@ -25,7 +25,7 @@ from horilla_views.generic.cbv.views import (
 @method_decorator(
     permission_required(perm="helpdesk.add_departmentmanager"), name="dispatch"
 )
-class DepartmentManagersListView(HorillaListView):
+class DepartmentManagersListView(CandourListView):
     """
     List view of the resticted days page
     """
@@ -90,7 +90,7 @@ class DepartmentManagersListView(HorillaListView):
 @method_decorator(
     permission_required(perm="helpdesk.add_departmentmanager"), name="dispatch"
 )
-class DepartmentManagersNav(HorillaNavView):
+class DepartmentManagersNav(CandourNavView):
     """
     Nav bar
     """
@@ -124,7 +124,7 @@ class DepartmentManagersNav(HorillaNavView):
 @method_decorator(
     permission_required(perm="helpdesk.add_departmentmanager"), name="dispatch"
 )
-class DepartmentManagersFormView(HorillaFormView):
+class DepartmentManagersFormView(CandourFormView):
     """
     Create and edit form for Department Manager
     """

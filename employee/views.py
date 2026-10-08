@@ -116,7 +116,7 @@ from employee.models import (
     NoteFiles,
 )
 from employee.threading import InvitationMailSendThread
-from horilla.decorators import (
+from candour.decorators import (
     hx_request_required,
     logger,
     login_required,
@@ -124,20 +124,20 @@ from horilla.decorators import (
     owner_can_enter,
     permission_required,
 )
-from horilla.filters import HorillaPaginator
-from horilla.group_by import group_by_queryset
-from horilla.http.response import HorillaRedirect
-from horilla.methods import dynamic_attr, get_horilla_model_class
-from horilla_audit.models import AccountBlockUnblock, HistoryTrackingFields
-from horilla_auth.methods import generate_random_password
-from horilla_auth.models import HorillaUser
-from horilla_documents.forms import (
+from candour.filters import CandourPaginator
+from candour.group_by import group_by_queryset
+from candour.http.response import CandourRedirect
+from candour.methods import dynamic_attr, get_candour_model_class
+from candour_audit.models import AccountBlockUnblock, HistoryTrackingFields
+from candour_auth.methods import generate_random_password
+from candour_auth.models import CandourUser
+from candour_documents.forms import (
     DocumentForm,
     DocumentRejectForm,
     DocumentRequestForm,
     DocumentUpdateForm,
 )
-from horilla_documents.models import Document, DocumentRequest
+from candour_documents.models import Document, DocumentRequest
 from notifications.signals import notify
 
 
@@ -312,7 +312,7 @@ def profile_edit_access(request, emp_id):
                 cache.delete(user_cache_key[-1])
                 update_employee_accessibility_cache(user_cache_key[-1], employee)
 
-    return HorillaRedirect(request)
+    return CandourRedirect(request)
 
 
 @login_required
@@ -407,7 +407,7 @@ def about_tab(request, pk, **kwargs):
     employee = Employee.objects.filter(id=pk).first()
     if not employee:
         messages.error(request, _("Employee not found."))
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
     contracts = employee.contract_set.all() if apps.is_installed("payroll") else None
     employee_leaves = (
         employee.available_leave.all() if apps.is_installed("leave") else None
@@ -443,7 +443,7 @@ def allowances_deductions_tab(request, pk):
     employee = Employee.objects.filter(id=pk).first()
     if not employee:
         messages.error(request, _("Employee not found."))
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
     active_contracts = (
         employee.contract_set.filter(contract_status="active").first()
         if apps.is_installed("payroll")
@@ -454,7 +454,7 @@ def allowances_deductions_tab(request, pk):
     employee_deductions = []
     if basic_pay:
         # Find the applicable allowances for the employee
-        Allowance = get_horilla_model_class(app_label="payroll", model="allowance")
+        Allowance = get_candour_model_class(app_label="payroll", model="allowance")
         specific_allowances = Allowance.objects.filter(specific_employees=employee)
         conditional_allowances = Allowance.objects.filter(
             is_condition_based=True
@@ -484,7 +484,7 @@ def allowances_deductions_tab(request, pk):
                     employee_allowances.remove(allowance)
 
         # Find the applicable deductions for the employee
-        Deduction = get_horilla_model_class(app_label="payroll", model="deduction")
+        Deduction = get_candour_model_class(app_label="payroll", model="deduction")
         specific_deductions = Deduction.objects.filter(
             specific_employees=employee, is_pretax=True, is_tax=False
         )
@@ -552,7 +552,7 @@ def shift_tab(request, pk):
     employee = Employee.objects.filter(id=pk).first()
     if not employee:
         messages.error(request, _("Employee not found."))
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
     work_type_requests = WorkTypeRequest.objects.filter(employee_id=pk)
     work_type_requests_ids = json.dumps(
         [instance.id for instance in work_type_requests]
@@ -580,7 +580,7 @@ def shift_tab(request, pk):
 
 
 @login_required
-@manager_can_enter("horilla_documents.view_documentrequest")
+@manager_can_enter("candour_documents.view_documentrequest")
 def document_request_view(request):
     """
     This function is used to view documents requests of employees.
@@ -596,7 +596,7 @@ def document_request_view(request):
     documents = Document.objects.filter(document_request_id__isnull=False)
     documents = filtersubordinates(
         request=request,
-        perm="horilla_documents.view_documentrequest",
+        perm="candour_documents.view_documentrequest",
         queryset=documents,
     )
     documents = group_by_queryset(
@@ -616,7 +616,7 @@ def document_request_view(request):
 
 @login_required
 @hx_request_required
-@manager_can_enter("horilla_documents.view_documentrequest")
+@manager_can_enter("candour_documents.view_documentrequest")
 def document_filter_view(request):
     """
     This method is used to filter employee.
@@ -649,7 +649,7 @@ def document_filter_view(request):
 
 @login_required
 @hx_request_required
-@manager_can_enter("horilla_documents.add_documentrequest")
+@manager_can_enter("candour_documents.add_documentrequest")
 def document_request_create(request):
     """
     This function is used to create document requests of an employee in employee requests view.
@@ -660,11 +660,11 @@ def document_request_create(request):
     Returns: return document_request_create_form template
     """
     form = DocumentRequestForm()
-    form = choosesubordinates(request, form, "horilla_documents.add_documentrequest")
+    form = choosesubordinates(request, form, "candour_documents.add_documentrequest")
     if request.method == "POST":
         form = DocumentRequestForm(request.POST)
         form = choosesubordinates(
-            request, form, "horilla_documents.add_documentrequest"
+            request, form, "candour_documents.add_documentrequest"
         )
         if form.is_valid():
             form = form.save()
@@ -679,7 +679,7 @@ def document_request_create(request):
                 redirect=reverse("employee-profile"),
                 icon="chatbox-ellipses",
             )
-            return HorillaRedirect(request)
+            return CandourRedirect(request)
 
     context = {
         "form": form,
@@ -691,7 +691,7 @@ def document_request_create(request):
 
 @login_required
 @hx_request_required
-@manager_can_enter("horilla_documents.change_documentrequest")
+@manager_can_enter("candour_documents.change_documentrequest")
 def document_request_update(request, id):
     """
     This function is used to update document requests of an employee in employee requests view.
@@ -712,7 +712,7 @@ def document_request_update(request, id):
                 Employee.objects.filter(id__in=form.data.getlist("employee_id"))
             )
             documents.exclude(employee_id__in=doc_obj.employee_id.all()).delete()
-            return HorillaRedirect(request)
+            return CandourRedirect(request)
 
     context = {
         "form": form,
@@ -725,7 +725,7 @@ def document_request_update(request, id):
 
 @login_required
 @hx_request_required
-@owner_can_enter("horilla_documents.view_document", Employee)
+@owner_can_enter("candour_documents.view_document", Employee)
 def document_tab(request, pk):
     """
     This function is used to view documents tab of an employee in employee individual
@@ -751,7 +751,7 @@ def document_tab(request, pk):
 
 @login_required
 @hx_request_required
-@owner_can_enter("horilla_documents.add_document", Employee)
+@owner_can_enter("candour_documents.add_document", Employee)
 def document_create(request, emp_id=None):
     """
     This function is used to create documents from employee individual & profile view.
@@ -765,14 +765,14 @@ def document_create(request, emp_id=None):
     employee_id = Employee.objects.filter(id=emp_id).first() if emp_id else None
     if not employee_id:
         messages.error(request, _("Employee not found."))
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
     form = DocumentForm(initial={"employee_id": employee_id, "expiry_date": None})
     if request.method == "POST":
         form = DocumentForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             messages.success(request, _("Document created successfully."))
-            return HorillaRedirect(request)
+            return CandourRedirect(request)
 
     context = {
         "form": form,
@@ -837,7 +837,7 @@ def document_delete(request, id):
     try:
         document_qs = Document.objects.filter(id=id)
 
-        if not request.user.has_perm("horilla_documents.delete_document"):
+        if not request.user.has_perm("candour_documents.delete_document"):
             document_qs = document_qs.filter(
                 employee_id__employee_user_id=request.user
             ).exclude(document_request_id__isnull=False)
@@ -891,7 +891,7 @@ def document_delete(request, id):
     refreshed = htmx_refresh_document_request_container(request)
     if refreshed is not None:
         return refreshed
-    return HorillaRedirect(request)
+    return CandourRedirect(request)
 
 
 def can_access_document(request, document, perm):
@@ -921,14 +921,14 @@ def file_upload(request, id):
 
     document_item = Document.find(id)
     if document_item is None:
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("No Document found matching the query.")
         )
 
     if not can_access_document(
-        request, document_item, "horilla_documents.change_document"
+        request, document_item, "candour_documents.change_document"
     ):
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("You do not have permission to update this document.")
         )
 
@@ -952,7 +952,7 @@ def file_upload(request, id):
                 )
             except:
                 pass
-            return HorillaRedirect(request)
+            return CandourRedirect(request)
 
     context = {"form": form, "document": document_item}
     return render(request, "tabs/htmx/document_form.html", context=context)
@@ -1000,18 +1000,18 @@ def view_file(request, id):
     # portal issue reported as GHSA-p745-9729-g8jw, and it mirrors the scoping
     # document_delete above already applies.
     document_qs = Document.objects.filter(id=id)
-    if not request.user.has_perm("horilla_documents.view_document"):
+    if not request.user.has_perm("candour_documents.view_document"):
         document_qs = document_qs.filter(employee_id__employee_user_id=request.user)
     document_obj = document_qs.first()
     if document_obj is None:
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("No Document found matching the query.")
         )
 
     if not can_access_document(
-        request, document_obj, "horilla_documents.view_document"
+        request, document_obj, "candour_documents.view_document"
     ):
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("You do not have permission to view this document.")
         )
 
@@ -1045,7 +1045,7 @@ def view_file(request, id):
 
 @login_required
 @hx_request_required
-@manager_can_enter("horilla_documents.add_document")
+@manager_can_enter("candour_documents.add_document")
 def document_approve(request, id):
     """
     This function used to view the approve uploaded document.
@@ -1083,12 +1083,12 @@ def document_approve(request, id):
         )
         return HttpResponse(span)
 
-    return HorillaRedirect(request)
+    return CandourRedirect(request)
 
 
 @login_required
 @hx_request_required
-@manager_can_enter("horilla_documents.add_document")
+@manager_can_enter("candour_documents.add_document")
 def document_reject(request, id):
     """
     This function used to view the reject uploaded document.
@@ -1110,10 +1110,10 @@ def document_reject(request, id):
                 document_obj.save()
                 messages.error(request, _("Document request rejected"))
 
-                return HorillaRedirect(request)
+                return CandourRedirect(request)
     else:
         messages.error(request, _("No document uploaded"))
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
 
     return render(
         request,
@@ -1123,7 +1123,7 @@ def document_reject(request, id):
 
 
 @login_required
-@manager_can_enter("horilla_documents.add_document")
+@manager_can_enter("candour_documents.add_document")
 def document_bulk_approve(request):
     """
     This function is used to bulk-approve uploaded documents.
@@ -1157,12 +1157,12 @@ def document_bulk_approve(request):
     refreshed = htmx_refresh_document_request_container(request)
     if refreshed is not None:
         return refreshed
-    return HorillaRedirect(request)
+    return CandourRedirect(request)
 
 
 @login_required
 @hx_request_required
-@manager_can_enter("horilla_documents.add_document")
+@manager_can_enter("candour_documents.add_document")
 def document_bulk_reject(request):
     """
     Handle bulk rejection of documents.
@@ -1201,7 +1201,7 @@ def document_bulk_reject(request):
         refreshed = htmx_refresh_document_request_container(request)
         if refreshed is not None:
             return refreshed
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
 
     return render(
         request, "documents/document_reject_reason.html", {"ids": ids, "form": form}
@@ -1222,7 +1222,7 @@ def employee_profile_bank_details(request):
         bank_info.employee_id = employee
         bank_info.save()
         messages.success(request, _("Bank details updated"))
-    return HorillaRedirect(request)
+    return CandourRedirect(request)
 
 
 @login_required
@@ -1250,7 +1250,7 @@ def employee_user_group_assign_delete(_, obj_id):
     """
     This method is used to delete user group assign
     """
-    user = HorillaUser.objects.get(id=obj_id)
+    user = CandourUser.objects.get(id=obj_id)
     user.groups.clear()
     return redirect("/employee/employee-user-group-assign-view")
 
@@ -1259,7 +1259,7 @@ def paginator_qry(qryset, page_number):
     """
     This method is used to paginate query set
     """
-    paginator = HorillaPaginator(qryset, get_pagination())
+    paginator = CandourPaginator(qryset, get_pagination())
     qryset = paginator.get_page(page_number)
     return qryset
 
@@ -1601,7 +1601,7 @@ def employee_account_block_unblock(request, emp_id):
     if not employee:
         messages.info(request, _("Employee not found"))
         return redirect(f"{reverse('employee-view')}?view=list")
-    user = get_object_or_404(HorillaUser, id=employee.employee_user_id.id)
+    user = get_object_or_404(CandourUser, id=employee.employee_user_id.id)
     if not user:
         messages.info(request, _("Employee not found"))
         return redirect(f"{reverse('employee-view')}?view=list")
@@ -1656,7 +1656,7 @@ def employee_view_update(request, obj_id, **kwargs):
     emp = Employee.objects.entire().filter(id=obj_id).first()
 
     if not employee and not emp:
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("No Employee found matching the query.")
         )
 
@@ -1789,7 +1789,7 @@ def employee_view_update(request, obj_id, **kwargs):
             },
         )
         return response
-    return HorillaRedirect(request, fallback_url="/employee/employee-view")
+    return CandourRedirect(request, fallback_url="/employee/employee-view")
 
 
 @login_required
@@ -2181,7 +2181,7 @@ def employee_update(request, obj_id):
     employee = Employee.objects.filter(id=obj_id).first()
     if not employee:
         messages.error(request, _("Employee not found."))
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
     form = EmployeeForm(instance=employee)
     work_info = EmployeeWorkInformation.objects.filter(employee_id=employee).first()
     bank_info = EmployeeBankDetails.objects.filter(employee_id=employee).first()
@@ -2227,7 +2227,7 @@ def employee_delete(request, obj_id):
             <= 1
         ):
             messages.error(request, _("You can't delete the last superuser."))
-            return HorillaRedirect(request, fallback_url=f"/view={view}")
+            return CandourRedirect(request, fallback_url=f"/view={view}")
         if apps.is_installed("payroll"):
             if employee.contract_set.all().exists():
                 contracts = employee.contract_set.all()
@@ -2251,7 +2251,7 @@ def employee_delete(request, obj_id):
         error_message = str(error_message)
         request.session["error_message"] = error_message
         return redirect(reverse("employee-view") + "?error_message=true")
-    return HorillaRedirect(request, fallback_url=f"/view={view}")
+    return CandourRedirect(request, fallback_url=f"/view={view}")
 
 
 @login_required
@@ -2422,7 +2422,7 @@ def employee_send_invitation(request, emp_id):
     employee = get_object_or_404(Employee, id=emp_id)
     if not employee.employee_user_id:
         messages.error(request, _("This employee has no linked login account."))
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
 
     sent = send_employee_invitation(employee, request.get_host(), request.is_secure())
     if sent:
@@ -2437,7 +2437,7 @@ def employee_send_invitation(request, emp_id):
             )
             % {"employee": employee},
         )
-    return HorillaRedirect(request)
+    return CandourRedirect(request)
 
 
 @login_required
@@ -2479,7 +2479,7 @@ def employee_archive(request, obj_id):
     employee = Employee.objects.filter(id=obj_id).first()
     if not employee:
         messages.error(request, _("Employee not found."))
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
     employee.is_active = not employee.is_active
     save = True
     message = "Employee un-archived"
@@ -2507,7 +2507,7 @@ def employee_archive(request, obj_id):
         messages.success(request, message)
         key = "HTTP_HX_REQUEST"
         if key not in request.META.keys():
-            return HorillaRedirect(request)
+            return CandourRedirect(request)
         else:
             return HttpResponse("<script>$('#applyFilter').click();</script>")
     else:
@@ -2529,7 +2529,7 @@ def employee_archive(request, obj_id):
 def replace_employee(request, emp_id):
     employee = Employee.objects.filter(id=emp_id).first()
     if not employee:
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("No Employee found matching the query.")
         )
 
@@ -2555,7 +2555,7 @@ def replace_employee(request, emp_id):
                     and field_name == "recruitment_managers"
                     and str(emp_id) != replace_emp_id
                 ):
-                    Recruitment = get_horilla_model_class(
+                    Recruitment = get_candour_model_class(
                         app_label="recruitment", model="recruitment"
                     )
                     recruitment_query = Recruitment.objects.filter(
@@ -2570,7 +2570,7 @@ def replace_employee(request, emp_id):
                     and field_name == "recruitment_stage_managers"
                     and str(emp_id) != replace_emp_id
                 ):
-                    Stage = get_horilla_model_class(
+                    Stage = get_candour_model_class(
                         app_label="recruitment", model="stage"
                     )
                     recruitment_stage_query = Stage.objects.filter(
@@ -2585,7 +2585,7 @@ def replace_employee(request, emp_id):
                     and field_name == "onboarding_stage_manager"
                     and str(emp_id) != replace_emp_id
                 ):
-                    OnboardingStage = get_horilla_model_class(
+                    OnboardingStage = get_candour_model_class(
                         app_label="onboarding", model="onboardingstage"
                     )
                     onboarding_stage_query = OnboardingStage.objects.filter(
@@ -2600,7 +2600,7 @@ def replace_employee(request, emp_id):
                     and field_name == "onboarding_task_manager"
                     and str(emp_id) != replace_emp_id
                 ):
-                    OnboardingTask = get_horilla_model_class(
+                    OnboardingTask = get_candour_model_class(
                         app_label="onboarding", model="onboardingtask"
                     )
                     onboarding_task_query = OnboardingTask.objects.filter(
@@ -2632,7 +2632,7 @@ def get_manager_in(request):
     employee_id = request.GET.get("employee_id")
     employee = Employee.objects.filter(id=employee_id).first()
     if not employee:
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("No Employee found matching the query.")
         )
 
@@ -2654,7 +2654,7 @@ def get_manager_in(request):
         employee.save()
         employee.sync_login_access()
         messages.success(request, message)
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
     else:
         return render(
             request,
@@ -2869,7 +2869,7 @@ def employee_import(request):
                 phone = employee_dict["phone"]
                 email = employee_dict["email"]
                 employee_full_name = employee_dict["employee_full_name"]
-                existing_user = HorillaUser.objects.filter(username=email).first()
+                existing_user = CandourUser.objects.filter(username=email).first()
                 if existing_user is None:
                     employee_first_name = employee_full_name
                     employee_last_name = ""
@@ -2879,7 +2879,7 @@ def employee_import(request):
                             employee_last_name,
                         ) = employee_full_name.split(" ", 1)
 
-                    user = HorillaUser.objects.create_user(
+                    user = CandourUser.objects.create_user(
                         username=email,
                         email=email,
                         password=str(phone).strip(),
@@ -2918,7 +2918,7 @@ def employee_export(request):
     are exported; otherwise every employee is exported, same as before.
     """
     if not has_export_access(request, Employee):
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("You don't have access to export this data")
         )
 
@@ -3114,7 +3114,7 @@ def work_info_export(request):
     This method is used to export employee data to xlsx
     """
     if not has_export_access(request, Employee):
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("You don't have access to export this data")
         )
 
@@ -3190,7 +3190,7 @@ def work_info_export(request):
             if isinstance(value, date):
                 try:
                     data = value.strftime(
-                        settings.HORILLA_DATE_FORMATS.get(date_format, "%Y-%m-%d")
+                        settings.CANDOUR_DATE_FORMATS.get(date_format, "%Y-%m-%d")
                     )
                 except Exception:
                     data = str(value)
@@ -3311,7 +3311,7 @@ def total_employees_count(request):
 def joining_today_count(request):
     newbies_today = 0
     if apps.is_installed("recruitment"):
-        Candidate = get_horilla_model_class(app_label="recruitment", model="candidate")
+        Candidate = get_candour_model_class(app_label="recruitment", model="candidate")
         newbies_today = Candidate.objects.filter(
             joining_date__range=[date.today(), date.today() + timedelta(days=1)],
             is_active=True,
@@ -3324,7 +3324,7 @@ def joining_today_count(request):
 def joining_week_count(request):
     newbies_week = 0
     if apps.is_installed("recruitment"):
-        Candidate = get_horilla_model_class(app_label="recruitment", model="candidate")
+        Candidate = get_candour_model_class(app_label="recruitment", model="candidate")
         newbies_week = Candidate.objects.filter(
             joining_date__range=[
                 date.today() - timedelta(days=date.today().weekday()),
@@ -3341,7 +3341,7 @@ def joining_week_count(request):
 def leave_today_count(request):
     leave_today = 0
     if apps.is_installed("leave"):
-        LeaveRequest = get_horilla_model_class(app_label="leave", model="leaverequest")
+        LeaveRequest = get_candour_model_class(app_label="leave", model="leaverequest")
         leave_today = LeaveRequest.objects.filter(
             Q(start_date__lte=date.today(), end_date__gte=date.today()),
             status="approved",
@@ -3509,7 +3509,7 @@ def note_tab(request, pk):
     employee_obj = Employee.objects.filter(id=pk).first()
     if not employee_obj:
         messages.error(request, _("Employee not found."))
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
     notes = EmployeeNote.objects.filter(employee_id=pk).order_by("-id")
     notes = paginator_qry(notes, request.GET.get("page"))
 
@@ -3541,13 +3541,13 @@ def employee_history_sidebar(request, pk):
     Same activity-history feed as the profile page's History tab, wrapped
     with the #historySidebar's own header chrome (close chevron + title) --
     for opening it directly from the employee list's History column, the
-    same way HorillaModel-based lists open their auto-added History column
-    (see generic/history_col.html / horilla_history_view.html).
+    same way CandourModel-based lists open their auto-added History column
+    (see generic/history_col.html / candour_history_view.html).
     """
     employee_obj = Employee.objects.filter(id=pk).first()
     if not employee_obj:
         messages.error(request, _("Employee not found."))
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
     return render(
         request,
         "employee/history_sidebar.html",
@@ -3567,7 +3567,7 @@ def add_note(request, emp_id=None):
     employee_obj = Employee.objects.filter(id=emp_id).first()
     if not employee_obj:
         messages.error(request, _("Employee not found."))
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
 
     form = EmployeeNoteForm(initial={"employee_id": emp_id})
     if request.method == "POST":
@@ -3606,7 +3606,7 @@ def employee_note_update(request, note_id):
 
     note = EmployeeNote.find(note_id)
     if not note:
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("No Employee Note found matching the query.")
         )
 
@@ -3621,7 +3621,7 @@ def employee_note_update(request, note_id):
                 "tabs/update_note.html",
                 {"form": form},
             )
-            return HorillaRedirect(request)
+            return CandourRedirect(request)
     return render(
         request,
         "tabs/update_note.html",
@@ -3642,7 +3642,7 @@ def employee_note_delete(request, note_id):
 
     note = EmployeeNote.find(note_id)
     if not note:
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("No Employee Note found matching the query.")
         )
 
@@ -3664,7 +3664,7 @@ def add_more_employee_files(request, note_id):
     note = EmployeeNote.objects.filter(id=note_id).first()
     if not note:
         messages.error(request, _("Note not found."))
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
     employee_id = note.employee_id.id
 
     if request.method == "POST":
@@ -3710,7 +3710,7 @@ def _bonus_points_context(employee_obj, page_number):
     try:
         points = BonusPoint.objects.get(employee_id=employee_obj.id)
         if apps.is_installed("payroll"):
-            Reimbursement = get_horilla_model_class(
+            Reimbursement = get_candour_model_class(
                 app_label="payroll", model="reimbursement"
             )
             requested_bonus_points = Reimbursement.objects.filter(
@@ -3729,7 +3729,7 @@ def _bonus_points_context(employee_obj, page_number):
                     "date": history["pair"][0].history_date,
                     "points": history["pair"][0].points - history["pair"][1].points,
                     "user": getattr(
-                        HorillaUser.objects.filter(
+                        CandourUser.objects.filter(
                             id=history["pair"][0].history_user_id
                         ).first(),
                         "employee_get",
@@ -3778,7 +3778,7 @@ def bonus_points_tab(request, pk):
     employee_obj = Employee.objects.filter(id=pk).first()
     if not employee_obj:
         messages.error(request, _("Employee not found."))
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
     context = {
         "employee": employee_obj,
         **_bonus_points_context(employee_obj, request.GET.get("page")),
@@ -3808,7 +3808,7 @@ def bonus_points_history_tab(request, pk):
     employee_obj = Employee.objects.filter(id=pk).first()
     if not employee_obj:
         messages.error(request, _("Employee not found."))
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
     context = {
         "employee": employee_obj,
         **_bonus_points_context(employee_obj, request.GET.get("page")),
@@ -3835,7 +3835,7 @@ def add_bonus_points(request, emp_id):
 
     bonus_point = BonusPoint.find(emp_id)
     if not bonus_point:
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("No Bonus Point found matching the query.")
         )
 
@@ -3856,7 +3856,7 @@ def add_bonus_points(request, emp_id):
                     form.cleaned_data["points"]
                 ),
             )
-            return HorillaRedirect(request)
+            return CandourRedirect(request)
 
     return render(
         request,
@@ -3883,7 +3883,7 @@ def redeem_points(request, emp_id):
     try:
         employee = Employee.objects.get(id=emp_id)
     except Employee.DoesNotExist:
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("No Employee found matching the query.")
         )
 
@@ -3897,7 +3897,7 @@ def redeem_points(request, emp_id):
 
     amount_for_bonus_point = 0
     if apps.is_installed("payroll"):
-        EncashmentGeneralSettings = get_horilla_model_class(
+        EncashmentGeneralSettings = get_candour_model_class(
             app_label="payroll", model="encashmentgeneralsettings"
         )
         amount_for_bonus_point = (
@@ -3913,7 +3913,7 @@ def redeem_points(request, emp_id):
             points = form.cleaned_data["points"]
             amount = amount_for_bonus_point * points
             if apps.is_installed("payroll"):
-                Reimbursement = get_horilla_model_class(
+                Reimbursement = get_candour_model_class(
                     app_label="payroll", model="reimbursement"
                 )
                 Reimbursement.objects.create(
@@ -3925,7 +3925,7 @@ def redeem_points(request, emp_id):
                     description=f"{employee} want to redeem {points} points",
                     allowance_on=date.today(),
                 )
-            return HorillaRedirect(request)
+            return CandourRedirect(request)
     return render(
         request,
         "tabs/forms/redeem_points_form.html",
@@ -4118,7 +4118,7 @@ def encashment_condition_create(request):
     if apps.is_installed("payroll"):
         from payroll.forms.forms import EncashmentGeneralSettingsForm
 
-        EncashmentGeneralSettings = get_horilla_model_class(
+        EncashmentGeneralSettings = get_candour_model_class(
             app_label="payroll", model="encashmentgeneralsettings"
         )
         instance = (
@@ -4136,7 +4136,7 @@ def encashment_condition_create(request):
                 messages.success(request, _("Settings updated."))
                 if request.headers.get("HX-Request"):
                     return HttpResponse("")
-                return HorillaRedirect(request)
+                return CandourRedirect(request)
         else:
             encashment_form = EncashmentGeneralSettingsForm(instance=instance)
 
@@ -4149,7 +4149,7 @@ def encashment_condition_create(request):
     messages.warning(request, _("Payroll app not installed"))
     if request.headers.get("HX-Request"):
         return HttpResponse("", status=400)
-    return HorillaRedirect(request)
+    return CandourRedirect(request)
 
 
 @login_required
@@ -4164,7 +4164,7 @@ def toggle_leave_encashment(request):
     if not apps.is_installed("payroll"):
         return HttpResponse("", status=400)
 
-    EncashmentGeneralSettings = get_horilla_model_class(
+    EncashmentGeneralSettings = get_candour_model_class(
         app_label="payroll", model="encashmentgeneralsettings"
     )
     instance = EncashmentGeneralSettings.objects.first()
@@ -4193,7 +4193,7 @@ def toggle_encashment_apply_to_all(request):
     if not apps.is_installed("payroll"):
         return HttpResponse("", status=400)
 
-    EncashmentGeneralSettings = get_horilla_model_class(
+    EncashmentGeneralSettings = get_candour_model_class(
         app_label="payroll", model="encashmentgeneralsettings"
     )
     instance = EncashmentGeneralSettings.objects.first()
@@ -4224,7 +4224,7 @@ def encashment_eligibility_settings(request):
 
     from payroll.forms.forms import EncashmentEligibilityForm
 
-    EncashmentGeneralSettings = get_horilla_model_class(
+    EncashmentGeneralSettings = get_candour_model_class(
         app_label="payroll", model="encashmentgeneralsettings"
     )
     instance = EncashmentGeneralSettings.objects.first()
@@ -4265,7 +4265,7 @@ def initial_prefix(request):
             messages.success(request, _("Initial prefix updated successfully."))
             if request.headers.get("HX-Request"):
                 return HttpResponse("")
-            return HorillaRedirect(request)
+            return CandourRedirect(request)
         else:
             messages.error(request, _("There was an error updating the prefix."))
     else:
@@ -4273,7 +4273,7 @@ def initial_prefix(request):
 
     if request.headers.get("HX-Request"):
         return HttpResponse("", status=400)
-    return HorillaRedirect(request)
+    return CandourRedirect(request)
 
 
 @login_required
@@ -4302,7 +4302,7 @@ def employee_get_mail_log(request, pk=None):
     employee = Employee.objects.filter(id=pk).first() if pk else None
     if not employee:
         messages.error(request, _("Employee not found."))
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
     tracked_mails = EmailLog.objects.filter(to__icontains=employee.email)
     try:
         if employee.employee_work_info and employee.employee_work_info.email:
@@ -4509,7 +4509,7 @@ def employee_tag_update(request, tag_id):
     tag = EmployeeTag.objects.filter(id=tag_id).first()
     if not tag:
         messages.error(request, _("Tag not found."))
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
     form = EmployeeTagForm(instance=tag)
     if request.method == "POST":
         form = EmployeeTagForm(request.POST, instance=tag)
@@ -4517,7 +4517,7 @@ def employee_tag_update(request, tag_id):
             form.save()
             form = EmployeeTagForm()
             messages.success(request, _("Tag has been updated successfully!"))
-            return HorillaRedirect(request)
+            return CandourRedirect(request)
     return render(
         request,
         "base/employee_tag/employee_tag_form.html",

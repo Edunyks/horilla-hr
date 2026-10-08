@@ -13,8 +13,8 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from base.models import Company
-from horilla.testkit import make_employee
-from horilla_auth.models import HorillaUser
+from candour.testkit import make_employee
+from candour_auth.models import CandourUser
 
 AXES_LIMIT = 3
 
@@ -32,10 +32,10 @@ class LoginLockoutTests(TestCase):
         _reset_axes()
         self.addCleanup(_reset_axes)
         company = Company.objects.create(company="Acme", hq=True)
-        self.user = HorillaUser.objects.create_user(
-            username="alice", email="alice@test.horilla", password="correct-horse"
+        self.user = CandourUser.objects.create_user(
+            username="alice", email="alice@test.candour", password="correct-horse"
         )
-        make_employee(company=company, email="alice@test.horilla", user=self.user)
+        make_employee(company=company, email="alice@test.candour", user=self.user)
 
     def _attempt(self, password):
         return self.client.post(
@@ -83,10 +83,10 @@ class LoginDoesNotLeakAccountExistenceTests(TestCase):
         _reset_axes()
         self.addCleanup(_reset_axes)
         company = Company.objects.create(company="Acme", hq=True)
-        blocked = HorillaUser.objects.create_user(
-            username="blocked", email="blocked@test.horilla", password="pw-not-real"
+        blocked = CandourUser.objects.create_user(
+            username="blocked", email="blocked@test.candour", password="pw-not-real"
         )
-        make_employee(company=company, email="blocked@test.horilla", user=blocked)
+        make_employee(company=company, email="blocked@test.candour", user=blocked)
         blocked.is_active = False
         blocked.save(update_fields=["is_active"])
 

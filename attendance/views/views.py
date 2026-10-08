@@ -14,8 +14,8 @@ provide the main entry points for interacting with the application's functionali
 import logging
 import uuid
 
-from horilla.http.response import HorillaRedirect
-from horilla.methods import remove_dynamic_url
+from candour.http.response import CandourRedirect
+from candour.methods import remove_dynamic_url
 
 logger = logging.getLogger(__name__)
 
@@ -122,7 +122,7 @@ from base.models import (
 )
 from employee.filters import EmployeeFilter
 from employee.models import Employee, EmployeeWorkInformation
-from horilla.decorators import (
+from candour.decorators import (
     hx_request_required,
     install_required,
     login_required,
@@ -233,7 +233,7 @@ def attendance_create(request):
         if form.is_valid():
             form.save()
             messages.success(request, _("Attendance added."))
-            return HorillaRedirect(request)
+            return CandourRedirect(request)
     return render(request, "attendance/attendance/form.html", {"form": form})
 
 
@@ -453,7 +453,7 @@ def attendance_update(request, obj_id):
             messages.success(request, _("Attendance Updated."))
             urlencode = request.GET.urlencode()
             modified_url = f"/attendance/attendance-view/?{urlencode}"
-            return HorillaRedirect(request)
+            return CandourRedirect(request)
     return render(
         request,
         "attendance/attendance/update_form.html",
@@ -472,7 +472,7 @@ def attendance_view_redirect(request):
             {"reloadAttendanceView": True, "showMessages": True}
         )
         return response
-    return HorillaRedirect(request)
+    return CandourRedirect(request)
 
 
 @login_required
@@ -632,7 +632,7 @@ def attendance_overtime_create(request):
         if form.is_valid():
             form.save()
             messages.success(request, _("Attendance account added."))
-            return HorillaRedirect(request)
+            return CandourRedirect(request)
     return render(request, "attendance/attendance_account/form.html", {"form": form})
 
 
@@ -711,7 +711,7 @@ def attendance_overtime_update(request, obj_id):
         if form.is_valid():
             form.save()
             messages.success(request, _("Attendance account updated successfully."))
-            return HorillaRedirect(request)
+            return CandourRedirect(request)
     return render(
         request, "attendance/attendance_account/update_form.html", {"form": form}
     )
@@ -756,12 +756,12 @@ def attendance_overtime_delete(request, obj_id):
                     f"/attendance/attendance-overtime-individual-tab/{employee_id}/?deleted=true"
                 )
             else:
-                return HorillaRedirect(request)
+                return CandourRedirect(request)
         else:
-            return HorillaRedirect(request)
+            return CandourRedirect(request)
     elif hx_target:
         return HttpResponse()
-    return HorillaRedirect(request)
+    return CandourRedirect(request)
 
 
 @login_required
@@ -1399,7 +1399,7 @@ def validate_bulk_attendance(request):
             attendance.attendance_validated = True
             # Recalculate worked hours from attendance activities before validation
             # to ensure Hours Account reflects actual worked time.
-            # Fixes: https://github.com/horilla/horilla-hr/issues/1055
+            # Fixes: https://github.com/candour/candour-hr/issues/1055
             if (
                 not attendance.attendance_worked_hour
                 or attendance.attendance_worked_hour == "00:00"
@@ -1458,7 +1458,7 @@ def validate_this_attendance(request, obj_id):
         attendance.attendance_validated = True
         # Recalculate worked hours from attendance activities before validation
         # to ensure Hours Account reflects actual worked time.
-        # Fixes: https://github.com/horilla/horilla-hr/issues/1055
+        # Fixes: https://github.com/candour/candour-hr/issues/1055
         if (
             not attendance.attendance_worked_hour
             or attendance.attendance_worked_hour == "00:00"
@@ -1505,7 +1505,7 @@ def revalidate_this_attendance(request, obj_id):
 
     attendance = Attendance.find(obj_id)
     if not attendance:
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("No Attendance found matching the query.")
         )
 
@@ -1528,7 +1528,7 @@ def revalidate_this_attendance(request, obj_id):
                 redirect=reverse("view-my-attendance") + f"?id={attendance.id}",
                 icon="refresh",
             )
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
     return HttpResponse("You Cannot Request for others attendance")
 
 
@@ -1630,7 +1630,7 @@ def attendance_add_to_batch(request):
         ids = request.GET.get("ids")
         if not ids:
             messages.error(request, _("Something went wrong."))
-            return HorillaRedirect(request)
+            return CandourRedirect(request)
         # Remove brackets and quotes, then split and convert to integers
         int_ids = [int(x.strip().strip("'")) for x in ids.strip("[]").split(",")]
         batch_id = request.POST.get("batch_attendance_id")
@@ -1644,12 +1644,12 @@ def attendance_add_to_batch(request):
                 except Exception as e:
                     logger.error(e)
                     messages.error(request, _("Something went wrong."))
-                    return HorillaRedirect(request)
+                    return CandourRedirect(request)
             messages.success(request, _(f"Attendances added to {batch}."))
-            return HorillaRedirect(request)
+            return CandourRedirect(request)
         else:
             messages.error(request, _("Something went wrong."))
-            return HorillaRedirect(request)
+            return CandourRedirect(request)
     return render(
         request,
         "attendance/attendance/attendance_add_batch.html",
@@ -1850,7 +1850,7 @@ def user_request_one_view(request, id):
     """
     attendance_request = Attendance.find(id)
     if not attendance_request:
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("No Attendance found matching the query.")
         )
 
@@ -2106,7 +2106,7 @@ def create_grace_time(request):
                 shift.grace_time_id = gracetime
                 shift.save()
             messages.success(request, _("Grace time created successfully."))
-            return HorillaRedirect(request)
+            return CandourRedirect(request)
     return render(
         request,
         "attendance/grace_time/grace_time_form.html",
@@ -2131,14 +2131,14 @@ def assign_shift(request, grace_id):
                     shift.grace_time_id = gracetime
                     shift.save()
                 messages.success(request, _("Grace time added to shifts successfully."))
-                return HorillaRedirect(request)
+                return CandourRedirect(request)
         return render(
             request,
             "attendance/grace_time/assign_shift.html",
             {"form": form, "grace_time": gracetime},
         )
     messages.error(request, _("Grace time not found."))
-    return HorillaRedirect(request)
+    return CandourRedirect(request)
 
 
 @login_required
@@ -2164,7 +2164,7 @@ def update_grace_time(request, grace_id):
             instance = form.save(commit=False)
             instance.save()
             messages.success(request, _("Grace time updated successfully."))
-            return HorillaRedirect(request)
+            return CandourRedirect(request)
     context = {
         "form": form,
         "grace_id": grace_id,
@@ -2197,7 +2197,7 @@ def delete_grace_time(request, grace_id):
     except GraceTime.DoesNotExist:
         delete_error = True
         messages.error(request, _("Grace time does not exist."))
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
     except ProtectedError:
         delete_error = True
         messages.error(request, _("Related datas exists."))
@@ -2300,7 +2300,7 @@ def create_attendancerequest_comment(request, attendance_id):
     previous_data = request.GET.urlencode()
     attendance = Attendance.objects.filter(id=attendance_id).first()
     if not attendance:
-        return HorillaRedirect(request, message=_("Attendance not found."))
+        return CandourRedirect(request, message=_("Attendance not found."))
 
     emp = request.user.employee_get
     form = AttendanceRequestCommentForm(
@@ -2449,7 +2449,7 @@ def delete_attendancerequest_comment(request, comment_id):
     """
     comment = AttendanceRequestComment.find(comment_id)
     if not comment:
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("No Comment found matching the query.")
         )
 
@@ -2471,7 +2471,7 @@ def delete_attendancerequest_comment(request, comment_id):
         employee_id__employee_user_id=request.user,
     )
     if not authorized_requests.exists():
-        return HorillaRedirect(
+        return CandourRedirect(
             request,
             message=_("You don't have permission to delete this comment."),
         )
@@ -2820,7 +2820,7 @@ def work_record_export(request):
         record_lookup[record_key] = record.work_record_type
 
     date_format = request.user.employee_get.get_date_format()
-    format_string = settings.HORILLA_DATE_FORMATS.get(date_format)
+    format_string = settings.CANDOUR_DATE_FORMATS.get(date_format)
     formatted_dates = [day.strftime(format_string) for day in all_date_objects]
     data_rows = []
 
@@ -3097,7 +3097,7 @@ def enable_disable_tracking_late_come_early_out(request):
         messages.success(
             request, _("Tracking late come early out {} successfully").format(message)
         )
-    return HorillaRedirect(request)
+    return CandourRedirect(request)
 
 
 @login_required
@@ -3270,7 +3270,7 @@ def enable_ip_restriction(request):
     is_enabled = True if request.POST.get("is_enabled") == "on" else False
     obj.is_enabled = is_enabled
     obj.save()
-    return HorillaRedirect(request)
+    return CandourRedirect(request)
 
 
 @login_required
@@ -3370,7 +3370,7 @@ def create_allowed_ips(request):
                     request,
                     _("All provided IP addresses are already in the allowed list."),
                 )
-            return HorillaRedirect(request)
+            return CandourRedirect(request)
     else:
         form = AttendanceAllowedIPForm()
 
@@ -3437,7 +3437,7 @@ def edit_allowed_ips(request):
                     obj.additional_data["allowed_ips"] = list(existing_ips)
                     obj.save()
                     messages.success(request, _("IP address updated successfully"))
-                return HorillaRedirect(request)
+                return CandourRedirect(request)
 
     except (ValueError, IndexError):
         messages.error(request, _("Invalid ID provided."))

@@ -5,14 +5,14 @@ from django.urls import reverse
 
 from base.models import Company
 from helpdesk.models import FAQ, FAQCategory
-from horilla.testkit import make_employee, make_user
+from candour.testkit import make_employee, make_user
 
 
 class FAQViewEscapesQuestionsTests(TestCase):
     def setUp(self):
         company = Company.objects.create(company="Acme", hq=True)
         user = make_user("emp", password="pw-not-real")
-        make_employee(company=company, email="emp@test.horilla", user=user)
+        make_employee(company=company, email="emp@test.candour", user=user)
         self.client.force_login(user)
         category = FAQCategory.objects.create(title="General", description="d")
         FAQ.objects.create(

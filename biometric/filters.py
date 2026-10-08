@@ -10,10 +10,10 @@ import django_filters
 
 from base.filters import FilterSet
 from biometric.models import BiometricDevices
-from horilla.filters import HorillaFilterSet
+from candour.filters import CandourFilterSet
 
 
-class BiometricDeviceFilter(HorillaFilterSet):
+class BiometricDeviceFilter(CandourFilterSet):
     """
     Filter class for querying biometric devices.
 

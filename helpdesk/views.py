@@ -63,16 +63,16 @@ from helpdesk.models import (
     TicketType,
 )
 from helpdesk.threading import AddAssigneeThread, RemoveAssigneeThread, TicketSendThread
-from horilla.decorators import (
+from candour.decorators import (
     hx_request_required,
     login_required,
     manager_can_enter,
     owner_can_enter,
     permission_required,
 )
-from horilla.group_by import group_by_queryset
-from horilla.http.response import HorillaRedirect
-from horilla.methods import handle_no_permission
+from candour.group_by import group_by_queryset
+from candour.http.response import CandourRedirect
+from candour.methods import handle_no_permission
 from notifications.signals import notify
 
 BLOCKED_EXTENSIONS = {
@@ -190,7 +190,7 @@ def faq_category_delete(request, id):
     except ProtectedError:
         message = _("You cannot delete this FAQ category.")
 
-    return HorillaRedirect(request, message=message)
+    return CandourRedirect(request, message=message)
 
 
 @login_required
@@ -419,7 +419,7 @@ def faq_delete(request, id):
     except ProtectedError:
         message = _("You cannot delete this FAQ.")
 
-    return HorillaRedirect(request, message=message)
+    return CandourRedirect(request, message=message)
 
 
 @login_required
@@ -533,7 +533,7 @@ def ticket_create(request):
                 icon="infinite",
                 redirect=reverse("ticket-detail", kwargs={"ticket_id": ticket.id}),
             )
-            return HorillaRedirect(request)
+            return CandourRedirect(request)
     context = {
         "form": form,
         "t_type_form": TicketTypeForm(),
@@ -572,7 +572,7 @@ def ticket_update(request, ticket_id):
                     attachment_instance = Attachment(file=attachment, ticket=ticket)
                     attachment_instance.save()
                 messages.success(request, _("The Ticket updated successfully."))
-                return HorillaRedirect(request)
+                return CandourRedirect(request)
         context = {
             "form": form,
             "ticket_id": ticket_id,
@@ -597,7 +597,7 @@ def ticket_archive(request, ticket_id):
 
     ticket = Ticket.find(ticket_id)
     if not ticket:
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("No Ticket found matching the query.")
         )
 
@@ -619,7 +619,7 @@ def ticket_archive(request, ticket_id):
         )
         messages.success(request, messsage)
 
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
     return handle_no_permission(request)
 
 
@@ -789,7 +789,7 @@ def ticket_delete(request, ticket_id):
             messages.error(request, _('The ticket is not in the "New" status'))
     except ProtectedError:
         messages.error(request, _("You cannot delete this Ticket."))
-    return HorillaRedirect(request)
+    return CandourRedirect(request)
 
 
 def get_allocated_tickets(request):
@@ -923,7 +923,7 @@ def ticket_filter(request):
 def ticket_detail(request, ticket_id, **kwargs):
     ticket = Ticket.find(ticket_id)
     if not ticket:
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("No Ticket found matching the query.")
         )
 
@@ -1005,7 +1005,7 @@ def ticket_detail(request, ticket_id, **kwargs):
 def ticket_individual_view(request, ticket_id):
     ticket = Ticket.find(ticket_id)
     if not ticket:
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("No Ticket found matching the query.")
         )
 
@@ -1021,7 +1021,7 @@ def ticket_individual_view(request, ticket_id):
 def view_ticket_claim_request(request, ticket_id):
     ticket = Ticket.find(ticket_id)
     if not ticket:
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("No Ticket found matching the query.")
         )
 
@@ -1048,7 +1048,7 @@ def ticket_update_tag(request):
     data = request.GET
     ticket = Ticket.find(data.get("ticketId"))
     if not ticket:
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("No Ticket found matching the query.")
         )
 
@@ -1137,7 +1137,7 @@ def ticket_change_assignees(request, ticket_id):
                 mail_thread.start()
 
                 messages.success(request, _("Assinees updated for the Ticket"))
-                return HorillaRedirect(request)
+                return CandourRedirect(request)
 
         return render(
             request,
@@ -1233,7 +1233,7 @@ def view_ticket_document(request, doc_id):
 
     document_obj = Attachment.find(doc_id)
     if document_obj is None:
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("No Attachment found matching the query.")
         )
 
@@ -1241,7 +1241,7 @@ def view_ticket_document(request, doc_id):
         document_obj.comment.ticket if document_obj.comment else None
     )
     if not can_access_ticket(request, ticket):
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("You do not have permission to view the documents.")
         )
 
@@ -1280,7 +1280,7 @@ def delete_ticket_document(request, doc_id):
     """
     document_obj = Attachment.find(doc_id)
     if document_obj is None:
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("No Attachment found matching the query.")
         )
 
@@ -1288,13 +1288,13 @@ def delete_ticket_document(request, doc_id):
         document_obj.comment.ticket if document_obj.comment else None
     )
     if not can_access_ticket(request, ticket):
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("You do not have permission to delete the documents.")
         )
 
     document_obj.delete()
     messages.success(request, _("Document has been deleted."))
-    return HorillaRedirect(request)
+    return CandourRedirect(request)
 
 
 @login_required
@@ -1397,7 +1397,7 @@ def comment_edit(request):
 def comment_delete(request, comment_id):
     comment = Comment.find(comment_id)
     if not comment:
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("No Comment found matching the query.")
         )
 
@@ -1406,7 +1406,7 @@ def comment_delete(request, comment_id):
     messages.success(
         request, _("{}'s comment has been deleted successfully.").format(employee)
     )
-    return HorillaRedirect(request)
+    return CandourRedirect(request)
 
 
 @login_required
@@ -1452,7 +1452,7 @@ def claim_ticket(request, id):
     """
     ticket = Ticket.find(id)
     if not ticket:
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("No Ticket found matching the query.")
         )
 
@@ -1486,7 +1486,7 @@ def claim_ticket(request, id):
             except Exception as e:
                 logger.error(e)
         messages.success(request, _("Ticket claimed successfully."))
-    return HorillaRedirect(request)
+    return CandourRedirect(request)
 
 
 @login_required
@@ -1731,7 +1731,7 @@ def create_department_manager(request):
             form.save()
             messages.success(request, _("The department manager created successfully."))
 
-            return HorillaRedirect(request)
+            return CandourRedirect(request)
     context = {
         "form": form,
     }
@@ -1751,7 +1751,7 @@ def update_department_manager(request, dep_id):
         if form.is_valid():
             form.save()
             messages.success(request, _("The department manager updated successfully."))
-            return HorillaRedirect(request)
+            return CandourRedirect(request)
     context = {
         "form": form,
         "dep_id": dep_id,
@@ -1764,7 +1764,7 @@ def update_department_manager(request, dep_id):
 def delete_department_manager(request, dep_id):
     department_manager = DepartmentManager.find(dep_id)
     if not department_manager:
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("No Department Manager found matching the query.")
         )
 
@@ -1791,7 +1791,7 @@ def update_priority(request, ticket_id):
         messages.error(
             request,
         )
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("No Ticket found matching the query.")
         )
 
@@ -1812,7 +1812,7 @@ def update_priority(request, ticket_id):
             ticket.priority = "high"
         ticket.save()
         messages.success(request, _("Priority updated successfully."))
-        return HorillaRedirect(request)
+        return CandourRedirect(request)
     return handle_no_permission(request)
 
 
@@ -1854,7 +1854,7 @@ def ticket_type_create(request):
             form.save()
             form = TicketTypeForm()
             messages.success(request, _("Ticket type has been created successfully!"))
-            return HorillaRedirect(request)
+            return CandourRedirect(request)
     return render(
         request,
         "base/ticket_type/ticket_type_form.html",
@@ -1881,7 +1881,7 @@ def ticket_type_update(request, t_type_id):
             form.save()
             form = TicketTypeForm()
             messages.success(request, _("Ticket type has been updated successfully!"))
-            return HorillaRedirect(request)
+            return CandourRedirect(request)
     return render(
         request,
         "base/ticket_type/ticket_type_form.html",
@@ -2086,7 +2086,7 @@ def ticket_file_upload(request, id):
     """
     ticket = Ticket.find(id)
     if not ticket:
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("No Ticket found matching the query.")
         )
 

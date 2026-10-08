@@ -44,13 +44,13 @@ from base.methods import (
 )
 from base.models import EmployeeShift, EmployeeShiftDay
 from employee.models import Employee
-from horilla.decorators import (
+from candour.decorators import (
     hx_request_required,
     login_required,
     manager_can_enter,
     permission_required,
 )
-from horilla.http.response import HorillaRedirect
+from candour.http.response import CandourRedirect
 from notifications.signals import notify
 
 
@@ -171,7 +171,7 @@ def request_new(request):
             if form.is_valid():
                 instance = form.save(commit=False)
                 messages.success(request, _("Attendance request created"))
-                return HorillaRedirect(request)
+                return CandourRedirect(request)
         return render(
             request,
             "requests/attendance/request_new_form.html",
@@ -204,9 +204,9 @@ def request_new(request):
             if form.new_instance is not None:
                 form.new_instance.save()
                 messages.success(request, _("New attendance request created"))
-                return HorillaRedirect(request)
+                return CandourRedirect(request)
             messages.success(request, _("Update request updated"))
-            return HorillaRedirect(request)
+            return CandourRedirect(request)
     return render(
         request,
         "requests/attendance/request_new_form.html",
@@ -314,7 +314,7 @@ def attendance_request_changes(request, attendance_id):
     """
     attendance = Attendance.find(attendance_id)
     if not attendance:
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("No Attendance found matching the query.")
         )
 
@@ -390,7 +390,7 @@ def attendance_request_changes(request, attendance_id):
                     + f"?id={attendance.id}",
                     icon="checkmark-circle-outline",
                 )
-            return HorillaRedirect(request)
+            return CandourRedirect(request)
     return render(
         request,
         "requests/attendance/form.html",
@@ -407,7 +407,7 @@ def validate_attendance_request(request, attendance_id):
     """
     attendance = Attendance.find(attendance_id)
     if not attendance:
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("No Attendance found matching the query.")
         )
 
@@ -462,7 +462,7 @@ def approve_validate_attendance_request(request, attendance_id):
     """
     attendance = Attendance.find(attendance_id)
     if not attendance:
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("No Attendance found matching the query.")
         )
 
@@ -578,7 +578,7 @@ def approve_validate_attendance_request(request, attendance_id):
             </script>
             """
         )
-    return HorillaRedirect(request)
+    return CandourRedirect(request)
 
 
 @login_required
@@ -638,7 +638,7 @@ def cancel_attendance_request(request, attendance_id):
             </script>
             """
         )
-    return HorillaRedirect(request)
+    return CandourRedirect(request)
 
 
 @login_required
@@ -853,7 +853,7 @@ def edit_validate_attendance(request, attendance_id):
     """
     attendance = Attendance.find(attendance_id)
     if not attendance:
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("No Attendance found matching the query.")
         )
 

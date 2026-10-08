@@ -13,13 +13,13 @@ from django.utils.translation import gettext_lazy as _
 from asset.filters import AssetBatchNoFilter
 from asset.forms import AssetBatchForm
 from asset.models import AssetLot
-from horilla.http.response import HorillaRedirect
-from horilla_views.cbv_methods import login_required, permission_required
-from horilla_views.generic.cbv.views import (
-    HorillaDetailedView,
-    HorillaFormView,
-    HorillaListView,
-    HorillaNavView,
+from candour.http.response import CandourRedirect
+from candour_views.cbv_methods import login_required, permission_required
+from candour_views.generic.cbv.views import (
+    CandourDetailedView,
+    CandourFormView,
+    CandourListView,
+    CandourNavView,
     TemplateView,
 )
 
@@ -36,7 +36,7 @@ class AssetBatchNoView(TemplateView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("asset.view_assetlot"), name="dispatch")
-class AssetBatchNoListView(HorillaListView):
+class AssetBatchNoListView(CandourListView):
     """
     list view for batch number
     """
@@ -68,7 +68,7 @@ class AssetBatchNoListView(HorillaListView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("asset.view_assetlot"), name="dispatch")
-class AssetBatchNoNav(HorillaNavView):
+class AssetBatchNoNav(CandourNavView):
     """
     Nav bar
     """
@@ -92,7 +92,7 @@ class AssetBatchNoNav(HorillaNavView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("asset.add_assetlot"), name="dispatch")
-class AssetBatchCreateFormView(HorillaFormView):
+class AssetBatchCreateFormView(CandourFormView):
     """
     form view for create batch number
     """
@@ -105,7 +105,7 @@ class AssetBatchCreateFormView(HorillaFormView):
         pk = kwargs.get("pk")
         if pk and not AssetLot.objects.filter(id=pk).exists():
             messages.error(request, _("Batch number not found."))
-            return HorillaRedirect(request)
+            return CandourRedirect(request)
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -139,7 +139,7 @@ class DynamicCreateBatchNo(AssetBatchCreateFormView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("asset.view_assetlot"), name="dispatch")
-class AssetBatchDetailView(HorillaDetailedView):
+class AssetBatchDetailView(CandourDetailedView):
     """
     detail view of the page
     """

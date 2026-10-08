@@ -19,7 +19,7 @@ from datetime import date, timedelta
 
 from django.test import TestCase
 
-from horilla.testkit import make_company, make_employee
+from candour.testkit import make_company, make_employee
 from pms.models import EmployeeKeyResult, EmployeeObjective, KeyResult, Objective
 
 
@@ -27,7 +27,7 @@ class ProgressCalculationTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         company = make_company("OKR Test Co")
-        cls.employee = make_employee(company=company, email="okr@test.horilla")
+        cls.employee = make_employee(company=company, email="okr@test.candour")
         cls.objective = Objective.objects.create(
             title="Ship the thing",
             description="An objective",

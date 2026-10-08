@@ -13,13 +13,13 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 
 from base.models import IntegrationApps
-from horilla.decorators import hx_request_required
-from horilla_views.cbv_methods import login_required, permission_required
-from horilla_views.generic.cbv.views import (
-    HorillaDetailedView,
-    HorillaFormView,
-    HorillaListView,
-    HorillaNavView,
+from candour.decorators import hx_request_required
+from candour_views.cbv_methods import login_required, permission_required
+from candour_views.generic.cbv.views import (
+    CandourDetailedView,
+    CandourFormView,
+    CandourListView,
+    CandourNavView,
     TemplateView,
 )
 from recruitment.filters import RecruitmentFilter
@@ -44,7 +44,7 @@ class RecruitmentView(TemplateView):
 @method_decorator(
     permission_required(perm="recruitment.view_recruitment"), name="dispatch"
 )
-class RecruitmentList(HorillaListView):
+class RecruitmentList(CandourListView):
     """
     List view of recruitment
     """
@@ -152,7 +152,7 @@ class RecruitmentList(HorillaListView):
 @method_decorator(
     permission_required(perm="recruitment.view_recruitment"), name="dispatch"
 )
-class RecruitmentNav(HorillaNavView):
+class RecruitmentNav(CandourNavView):
     """
     For nav bar
     """
@@ -177,7 +177,7 @@ class RecruitmentNav(HorillaNavView):
     filter_form_context_name = "form"
     search_swap_target = "#listContainer"
     filter_body_template = "cbv/recruitment/filters.html"
-    # Modern slide-over filter panel (generic/horilla_nav.html's own
+    # Modern slide-over filter panel (generic/candour_nav.html's own
     # {% if modern_filter %} branch) -- same treatment as every other
     # panel this session. RecruitmentFilter.ajax_fields (Managers,
     # Company) already exists from the Pipeline panel work.
@@ -265,7 +265,7 @@ class RecruitmentCreationFormExtended(RecruitmentCreationForm):
 
 
 @method_decorator(login_required, name="dispatch")
-class RecruitmentNewSkillForm(HorillaFormView):
+class RecruitmentNewSkillForm(CandourFormView):
     """
     form view for add new skill
     """
@@ -288,7 +288,7 @@ class RecruitmentNewSkillForm(HorillaFormView):
 @method_decorator(
     permission_required(perm="recruitment.view_recruitment"), name="dispatch"
 )
-class RecruitmentForm(HorillaFormView):
+class RecruitmentForm(CandourFormView):
     """
     Form View
     """
@@ -367,7 +367,7 @@ class RecruitmentForm(HorillaFormView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(hx_request_required, name="dispatch")
-class AddCandidateFormView(HorillaFormView):
+class AddCandidateFormView(CandourFormView):
     """
     form view for add candidate
     """
@@ -406,7 +406,7 @@ class AddCandidateFormView(HorillaFormView):
 @method_decorator(
     permission_required(perm="recruitment.view_recruitment"), name="dispatch"
 )
-class RecruitmentFormDuplicate(HorillaFormView):
+class RecruitmentFormDuplicate(CandourFormView):
     """
     Duplicate form view
     """
@@ -458,7 +458,7 @@ class RecruitmentFormDuplicate(HorillaFormView):
 @method_decorator(
     permission_required(perm="recruitment.view_recruitment"), name="dispatch"
 )
-class RecruitmentDetailView(HorillaDetailedView):
+class RecruitmentDetailView(CandourDetailedView):
     """
     detail view of page
     """

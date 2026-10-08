@@ -12,7 +12,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils.translation import gettext_lazy as _
 
-from horilla.decorators import login_required
+from candour.decorators import login_required
 from project.cbv.cbv_decorators import is_projectmanager_or_member_or_perms
 
 PIPELINE_STAGES = (
@@ -147,7 +147,7 @@ def project_status_pipeline(request):
     from project.models import Project
 
     qs = Project.objects.filter(is_active=True)
-    # HorillaCompanyManager's get_queryset() applies .distinct() whenever the
+    # CandourCompanyManager's get_queryset() applies .distinct() whenever the
     # company OR-filter is active; chaining .values("status").annotate(Count())
     # on top of that collapses to one row per Project instead of one row per
     # status (Django groups by the queryset's already-selected columns, not

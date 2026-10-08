@@ -7,7 +7,7 @@ from datetime import date
 from django.test import RequestFactory, SimpleTestCase, TestCase
 from django.utils.datastructures import MultiValueDict
 
-from horilla.testkit.factories import make_company, make_employee
+from candour.testkit.factories import make_company, make_employee
 from report.engine import ReportFilters, month_bounds, month_offset, parse_period
 from report.export import export_csv, export_xlsx
 from report.pivot_limits import MAX_PIVOT_ROWS, capped_list
@@ -142,7 +142,7 @@ class RegistryTests(SimpleTestCase):
         from report.registry import get_report
 
         definition = get_report("document-expiry-aging")
-        self.assertIn("horilla_documents.view_document", definition.alt_permissions)
+        self.assertIn("candour_documents.view_document", definition.alt_permissions)
 
         class _User:
             is_authenticated = True
@@ -156,7 +156,7 @@ class RegistryTests(SimpleTestCase):
 
         # Granted on its own subject-matter permission ...
         self.assertTrue(
-            definition.user_has_permission(_User({"horilla_documents.view_document"}))
+            definition.user_has_permission(_User({"candour_documents.view_document"}))
         )
         # ... without revoking anyone who only holds the original one.
         self.assertTrue(
@@ -383,7 +383,7 @@ class ExportTests(SimpleTestCase):
                     "logo_path": None,
                 },
                 "user": "Admin",
-                "product_name": "Horilla HR · Standard Reports",
+                "product_name": "Candour HR · Standard Reports",
                 "filters_label": "This month · Active",
                 "slug": "workforce-composition",
                 "domain": "workforce",
@@ -634,7 +634,7 @@ class PdfExportTests(SimpleTestCase):
                         "logo_path": None,
                     },
                     "user": "Admin",
-                    "product_name": "Horilla HR · Standard Reports",
+                    "product_name": "Candour HR · Standard Reports",
                     "domain": "workforce",
                 },
             )
@@ -799,7 +799,7 @@ class SubscriptionDeliveryTests(SimpleTestCase):
         # Nothing starts at import now, so there is no argv to guard -- the job
         # is registered and run_scheduler owns execution.
         import report.scheduler  # noqa: F401
-        from horilla.scheduling import get_registered_jobs
+        from candour.scheduling import get_registered_jobs
 
         job = next(
             (j for j in get_registered_jobs() if j.job_id == "report_subscriptions"),

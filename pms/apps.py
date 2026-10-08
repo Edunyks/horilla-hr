@@ -20,14 +20,14 @@ class PmsConfig(AppConfig):
     def ready(self):
         from django.urls import include, path
 
-        from horilla.urls import urlpatterns
+        from candour.urls import urlpatterns
 
         settings.APPS.append("pms")
         urlpatterns.append(
             path("pms/", include("pms.urls")),
         )
 
-        from horilla_views.related_link_registry import register_detail_view
+        from candour_views.related_link_registry import register_detail_view
         from pms.models import QuestionTemplate
 
         register_detail_view(QuestionTemplate, get_url=QuestionTemplate.get_related_url)

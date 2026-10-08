@@ -22,7 +22,7 @@ from django.test import TestCase
 
 from base.models import Company, Department, JobPosition
 from employee.models import Employee
-from horilla_auth.models import HorillaUser
+from candour_auth.models import CandourUser
 from recruitment.models import Candidate, CandidateDocument, Recruitment
 from recruitment.views.views import candidate_documents_visible_to
 
@@ -116,13 +116,13 @@ class CandidateDocumentScopingTests(TestCase):
 
     def test_recruiter_permission_still_sees_every_document(self):
         """HR must keep working -- this is the half a naive fix breaks."""
-        user = HorillaUser.objects.create_user(
+        user = CandourUser.objects.create_user(
             username="recruiter", password="Test-Passw0rd!"
         )
         user.user_permissions.add(
             Permission.objects.get(codename="view_candidatedocument")
         )
-        user = HorillaUser.objects.get(pk=user.pk)  # refresh the perm cache
+        user = CandourUser.objects.get(pk=user.pk)  # refresh the perm cache
 
         visible = candidate_documents_visible_to(_Request(user, {}))
         self.assertIn(self.victim_doc, visible)

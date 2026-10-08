@@ -11,11 +11,11 @@ from django.utils.translation import gettext_lazy as _
 
 from attendance.filters import AttendanceFilters
 from attendance.models import Attendance
-from horilla_views.cbv_methods import login_required
-from horilla_views.generic.cbv.views import (
-    HorillaDetailedView,
-    HorillaListView,
-    HorillaNavView,
+from candour_views.cbv_methods import login_required
+from candour_views.generic.cbv.views import (
+    CandourDetailedView,
+    CandourListView,
+    CandourNavView,
     TemplateView,
 )
 
@@ -29,7 +29,7 @@ class MyAttendances(TemplateView):
     template_name = "cbv/my_attendances/my_attendances.html"
 
 
-class MyAttendancesListView(HorillaListView):
+class MyAttendancesListView(CandourListView):
 
     model = Attendance
     filter_class = AttendanceFilters
@@ -239,7 +239,7 @@ class MyAttendanceList(MyAttendancesListView):
 
 
 @method_decorator(login_required, name="dispatch")
-class MyAttendancestNav(HorillaNavView):
+class MyAttendancestNav(CandourNavView):
     """
     Nav bar
     """
@@ -259,14 +259,14 @@ class MyAttendancestNav(HorillaNavView):
     search_swap_target = "#listContainer"
     search_input_attrs = """ hidden """
     # Opts into the same modern slide-over filter panel built for
-    # Employee/Attendance (horilla_nav.html's .oh-filter-modern styles).
+    # Employee/Attendance (candour_nav.html's .oh-filter-modern styles).
     modern_filter = True
 
     # Mirrors MyAttendanceList.nested_group_by_fields above -- List and Nav
     # are separate classes/templates (see employee/cbv/employees.py's
     # EmployeesList/EmployeeNav for the same split), so the "Group By"
     # section rendered inside this page's own filter panel
-    # (horilla_nav.html) needs this here too, not just the List view.
+    # (candour_nav.html) needs this here too, not just the List view.
     nested_group_by_fields = [
         ("attendance_date", _("Attendance Date")),
         ("attendance_day", _("Attendance Day")),
@@ -278,7 +278,7 @@ class MyAttendancestNav(HorillaNavView):
 
 
 @method_decorator(login_required, name="dispatch")
-class MyAttendancesDetailView(HorillaDetailedView):
+class MyAttendancesDetailView(CandourDetailedView):
     """
     Detail View
     """

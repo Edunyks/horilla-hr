@@ -16,12 +16,12 @@ from django.views.generic import ListView
 from base.methods import has_export_access
 from base.models import Company
 from employee.models import Employee
-from horilla_views.cbv_methods import login_required
-from horilla_views.generic.cbv.views import (
-    HorillaCardView,
-    HorillaFormView,
-    HorillaListView,
-    HorillaNavView,
+from candour_views.cbv_methods import login_required
+from candour_views.generic.cbv.views import (
+    CandourCardView,
+    CandourFormView,
+    CandourListView,
+    CandourNavView,
     TemplateView,
 )
 from project.cbv.cbv_decorators import is_projectmanager_or_member_or_perms
@@ -47,7 +47,7 @@ class ProjectsView(TemplateView):
 @method_decorator(
     is_projectmanager_or_member_or_perms("project.view_project"), name="dispatch"
 )
-class ProjectsNavView(HorillaNavView):
+class ProjectsNavView(CandourNavView):
     """
     Nav bar
     """
@@ -58,7 +58,7 @@ class ProjectsNavView(HorillaNavView):
     group_by_fields = ["status", "is_active"]
     template_name = "cbv/projects/project_nav.html"
     filter_body_template = "cbv/projects/filter.html"
-    # Modern slide-over filter panel (generic/horilla_nav.html's own
+    # Modern slide-over filter panel (generic/candour_nav.html's own
     # {% if modern_filter %} branch) -- same treatment as every other
     # panel this session. ProjectFilter.ajax_fields carries the
     # AJAX-loaded managers combobox this needs.
@@ -164,7 +164,7 @@ class ProjectsNavView(HorillaNavView):
 @method_decorator(
     is_projectmanager_or_member_or_perms("project.view_project"), name="dispatch"
 )
-class ProjectsList(HorillaListView):
+class ProjectsList(CandourListView):
     """
     Projects list view
     """
@@ -309,7 +309,7 @@ class ProjectsList(HorillaListView):
 
 @method_decorator(login_required, name="dispatch")
 # @method_decorator(permission_required("project.add_project"), name="dispatch")
-class ProjectFormView(HorillaFormView):
+class ProjectFormView(CandourFormView):
     """
     form view for create project
     """
@@ -372,7 +372,7 @@ class DynamicProjectCreationFormView(ProjectFormView):
 @method_decorator(
     is_projectmanager_or_member_or_perms("project.view_project"), name="dispatch"
 )
-class ProjectCardView(HorillaCardView):
+class ProjectCardView(CandourCardView):
     """
     For card view
     """

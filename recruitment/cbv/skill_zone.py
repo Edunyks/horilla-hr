@@ -7,8 +7,8 @@ from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 
-from horilla_views.cbv_methods import login_required
-from horilla_views.generic.cbv.views import HorillaFormView, HorillaListView
+from candour_views.cbv_methods import login_required
+from candour_views.generic.cbv.views import CandourFormView, CandourListView
 from recruitment.cbv_decorators import manager_can_enter
 from recruitment.filters import SkillZoneCandidateFilter
 from recruitment.forms import SkillZoneCandidateForm, SkillZoneCreateForm
@@ -17,7 +17,7 @@ from recruitment.models import Candidate, SkillZone, SkillZoneCandidate
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(manager_can_enter("recruitment.add_skillzone"), name="dispatch")
-class SkillZoneFormView(HorillaFormView):
+class SkillZoneFormView(CandourFormView):
     """
     form view for create talent pool
     """
@@ -50,7 +50,7 @@ class SkillZoneFormView(HorillaFormView):
 @method_decorator(
     manager_can_enter("recruitment.add_skillzonecandidate"), name="dispatch"
 )
-class SkillZoneCandidateFormView(HorillaFormView):
+class SkillZoneCandidateFormView(CandourFormView):
     """
     form view for create talent pool candidate
     """
@@ -88,7 +88,7 @@ class SkillZoneCandidateFormView(HorillaFormView):
 @method_decorator(
     manager_can_enter("recruitment.add_skillzonecandidate"), name="dispatch"
 )
-class SkillZoneProfileListView(HorillaListView):
+class SkillZoneProfileListView(CandourListView):
     """
     Talent Pool Candidate profile List View
     """
@@ -110,7 +110,7 @@ class SkillZoneProfileListView(HorillaListView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # Fixed (not auto-random) so pagination/sort/search requests - which
-        # all hx-target="#{{view_id}}" from generic/horilla_list_table.html -
+        # all hx-target="#{{view_id}}" from generic/candour_list_table.html -
         # can be recognized in get_template_names() below and answered with
         # just that fragment. Without this, every such request re-renders the
         # full tab (header + Add button included) and htmx's outerHTML swap
@@ -120,7 +120,7 @@ class SkillZoneProfileListView(HorillaListView):
 
     def get_template_names(self):
         if self.request.headers.get("HX-Target") == self.view_id:
-            return ["generic/horilla_list_table.html"]
+            return ["generic/candour_list_table.html"]
         return [self.template_name]
 
     def get_queryset(self):

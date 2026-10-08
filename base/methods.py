@@ -27,7 +27,7 @@ from django.template.base import Lexer, TokenType
 from django.template.loader import render_to_string
 from django.utils.translation import gettext as _
 
-from horilla.models import has_xss
+from candour.models import has_xss
 
 logger = logging.getLogger(__name__)
 
@@ -39,8 +39,8 @@ from base.models import (
     Holidays,
 )
 from employee.models import Employee, EmployeeWorkInformation
-from horilla.export_safety import safe_cell
-from horilla.horilla_middlewares import _thread_locals
+from candour.export_safety import safe_cell
+from candour.candour_middlewares import _thread_locals
 
 CHART_CONFIG = {
     "offline_employees": {
@@ -995,7 +995,7 @@ def format_export_value(value, employee):
         check_in_time = datetime.strptime(str(value).split(".")[0], "%H:%M:%S").time()
 
         # Print the formatted time for each format
-        for format_name, format_string in settings.HORILLA_TIME_FORMATS.items():
+        for format_name, format_string in settings.CANDOUR_TIME_FORMATS.items():
             if format_name == time_format:
                 value = check_in_time.strftime(format_string)
 
@@ -1003,7 +1003,7 @@ def format_export_value(value, employee):
         # Convert the string to a datetime.date object
         start_date = datetime.strptime(str(value), "%Y-%m-%d").date()
         # Print the formatted date for each format
-        for format_name, format_string in settings.HORILLA_DATE_FORMATS.items():
+        for format_name, format_string in settings.CANDOUR_DATE_FORMATS.items():
             if format_name == date_format:
                 value = start_date.strftime(format_string)
 
@@ -1032,9 +1032,9 @@ _EXPORTABLE_APP_LABELS = {
     "project",
     "pms",
     "biometric",
-    "horilla_documents",
-    "horilla_automations",
-    "horilla_audit",
+    "candour_documents",
+    "candour_automations",
+    "candour_audit",
     "accessibility",
 }
 
@@ -1111,10 +1111,10 @@ def export_data(request, model, form_class, filter_class, file_name, perm=None):
     }
     employee = request.user.employee_get
 
-    from horilla.http.response import HorillaRedirect
+    from candour.http.response import CandourRedirect
 
     if not has_export_access(request, model):
-        return HorillaRedirect(
+        return CandourRedirect(
             request, message=_("You don't have access to export this data")
         )
 
@@ -1373,7 +1373,7 @@ def generate_pdf(template_path, context, path=True, title=None, html=True):
     template carrying an injected payload could read files off the server and
     post them out.
 
-    horilla_automations/signals.py already did this check at its own call site.
+    candour_automations/signals.py already did this check at its own call site.
     Four other callers (recruitment, attendance API, employee dashboard,
     onboarding) did not, so the guard belongs here, where all five route
     through, rather than repeated at each one.
@@ -1422,7 +1422,7 @@ def get_pagination(default=20):
     falling back to their "All Companies" preference, then the
     caller-supplied `default`.
     """
-    from horilla.horilla_middlewares import _thread_locals
+    from candour.candour_middlewares import _thread_locals
 
     request = getattr(_thread_locals, "request", None)
     user = request.user
@@ -1659,7 +1659,7 @@ def get_subordinates(request):
 def format_date(date_str):
     # List of possible date formats to try
 
-    for format_name, format_string in settings.HORILLA_DATE_FORMATS.items():
+    for format_name, format_string in settings.CANDOUR_DATE_FORMATS.items():
         try:
             return datetime.strptime(date_str, format_string).strftime("%Y-%m-%d")
         except ValueError:

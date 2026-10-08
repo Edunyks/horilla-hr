@@ -16,16 +16,16 @@ from django.utils.translation import gettext_noop
 from base.methods import has_export_access
 from employee import views as employee_view
 from employee.cbv.employee_profile import EmployeeProfileView
-from horilla.http.response import HorillaRedirect
-from horilla_views.cbv_methods import (
+from candour.http.response import CandourRedirect
+from candour_views.cbv_methods import (
     hx_request_required,
     login_required,
     permission_required,
 )
-from horilla_views.generic.cbv.views import (
-    HorillaFormView,
-    HorillaListView,
-    HorillaNavView,
+from candour_views.generic.cbv.views import (
+    CandourFormView,
+    CandourListView,
+    CandourNavView,
     TemplateView,
 )
 from notifications.signals import notify
@@ -61,7 +61,7 @@ class PayslipView(TemplateView):
 
 
 @method_decorator(login_required, name="dispatch")
-class PayslipList(HorillaListView):
+class PayslipList(CandourListView):
     """
     list view
     """
@@ -196,7 +196,7 @@ class PayslipList(HorillaListView):
 
 
 @method_decorator(login_required, name="dispatch")
-class PayslipNav(HorillaNavView):
+class PayslipNav(CandourNavView):
     """
     navbar
     """
@@ -289,7 +289,7 @@ class PayslipNav(HorillaNavView):
     filter_instance = PayslipFilter()
     filter_form_context_name = "form"
     search_swap_target = "#listContainer"
-    # Modern slide-over filter panel (generic/horilla_nav.html's own
+    # Modern slide-over filter panel (generic/candour_nav.html's own
     # {% if modern_filter %} branch) -- same treatment as every other
     # panel this session. PayslipFilter.ajax_fields carries the
     # AJAX-loaded Employee combobox this needs.
@@ -344,7 +344,7 @@ class PayslipBulkExport(TemplateView):
 
     def get(self, request, *args, **kwargs):
         if not has_export_access(request, Payslip):
-            return HorillaRedirect(
+            return CandourRedirect(
                 request, message=_("You don't have access to export this data")
             )
         return super().get(request, *args, **kwargs)
@@ -368,7 +368,7 @@ class PayslipBulkExport(TemplateView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("payroll.add_payslip"), name="dispatch")
-class PayrollCreateFormView(HorillaFormView):
+class PayrollCreateFormView(CandourFormView):
     """
     form view for creating payslip
     """

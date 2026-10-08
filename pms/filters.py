@@ -20,7 +20,7 @@ from base.filters import FilterSet
 from base.methods import reload_queryset
 from base.models import Company, Department, EmployeeShift, JobPosition, WorkType
 from employee.models import Employee
-from horilla.filters import HorillaFilterSet
+from candour.filters import CandourFilterSet
 from pms.models import (
     AnonymousFeedback,
     BonusPointSetting,
@@ -109,7 +109,7 @@ class CustomFilterSet(django_filters.FilterSet):
                 field.lookup_expr = "icontains"
 
 
-class ActualObjectiveFilter(HorillaFilterSet):
+class ActualObjectiveFilter(CandourFilterSet):
     """
     ActualObjectiveFilter
     """
@@ -119,7 +119,7 @@ class ActualObjectiveFilter(HorillaFilterSet):
         method="filter_by_emp_obj_status", label=_("Status")
     )
 
-    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
+    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
     # -- Managers, Assignees, and Key Result opt into AJAX-searched
     # comboboxes instead of pre-rendering their whole queryset as
     # <option> tags.
@@ -183,7 +183,7 @@ class ActualObjectiveFilter(HorillaFilterSet):
     def _build_custom_filter_fields(self):
         """
         Registry backing the Advanced section's "+ Add filter" builder
-        (see HorillaFilterSet._build_custom_filter_fields's docstring
+        (see CandourFilterSet._build_custom_filter_fields's docstring
         for the two supported entry shapes) -- same "choose field, then
         lookup, then value" pattern used by AttendanceFilters/
         EmployeeFilter/AssetFilter. Created At is the only real date
@@ -206,7 +206,7 @@ class ActualObjectiveFilter(HorillaFilterSet):
 
     def filter_queryset(self, queryset):
         """
-        HorillaFilterSet._apply_custom_filters isn't wired into the base
+        CandourFilterSet._apply_custom_filters isn't wired into the base
         filter_queryset automatically -- this is the minimal "call it at
         the end" hookup, same as AttendanceFilters/FeedbackFilter/
         AssetFilter.
@@ -295,7 +295,7 @@ DUE_DATE_CHOICES = [
 ]
 
 
-class FeedbackFilter(HorillaFilterSet):
+class FeedbackFilter(CandourFilterSet):
     """
     Custom filter set for Feedback records.
 
@@ -334,7 +334,7 @@ class FeedbackFilter(HorillaFilterSet):
         ),
     )
 
-    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
+    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
     # -- Employee, Manager, Subordinate, and Colleague opt into
     # AJAX-searched comboboxes instead of pre-rendering their whole
     # queryset as <option> tags.
@@ -452,7 +452,7 @@ class FeedbackFilter(HorillaFilterSet):
     def _build_custom_filter_fields(self):
         """
         Registry backing the Advanced section's "+ Add filter" builder
-        (see HorillaFilterSet._build_custom_filter_fields's docstring
+        (see CandourFilterSet._build_custom_filter_fields's docstring
         for the two supported entry shapes) -- same "choose field, then
         lookup, then value" pattern used by AttendanceFilters/
         EmployeeFilter. Start Date/End Date/Created At are plain
@@ -491,7 +491,7 @@ class FeedbackFilter(HorillaFilterSet):
 
     def filter_queryset(self, queryset):
         """
-        HorillaFilterSet._apply_custom_filters isn't wired into the base
+        CandourFilterSet._apply_custom_filters isn't wired into the base
         filter_queryset automatically -- this is the minimal "call it at
         the end" hookup, same as AttendanceFilters.filter_queryset.
         """
@@ -594,14 +594,14 @@ class KeyResultFilter(CustomFilterSet):
         fields = "__all__"
 
 
-class ActualKeyResultFilter(HorillaFilterSet):
+class ActualKeyResultFilter(CandourFilterSet):
     """
     Filter through KeyResult model
     """
 
     search = django_filters.CharFilter(method="search_method")
 
-    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
+    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
     # -- Company opts into an AJAX-searched combobox instead of
     # pre-rendering its whole queryset as <option> tags.
     ajax_fields = {
@@ -638,7 +638,7 @@ class ActualKeyResultFilter(HorillaFilterSet):
     def _build_custom_filter_fields(self):
         """
         Registry backing the Advanced section's "+ Add filter" builder
-        (see HorillaFilterSet._build_custom_filter_fields's docstring
+        (see CandourFilterSet._build_custom_filter_fields's docstring
         for the two supported entry shapes) -- same "choose field, then
         lookup, then value" pattern used by AttendanceFilters/
         EmployeeFilter/AssetFilter. Created At is the only real date
@@ -661,7 +661,7 @@ class ActualKeyResultFilter(HorillaFilterSet):
 
     def filter_queryset(self, queryset):
         """
-        HorillaFilterSet._apply_custom_filters isn't wired into the base
+        CandourFilterSet._apply_custom_filters isn't wired into the base
         filter_queryset automatically -- this is the minimal "call it at
         the end" hookup, same as AttendanceFilters/FeedbackFilter/
         AssetFilter.
@@ -682,7 +682,7 @@ class ObjectiveReGroup:
     ]
 
 
-class EmployeeObjectiveFilter(HorillaFilterSet):
+class EmployeeObjectiveFilter(CandourFilterSet):
     """
     Filter through EmployeeObjective model
     """
@@ -837,7 +837,7 @@ class EmployeeObjectiveFilter(HorillaFilterSet):
         return empty.distinct()
 
 
-class MeetingsFilter(HorillaFilterSet):
+class MeetingsFilter(CandourFilterSet):
 
     search = django_filters.CharFilter(field_name="title", lookup_expr="icontains")
     date = django_filters.DateFilter(
@@ -856,7 +856,7 @@ class MeetingsFilter(HorillaFilterSet):
         widget=forms.DateInput(attrs={"type": "date"}),
     )
 
-    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
+    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism)
     # -- every model/queryset-backed field in the modern filter panel opts
     # in here instead of pre-rendering its whole queryset as <option> tags.
     ajax_fields = {
@@ -986,7 +986,7 @@ class MeetingsFilter(HorillaFilterSet):
     #     return super().filter_queryset(queryset)
 
 
-class AnonymousFilter(HorillaFilterSet):
+class AnonymousFilter(CandourFilterSet):
     """
     Custom filter set for Anonymous records.
 
@@ -1065,7 +1065,7 @@ class QuestionTemplateFilter(FilterSet):
         ]
 
 
-class PeriodFilter(HorillaFilterSet):
+class PeriodFilter(CandourFilterSet):
 
     search = django_filters.CharFilter(
         field_name="period_name", lookup_expr="icontains"

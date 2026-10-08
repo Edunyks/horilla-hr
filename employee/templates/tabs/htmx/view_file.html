@@ -1,5 +1,5 @@
 {% load i18n %}
-{% load horillafilters %}
+{% load candourfilters %}
 {% load static %}
 
 <div class="bg-white w-full max-w-2xl mx-auto rounded-lg shadow-card transition-all duration-300 opacity-100 scale-100">
@@ -18,7 +18,7 @@
                 aria-label="{% trans 'Close' %}"
                 onclick="$(this).closest('.oh-modal--show').removeClass('oh-modal--show')"
             >
-                <img src="{% static 'horilla_theme/assets/icons/close.svg' %}" alt="">
+                <img src="{% static 'candour_theme/assets/icons/close.svg' %}" alt="">
             </button>
         </div>
 
@@ -36,7 +36,7 @@
                 {% trans "Upload File" %}
             </a>
             {% if document.document %}
-                {% if perms.horilla_documents.change_documentrequest %}
+                {% if perms.candour_documents.change_documentrequest %}
                     {% if document.status == "approved" %}
                         <a class="oh-btn oh-btn--success oh-btn--disabled px-4 py-2 rounded-md text-xs flex items-center justify-center gap-2 transition duration-300" title="{% trans 'Approved' %}">
                             <ion-icon name="checkmark-outline"></ion-icon>

@@ -33,7 +33,7 @@ def _viewer_is_superuser(filters: ReportFilters) -> bool:
 
 
 def audit_activity(filters: ReportFilters) -> dict:
-    """Recent audit log activity summary when horilla_audit / auditlog is available."""
+    """Recent audit log activity summary when candour_audit / auditlog is available."""
     try:
         from auditlog.models import LogEntry
     except Exception:
@@ -49,7 +49,7 @@ def audit_activity(filters: ReportFilters) -> dict:
     )
 
     # auditlog.LogEntry is third-party: it has no company column and no
-    # HorillaCompanyManager, so unlike every other model this metrics layer
+    # CandourCompanyManager, so unlike every other model this metrics layer
     # touches it was returning every tenant's activity to anyone who could
     # view the report. Scope through the acting user's employee record.
     #
@@ -126,13 +126,13 @@ def audit_activity(filters: ReportFilters) -> dict:
 
 
 def document_expiry(filters: ReportFilters) -> dict:
-    """Expiring employee documents (horilla_documents) and optional assets."""
+    """Expiring employee documents (candour_documents) and optional assets."""
     rows = []
     kpis_docs = 0
 
-    if apps.is_installed("horilla_documents"):
+    if apps.is_installed("candour_documents"):
         try:
-            Document = apps.get_model("horilla_documents", "Document")
+            Document = apps.get_model("candour_documents", "Document")
             qs = Document.objects.filter(
                 expiry_date__gte=filters.from_date,
                 expiry_date__lte=filters.to_date,
@@ -149,7 +149,7 @@ def document_expiry(filters: ReportFilters) -> dict:
                 emp = getattr(obj, "employee_id", None)
                 rows.append(
                     {
-                        "source": "horilla_documents.Document",
+                        "source": "candour_documents.Document",
                         "title": str(obj),
                         "employee": emp.get_full_name() if emp else "",
                         "expiry": str(obj.expiry_date),
@@ -319,9 +319,9 @@ def visa_contract_expiry(filters: ReportFilters) -> dict:
         "i-9",
         "immigration",
     )
-    if apps.is_installed("horilla_documents"):
+    if apps.is_installed("candour_documents"):
         try:
-            Document = apps.get_model("horilla_documents", "Document")
+            Document = apps.get_model("candour_documents", "Document")
             docs = Document.objects.filter(
                 expiry_date__gte=filters.from_date,
                 expiry_date__lte=horizon_end,

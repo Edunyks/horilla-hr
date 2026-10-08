@@ -24,13 +24,13 @@ The app reads its database connection from `DATABASE_URL`. The entrypoint also
 waits on `DB_HOST:DB_PORT` before migrating, so keep those in step with the URL.
 The `.env.example` defaults use the bundled disposable Postgres service by
 enabling `COMPOSE_PROFILES=embedded-db` and pointing `DATABASE_URL` at
-`postgres:5432/horilla_staging`.
+`postgres:5432/candour_staging`.
 
 To use a dedicated or managed Postgres instance, remove `embedded-db` from
 `COMPOSE_PROFILES`, then set:
 
 ```env
-DATABASE_URL=postgres://user:password@your-db-host:5432/horilla_staging?sslmode=require
+DATABASE_URL=postgres://user:password@your-db-host:5432/candour_staging?sslmode=require
 DB_HOST=your-db-host
 DB_PORT=5432
 ```
@@ -40,7 +40,7 @@ The `POSTGRES_*` variables are only for the bundled Postgres container.
 ## Migrations
 
 Schema migrations are applied by the `migrate` Compose service, not by the
-`web` container. `web` and `scheduler` set `HORILLA_SKIP_RELEASE_TASKS=1` and
+`web` container. `web` and `scheduler` set `CANDOUR_SKIP_RELEASE_TASKS=1` and
 depend on `migrate` completing successfully. If a migration fails, Compose
 leaves the app stopped instead of starting it against an incompatible schema,
 and the two long-running containers never race each other on DDL.
@@ -72,8 +72,8 @@ at exactly one replica; the jobs are not idempotent. `web` can be scaled.
 
 ## Volumes
 
-- `horilla-staging-media` — uploaded files, shared by `web`, `scheduler` and
+- `candour-staging-media` — uploaded files, shared by `web`, `scheduler` and
   `migrate`. Back this up alongside the database.
-- `horilla-staging-staticfiles` — collected static files, rebuilt on every
+- `candour-staging-staticfiles` — collected static files, rebuilt on every
   deploy by `migrate`.
-- `horilla-staging-postgres`, `horilla-staging-redis` — bundled services' data.
+- `candour-staging-postgres`, `candour-staging-redis` — bundled services' data.

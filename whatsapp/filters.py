@@ -1,10 +1,10 @@
 import django_filters
 
-from horilla.filters import HorillaFilterSet
+from candour.filters import CandourFilterSet
 from whatsapp.models import WhatsappCredientials
 
 
-class CredentialsViewFilter(HorillaFilterSet):
+class CredentialsViewFilter(CandourFilterSet):
     search = django_filters.CharFilter(
         field_name="meta_phone_number", lookup_expr="icontains"
     )

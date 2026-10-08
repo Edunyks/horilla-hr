@@ -7,15 +7,15 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 
 from base.methods import filter_own_records
-from horilla.methods import handle_no_permission
-from horilla_views.cbv_methods import login_required
-from horilla_views.generic.cbv.views import (
-    HorillaDetailedView,
-    HorillaFormView,
-    HorillaListView,
-    HorillaNavView,
-    HorillaTabContentShell,
-    HorillaTabView,
+from candour.methods import handle_no_permission
+from candour_views.cbv_methods import login_required
+from candour_views.generic.cbv.views import (
+    CandourDetailedView,
+    CandourFormView,
+    CandourListView,
+    CandourNavView,
+    CandourTabContentShell,
+    CandourTabView,
     TemplateView,
 )
 from payroll.decorators import is_leave_encashment_enabled, leave_encashment_visible_to
@@ -34,7 +34,7 @@ class ReimbursementsView(TemplateView):
 
 
 @method_decorator(login_required, name="dispatch")
-class ReimbursementsAndEncashmentsTabView(HorillaTabView):
+class ReimbursementsAndEncashmentsTabView(CandourTabView):
     """
     Tab View
     """
@@ -103,7 +103,7 @@ class ReimbursementsAndEncashmentsTabView(HorillaTabView):
 
 
 @method_decorator(login_required, name="dispatch")
-class ReimbursementsAndEncashmentsListView(HorillaListView):
+class ReimbursementsAndEncashmentsListView(CandourListView):
     """
     list view
     """
@@ -321,7 +321,7 @@ class BonusEncashmentsListView(ReimbursementsAndEncashmentsListView):
         return queryset
 
 
-class _ReimbursementTabNavBase(HorillaNavView):
+class _ReimbursementTabNavBase(CandourNavView):
     """
     Shared Search/Filter/Create wiring for each Reimbursements/Encashments
     tab's own, independent Nav - nav_title/search_url/search_swap_target
@@ -332,7 +332,7 @@ class _ReimbursementTabNavBase(HorillaNavView):
     filter_instance = ReimbursementFilter()
     filter_form_context_name = "form"
     filter_body_template = "cbv/reimbursements/filter.html"
-    # Modern slide-over filter panel (generic/horilla_nav.html's own
+    # Modern slide-over filter panel (generic/candour_nav.html's own
     # {% if modern_filter %} branch) -- same treatment as every other
     # panel this session. ReimbursementFilter.ajax_fields carries the
     # AJAX-loaded comboboxes this needs.
@@ -401,20 +401,20 @@ class BonusEncashNav(_ReimbursementTabNavBase):
         self.search_swap_target = "#bonusEncashListContainer"
 
 
-class ReimbursementTabShell(HorillaTabContentShell):
+class ReimbursementTabShell(CandourTabContentShell):
     nav_url_name = "reimbursement-nav"
     container_id = "reimbursementListContainer"
     tabs_root_id = "reimbursmentContainer"
 
 
 @method_decorator(is_leave_encashment_enabled(), name="dispatch")
-class LeaveEncashTabShell(HorillaTabContentShell):
+class LeaveEncashTabShell(CandourTabContentShell):
     nav_url_name = "leave-encash-nav"
     container_id = "leaveEncashListContainer"
     tabs_root_id = "reimbursmentContainer"
 
 
-class BonusEncashTabShell(HorillaTabContentShell):
+class BonusEncashTabShell(CandourTabContentShell):
     nav_url_name = "bonus-encash-nav"
     container_id = "bonusEncashListContainer"
     tabs_root_id = "reimbursmentContainer"
@@ -439,7 +439,7 @@ class BonusEncashTabShell(HorillaTabContentShell):
 
 
 @method_decorator(login_required, name="dispatch")
-class ReimbursementsDetailView(HorillaDetailedView):
+class ReimbursementsDetailView(CandourDetailedView):
     """
     detail view of reimbursements
     """
@@ -490,7 +490,7 @@ class BonusEncashmentsDetailedView(ReimbursementsDetailView):
 
 
 @method_decorator(login_required, name="dispatch")
-class ReimbursementsFormView(HorillaFormView):
+class ReimbursementsFormView(CandourFormView):
     """
     Create and edit form for reimbursements
     """

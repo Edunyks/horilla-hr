@@ -22,7 +22,7 @@ from datetime import date, timedelta
 from django.contrib.auth.models import Permission
 from django.test import TestCase
 
-from horilla.testkit import make_company, make_employee, make_user
+from candour.testkit import make_company, make_employee, make_user
 from leave.models import LeaveRequest, LeaveType
 from leave.views import can_view_leave_request
 
@@ -40,12 +40,12 @@ class LeaveRequestVisibilityTests(TestCase):
         company = make_company("Leave Co")
         cls.owner_user = make_user("leave_owner", password="secret123")
         cls.owner = make_employee(
-            company=company, email="leave_owner@test.horilla", user=cls.owner_user
+            company=company, email="leave_owner@test.candour", user=cls.owner_user
         )
         cls.snooper_user = make_user("leave_snooper", password="secret123")
         cls.snooper = make_employee(
             company=company,
-            email="leave_snooper@test.horilla",
+            email="leave_snooper@test.candour",
             user=cls.snooper_user,
         )
         leave_type = LeaveType.objects.create(name="Sick Leave")

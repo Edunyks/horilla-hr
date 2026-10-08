@@ -92,10 +92,10 @@
                      instead of just exact match, and adds Created At as
                      a second option. Registry: AssetRequestFilter.
                      _build_custom_filter_fields; applied server-side by
-                     HorillaFilterSet._apply_custom_filters (see
+                     CandourFilterSet._apply_custom_filters (see
                      AssetRequestFilter.filter_queryset). Row markup/JS
                      are generic (initCustomFilterBuilder,
-                     horilla_nav.html). Bound to this request's own GET
+                     candour_nav.html). Bound to this request's own GET
                      data separately from the Nav's own filter_instance
                      (see RequestAndAllocationNav.get_context_data), so
                      uses its own "asset_request_custom_filter_fields"/
@@ -176,10 +176,10 @@
                          of just exact match, and adds Created At as a
                          third option. Registry: AssetAllocationFilter.
                          _build_custom_filter_fields; applied server-side
-                         by HorillaFilterSet._apply_custom_filters (see
+                         by CandourFilterSet._apply_custom_filters (see
                          AssetAllocationFilter.filter_queryset). Row
                          markup/JS are generic (initCustomFilterBuilder,
-                         horilla_nav.html). Uses the generic
+                         candour_nav.html). Uses the generic
                          "custom_filter_fields"/"custom_filter_rows"
                          context keys (this Nav's own filter_instance IS
                          AssetAllocationFilter) and "asset-allocation"

@@ -13,13 +13,13 @@ from django.core.mail.backends.smtp import EmailBackend
 
 from base.email_redaction import get_current_company, redact_credential_body
 from base.models import DynamicEmailConfiguration, EmailLog
-from horilla import settings
-from horilla.horilla_middlewares import _thread_locals
+from candour import settings
+from candour.candour_middlewares import _thread_locals
 
 logger = logging.getLogger(__name__)
 
 
-class DefaultHorillaMailBackend(EmailBackend):
+class DefaultCandourMailBackend(EmailBackend):
     def __init__(
         self,
         host=None,
@@ -184,10 +184,10 @@ class DefaultHorillaMailBackend(EmailBackend):
 EMAIL_BACKEND = getattr(settings, "EMAIL_BACKEND", "")
 
 
-BACKEND_CLASS: EmailBackend = DefaultHorillaMailBackend
+BACKEND_CLASS: EmailBackend = DefaultCandourMailBackend
 default = "base.backends.ConfiguredEmailBackend"
 
-setattr(BACKEND_CLASS, "send_messages", DefaultHorillaMailBackend.send_messages)
+setattr(BACKEND_CLASS, "send_messages", DefaultCandourMailBackend.send_messages)
 
 if EMAIL_BACKEND and EMAIL_BACKEND != default:
     module_path, class_name = EMAIL_BACKEND.rsplit(".", 1)
@@ -247,7 +247,7 @@ def new_init(
     custom __init_method to override
     """
     request = getattr(_thread_locals, "request", None)
-    DefaultHorillaMailBackend()
+    DefaultCandourMailBackend()
     user_id = ""
     if request and request.user and request.user.is_authenticated:
         user_id = request.user.pk

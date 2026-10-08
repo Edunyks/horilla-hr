@@ -35,9 +35,9 @@ from base.forms import ModelForm
 from base.methods import reload_queryset
 from employee.filters import EmployeeFilter
 from employee.models import Employee, EmployeeBankDetails
-from horilla_auth.models import HorillaUser
-from horilla_widgets.widgets.horilla_multi_select_field import HorillaMultiSelectField
-from horilla_widgets.widgets.select_widgets import HorillaMultiSelectWidget
+from candour_auth.models import CandourUser
+from candour_widgets.widgets.candour_multi_select_field import CandourMultiSelectField
+from candour_widgets.widgets.select_widgets import CandourMultiSelectWidget
 from onboarding.models import (
     CandidateStage,
     CandidateTask,
@@ -141,7 +141,7 @@ class OnboardingCandidateForm(ModelForm):
 
 class UserCreationForm(UserCreationFormCustom):
     """
-    Form for HorillaUser model
+    Form for CandourUser model
     """
 
     class Meta:
@@ -149,7 +149,7 @@ class UserCreationForm(UserCreationFormCustom):
         Meta class to add some additional options
         """
 
-        model = HorillaUser
+        model = CandourUser
         fields = ["password1", "password2"]
 
 
@@ -195,7 +195,7 @@ class OnboardingViewTaskForm(ModelForm):
 
     def clean(self):
         for field_name, field_instance in self.fields.items():
-            if isinstance(field_instance, HorillaMultiSelectField):
+            if isinstance(field_instance, CandourMultiSelectField):
                 self.errors.pop(field_name, None)
                 if len(self.data.getlist(field_name)) < 1:
                     raise forms.ValidationError({field_name: "Thif field is required"})
@@ -209,9 +209,9 @@ class OnboardingViewTaskForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["managers"] = HorillaMultiSelectField(
+        self.fields["managers"] = CandourMultiSelectField(
             queryset=Employee.objects.all(),
-            widget=HorillaMultiSelectWidget(
+            widget=CandourMultiSelectWidget(
                 filter_route_name="employee-widget-filter",
                 filter_class=EmployeeFilter,
                 filter_instance_context_name="f",
@@ -260,9 +260,9 @@ class OnboardingTaskForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["employee_id"] = HorillaMultiSelectField(
+        self.fields["employee_id"] = CandourMultiSelectField(
             queryset=Employee.objects.all(),
-            widget=HorillaMultiSelectWidget(
+            widget=CandourMultiSelectWidget(
                 filter_route_name="employee-widget-filter",
                 filter_class=EmployeeFilter,
                 filter_instance_context_name="f",
@@ -285,7 +285,7 @@ class OnboardingTaskForm(ModelForm):
             self.fields["candidates"].queryset = cand_queryset
 
     def clean(self):
-        if isinstance(self.fields["employee_id"], HorillaMultiSelectField):
+        if isinstance(self.fields["employee_id"], CandourMultiSelectField):
             ids = self.data.getlist("employee_id")
             if ids:
                 self.errors.pop("employee_id", None)
@@ -315,9 +315,9 @@ class OnboardingViewStageForm(ModelForm):
         """
         super().__init__(*args, **kwargs)
         reload_queryset(self.fields)
-        self.fields["employee_id"] = HorillaMultiSelectField(
+        self.fields["employee_id"] = CandourMultiSelectField(
             queryset=Employee.objects.filter(is_active=True),
-            widget=HorillaMultiSelectWidget(
+            widget=CandourMultiSelectWidget(
                 filter_route_name="employee-widget-filter",
                 filter_class=EmployeeFilter,
                 filter_instance_context_name="f",
@@ -340,11 +340,11 @@ class OnboardingViewStageForm(ModelForm):
         Render the form fields as HTML table rows with Bootstrap styling.
         """
         context = {"form": self}
-        table_html = render_to_string("horilla_form.html", context)
+        table_html = render_to_string("candour_form.html", context)
         return table_html
 
     def clean(self):
-        if isinstance(self.fields["employee_id"], HorillaMultiSelectField):
+        if isinstance(self.fields["employee_id"], CandourMultiSelectField):
             ids = self.data.getlist("employee_id")
             if ids:
                 self.errors.pop("employee_id", None)

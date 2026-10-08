@@ -4,7 +4,7 @@ from django.utils.translation import gettext as _
 
 from base.methods import check_manager
 from helpdesk.models import Ticket
-from horilla.http.response import HorillaRedirect
+from candour.http.response import CandourRedirect
 
 decorator_with_arguments = (
     lambda decorator: lambda *args, **kwargs: lambda func: decorator(
@@ -37,7 +37,7 @@ def ticket_owner_can_enter(function, perm: str, model: object, manager_access=Fa
                 employee = model.objects.get(id=instance_id).employee_id
             except:
                 messages.error(request, _("Sorry, something went wrong!"))
-                return HorillaRedirect(request)
+                return CandourRedirect(request)
         can_enter = (
             request.user.employee_get == employee
             or request.user.has_perm(perm)

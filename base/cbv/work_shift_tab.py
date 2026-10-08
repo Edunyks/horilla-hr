@@ -25,8 +25,8 @@ from base.models import (
     WorkTypeRequest,
 )
 from employee.models import Employee
-from horilla_views.cbv_methods import hx_request_required, login_required
-from horilla_views.generic.cbv.views import HorillaNavView, HorillaTabView
+from candour_views.cbv_methods import hx_request_required, login_required
+from candour_views.generic.cbv.views import CandourNavView, CandourTabView
 
 
 @method_decorator(login_required, name="dispatch")
@@ -56,7 +56,7 @@ class ProfileTabShellView(TemplateView):
         return context
 
 
-class WorkAndShiftTabView(HorillaTabView):
+class WorkAndShiftTabView(CandourTabView):
     """
     generic tab view for work type and shift
     """
@@ -75,7 +75,7 @@ class WorkAndShiftTabView(HorillaTabView):
         context["employee"] = employee
         # Each sub-tab's own badge count is only otherwise filled in once
         # that tab's content has actually loaded (client-side, from its
-        # list view's data-total-count) - horilla_tabs.html only ever
+        # list view's data-total-count) - candour_tabs.html only ever
         # auto-loads the ACTIVE sub-tab on first render, so every other
         # sub-tab's badge was stuck at its server-rendered default (0)
         # until the user clicked it, even when it had real records.
@@ -150,7 +150,7 @@ class WorkTypeIndividualTabShell(ProfileTabShellView):
 
 
 @method_decorator(login_required, name="dispatch")
-class WorkTypeIndividualNav(HorillaNavView):
+class WorkTypeIndividualNav(CandourNavView):
     """
     Minimal nav (Create button only) for the Work type request profile tab.
     """
@@ -205,7 +205,7 @@ class ShiftRequestIndividualTabShell(ProfileTabShellView):
 
 
 @method_decorator(login_required, name="dispatch")
-class ShiftRequestIndividualNav(HorillaNavView):
+class ShiftRequestIndividualNav(CandourNavView):
     """
     Minimal nav (Create button only) for the Shift request profile tab.
     """
@@ -263,7 +263,7 @@ class ShiftAllocationIndividualTabShell(ProfileTabShellView):
 
 
 @method_decorator(login_required, name="dispatch")
-class ShiftAllocationIndividualNav(HorillaNavView):
+class ShiftAllocationIndividualNav(CandourNavView):
     """
     Minimal nav (Create button only) for the Shift Allocation profile tab.
     """
@@ -328,7 +328,7 @@ class RotatingShiftIndividualTabShell(ProfileTabShellView):
 
 
 @method_decorator(login_required, name="dispatch")
-class RotatingShiftIndividualNav(HorillaNavView):
+class RotatingShiftIndividualNav(CandourNavView):
     """
     Minimal nav (Create button only) for the Rotating Shift profile tab.
     """
@@ -393,7 +393,7 @@ class RotatingWorkIndividualTabShell(ProfileTabShellView):
 
 
 @method_decorator(login_required, name="dispatch")
-class RotatingWorkIndividualNav(HorillaNavView):
+class RotatingWorkIndividualNav(CandourNavView):
     """
     Minimal nav (Create button only) for the Rotating work type profile tab.
     """

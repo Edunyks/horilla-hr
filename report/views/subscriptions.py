@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
 
-from horilla.decorators import login_required
+from candour.decorators import login_required
 from report.access import company_id_from_request, user_can_subscribe_report
 from report.delivery import deliver_subscription
 from report.models import ReportSubscription
@@ -22,7 +22,7 @@ def _owned_subscriptions(request):
 
 
 def _reload_response(request):
-    """Refresh the CBV list container in place, matching the rest of Horilla's
+    """Refresh the CBV list container in place, matching the rest of Candour's
     'POST action -> click the hidden {view_id}Reload button' convention.
     Also closes #genericModal — a no-op for the row-action callers (toggle/
     delete/run-now, never invoked from inside that modal) but needed for the

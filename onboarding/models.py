@@ -15,15 +15,15 @@ from django.dispatch import receiver
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from base.horilla_company_manager import HorillaCompanyManager
+from base.candour_company_manager import CandourCompanyManager
 from employee.models import Employee
-from horilla.models import HorillaModel
-from horilla_audit.models import HorillaAuditInfo, HorillaAuditLog
-from horilla_views.cbv_methods import render_template
+from candour.models import CandourModel
+from candour_audit.models import CandourAuditInfo, CandourAuditLog
+from candour_views.cbv_methods import render_template
 from recruitment.models import Candidate, Recruitment
 
 
-class OnboardingStage(HorillaModel):
+class OnboardingStage(CandourModel):
     """
     OnboardingStage models
     """
@@ -41,7 +41,7 @@ class OnboardingStage(HorillaModel):
     is_final_stage = models.BooleanField(
         default=False, verbose_name=_("Is Final Stage")
     )
-    objects = HorillaCompanyManager("recruitment_id__company_id")
+    objects = CandourCompanyManager("recruitment_id__company_id")
 
     def __str__(self):
         return f"{self.stage_title}"
@@ -69,7 +69,7 @@ def create_initial_stage(sender, instance, created, **kwargs):
         initial_stage.save()
 
 
-class OnboardingTask(HorillaModel):
+class OnboardingTask(CandourModel):
     """
     OnboardingTask models
     """
@@ -100,7 +100,7 @@ class OnboardingTask(HorillaModel):
         ),
     )
 
-    objects = HorillaCompanyManager("stage_id__recruitment_id__company_id")
+    objects = CandourCompanyManager("stage_id__recruitment_id__company_id")
 
     def get_detail_url(self):
         """
@@ -139,7 +139,7 @@ class OnboardingCandidate(Candidate):
         app_label = "onboarding"
 
 
-class CandidateStage(HorillaModel):
+class CandidateStage(CandourModel):
     """
     CandidateStage model
     """
@@ -155,7 +155,7 @@ class CandidateStage(HorillaModel):
     )
     onboarding_end_date = models.DateField(blank=True, null=True)
     sequence = models.IntegerField(null=True, default=0)
-    objects = HorillaCompanyManager("candidate_id__recruitment_id__company_id")
+    objects = CandourCompanyManager("candidate_id__recruitment_id__company_id")
 
     def __str__(self):
         return f"{self.candidate_id}  |  {self.onboarding_stage_id}"
@@ -216,7 +216,7 @@ class CandidateStage(HorillaModel):
         ordering = ["sequence"]
 
 
-class CandidateTask(HorillaModel):
+class CandidateTask(CandourModel):
     """
     CandidateTask model
     """
@@ -242,11 +242,11 @@ class CandidateTask(HorillaModel):
         max_length=50, choices=choice, blank=True, null=True, default="todo"
     )
     onboarding_task_id = models.ForeignKey(OnboardingTask, on_delete=models.PROTECT)
-    objects = HorillaCompanyManager("candidate_id__recruitment_id__company_id")
-    history = HorillaAuditLog(
+    objects = CandourCompanyManager("candidate_id__recruitment_id__company_id")
+    history = CandourAuditLog(
         related_name="history_set",
         bases=[
-            HorillaAuditInfo,
+            CandourAuditInfo,
         ],
     )
 
@@ -272,7 +272,7 @@ class CandidateTask(HorillaModel):
         verbose_name_plural = _("Onboarding Tasks")
 
 
-class OnboardingPortal(HorillaModel):
+class OnboardingPortal(CandourModel):
     """
     OnboardingPortal model
     """
@@ -284,7 +284,7 @@ class OnboardingPortal(HorillaModel):
     used = models.BooleanField(default=False)
     count = models.IntegerField(default=0)
     profile = models.ImageField(upload_to="employee/profile", null=True, blank=True)
-    objects = HorillaCompanyManager("candidate_id__recruitment_id__company_id")
+    objects = CandourCompanyManager("candidate_id__recruitment_id__company_id")
 
     def __str__(self):
         return str(self.candidate_id)

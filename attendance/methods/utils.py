@@ -186,7 +186,7 @@ def get_client_ip(request):
 def geofence_denial_web(request, company):
     """
     The web clock-in/out views' counterpart to
-    horilla_api...attendance.views.geofence_denial(): that one reads
+    candour_api...attendance.views.geofence_denial(): that one reads
     request.data, which only exists on a DRF Request, not the plain
     HttpRequest these views get. The mobile/API flow enforces a configured
     geo-fence; the web flow previously didn't check it at all, so an
@@ -622,7 +622,7 @@ class Request:
         self.datetime = datetime
         self.META = META()
         # Empty dict stands in for Django's QueryDict here -- only .get() is
-        # ever called on request.GET (e.g. horilla_crumbs' breadcrumbs context
+        # ever called on request.GET (e.g. candour_crumbs' breadcrumbs context
         # processor), and dict.get() already returns None for a missing key
         # exactly like QueryDict.get() does.
         self.GET = {}
@@ -680,7 +680,7 @@ class META:
 
     def __contains__(self, key):
         """
-        Support ``key in request.META`` (e.g. horilla_crumbs' breadcrumbs
+        Support ``key in request.META`` (e.g. candour_crumbs' breadcrumbs
         context processor checks "HTTP_HX_REQUEST" in request.META directly,
         not just via .keys()).
         """
@@ -692,7 +692,7 @@ def parse_time(time_str):
         return time_str
 
     if isinstance(time_str, str):
-        for format_str in settings.HORILLA_TIME_FORMATS.values():
+        for format_str in settings.CANDOUR_TIME_FORMATS.values():
             try:
                 return datetime.strptime(time_str, format_str).time()
             except ValueError:
@@ -720,7 +720,7 @@ def get_date(date):
     if isinstance(date, datetime):
         return date
     elif isinstance(date, str):
-        for format_name, format_str in settings.HORILLA_DATE_FORMATS.items():
+        for format_name, format_str in settings.CANDOUR_DATE_FORMATS.items():
             try:
                 return datetime.strptime(date, format_str)
             except ValueError:

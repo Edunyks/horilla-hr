@@ -15,17 +15,17 @@ from base.forms import TagsForm
 from base.models import Tags
 from helpdesk.filter import TagsFilter
 from helpdesk.forms import TicketTypeForm
-from horilla_views.cbv_methods import login_required, permission_required
-from horilla_views.generic.cbv.views import (
-    HorillaFormView,
-    HorillaListView,
-    HorillaNavView,
+from candour_views.cbv_methods import login_required, permission_required
+from candour_views.generic.cbv.views import (
+    CandourFormView,
+    CandourListView,
+    CandourNavView,
 )
 
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="base.view_tags"), name="dispatch")
-class TagsListView(HorillaListView):
+class TagsListView(CandourListView):
     """
     list view for tickets in settings
     """
@@ -82,7 +82,7 @@ class TagsListView(HorillaListView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="base.view_tags"), name="dispatch")
-class TagsNavView(HorillaNavView):
+class TagsNavView(CandourNavView):
     """
     nav bar of the department view
     """
@@ -107,7 +107,7 @@ class TagsNavView(HorillaNavView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required(perm="base.add_tags"), name="dispatch")
-class TagsFormView(HorillaFormView):
+class TagsFormView(CandourFormView):
     """
     Form view for creating and updating Ticket Tags.
     """

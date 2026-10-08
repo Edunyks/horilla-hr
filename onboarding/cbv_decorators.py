@@ -1,7 +1,7 @@
 from employee.models import Employee
-from horilla.horilla_middlewares import _thread_locals
-from horilla.methods import handle_no_permission
-from horilla_views.cbv_methods import decorator_with_arguments
+from candour.candour_middlewares import _thread_locals
+from candour.methods import handle_no_permission
+from candour_views.cbv_methods import decorator_with_arguments
 from onboarding.models import OnboardingStage, OnboardingTask
 from recruitment.models import Recruitment
 

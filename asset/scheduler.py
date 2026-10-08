@@ -9,7 +9,7 @@ from datetime import date, timedelta
 from django.urls import reverse
 from django.utils.translation import gettext_noop
 
-from horilla.scheduling import register_job
+from candour.scheduling import register_job
 from notifications.signals import notify
 
 
@@ -18,14 +18,14 @@ def notify_expiring_assets():
     Finds all Expiring Assets and send a notification on the notify_before date.
     """
     from asset.models import Asset
-    from horilla_auth.models import HorillaUser
+    from candour_auth.models import CandourUser
 
     today = date.today()
     assets = Asset.objects.all()
 
     # Cache bot & superuser once
-    bot = HorillaUser.objects.filter(username="Horilla Bot").only("id").first()
-    superuser = HorillaUser.objects.filter(is_superuser=True).only("id").first()
+    bot = CandourUser.objects.filter(username="Candour Bot").only("id").first()
+    superuser = CandourUser.objects.filter(is_superuser=True).only("id").first()
 
     # Query only assets that are expiring today
     assets = Asset.objects.filter(
@@ -75,12 +75,12 @@ def notify_expiring_documents():
     """
     Finds all Expiring Documents and send a notification on the notify_before date.
     """
-    from horilla_auth.models import HorillaUser
-    from horilla_documents.models import Document
+    from candour_auth.models import CandourUser
+    from candour_documents.models import Document
 
     today = date.today()
     documents = Document.objects.all()
-    bot = HorillaUser.objects.filter(username="Horilla Bot").first()
+    bot = CandourUser.objects.filter(username="Candour Bot").first()
     for document in documents:
         if document.expiry_date:
             expiry_date = document.expiry_date

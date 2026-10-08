@@ -28,13 +28,13 @@ from base.models import (
     WorkType,
 )
 from employee.models import Employee
-from horilla.filters import (
+from candour.filters import (
     FilterSet,
-    HorillaFilterSet,
+    CandourFilterSet,
     filter_by_name,
     filter_name_or_badge_terms,
 )
-from horilla_views.templatetags.generic_template_filters import getattribute
+from candour_views.templatetags.generic_template_filters import getattribute
 
 from .models import (
     AvailableLeave,
@@ -45,7 +45,7 @@ from .models import (
 )
 
 
-class LeaveTypeFilter(HorillaFilterSet):
+class LeaveTypeFilter(CandourFilterSet):
     """
     Filter class for LeaveType model.
 
@@ -73,7 +73,7 @@ class LeaveTypeFilter(HorillaFilterSet):
         exclude = ["icon"]
 
 
-class AssignedLeaveFilter(HorillaFilterSet):
+class AssignedLeaveFilter(CandourFilterSet):
     """
     Filter class for AvailableLeave model.
 
@@ -97,13 +97,13 @@ class AssignedLeaveFilter(HorillaFilterSet):
     # Dedicated comma-separated "Name or Badge ID" search, alongside the
     # AJAX employee_id picker below rather than instead of it -- same
     # field/behavior as LeaveRequestFilter.name_or_badge; see
-    # horilla.filters.filter_name_or_badge_terms for the shared matching
+    # candour.filters.filter_name_or_badge_terms for the shared matching
     # logic.
     name_or_badge = django_filters.CharFilter(
         method="filter_name_or_badge", label=_("Name or Badge ID")
     )
 
-    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism,
+    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism,
     # see LeaveRequestFilter.ajax_fields for the full explanation).
     ajax_fields = {
         "employee_id": {
@@ -160,7 +160,7 @@ class AssignedLeaveFilter(HorillaFilterSet):
     def filter_name_or_badge(self, queryset, name, value):
         """
         Filter panel's dedicated "Name or Badge ID" field (see
-        name_or_badge above) -- see horilla.filters.
+        name_or_badge above) -- see candour.filters.
         filter_name_or_badge_terms for the shared comma-separated
         matching logic.
         """
@@ -181,7 +181,7 @@ class AssignedLeaveFilter(HorillaFilterSet):
         )
 
 
-class LeaveRequestFilter(HorillaFilterSet):
+class LeaveRequestFilter(CandourFilterSet):
     """
     Filter class for LeaveRequest model.
     This filter allows searching LeaveRequest objects
@@ -225,13 +225,13 @@ class LeaveRequestFilter(HorillaFilterSet):
     # Dedicated comma-separated "Name or Badge ID" search, alongside the
     # AJAX employee_id picker below rather than instead of it -- same
     # field/behavior as EmployeeFilter.name_or_badge/AttendanceFilters.
-    # name_or_badge; see horilla.filters.filter_name_or_badge_terms for the
+    # name_or_badge; see candour.filters.filter_name_or_badge_terms for the
     # shared matching logic.
     name_or_badge = django_filters.CharFilter(
         method="filter_name_or_badge", label=_("Name or Badge ID")
     )
 
-    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism,
+    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism,
     # see EmployeeFilter.ajax_fields for the full explanation) -- every
     # model/queryset-backed field in the modern filter panel opts in here
     # instead of pre-rendering its whole queryset as <option> tags.
@@ -424,7 +424,7 @@ class LeaveRequestFilter(HorillaFilterSet):
     def filter_name_or_badge(self, queryset, name, value):
         """
         Filter panel's dedicated "Name or Badge ID" field (see
-        name_or_badge above) -- see horilla.filters.
+        name_or_badge above) -- see candour.filters.
         filter_name_or_badge_terms for the shared comma-separated
         matching logic (also used by EmployeeFilter and AttendanceFilters).
         """
@@ -439,7 +439,7 @@ class LeaveRequestFilter(HorillaFilterSet):
     def _build_custom_filter_fields(self):
         """
         Registry backing the Advanced section's "+ Add filter" builder
-        (see HorillaFilterSet._build_custom_filter_fields's docstring
+        (see CandourFilterSet._build_custom_filter_fields's docstring
         for the two supported entry shapes) -- same "choose field, then
         lookup, then value" pattern used by AttendanceFilters/
         EmployeeFilter/AssetFilter. Start Date/End Date are deliberately
@@ -467,7 +467,7 @@ class LeaveRequestFilter(HorillaFilterSet):
 
     def filter_queryset(self, queryset):
         """
-        HorillaFilterSet._apply_custom_filters isn't wired into the base
+        CandourFilterSet._apply_custom_filters isn't wired into the base
         filter_queryset automatically -- this is the minimal "call it at
         the end" hookup, same as AttendanceFilters/FeedbackFilter/
         AssetFilter.
@@ -526,7 +526,7 @@ class UserLeaveRequestFilter(FilterSet):
 
     def __init__(self, data=None, queryset=None, *, request=None, prefix=None):
         super().__init__(data=data, queryset=queryset, request=request, prefix=prefix)
-        from horilla.horilla_middlewares import _thread_locals
+        from candour.candour_middlewares import _thread_locals
 
         request = getattr(_thread_locals, "request", None)
         leave_requests = request.user.employee_get.leaverequest_set.all()
@@ -536,7 +536,7 @@ class UserLeaveRequestFilter(FilterSet):
         self.form.fields["leave_type_id"].queryset = assigned_leave_types
 
 
-class LeaveAllocationRequestFilter(HorillaFilterSet):
+class LeaveAllocationRequestFilter(CandourFilterSet):
     """
     Filter class for LeaveAllocationRequest model specific to user leave requests.
     This filter allows searching user-specific LeaveRequest objects
@@ -558,16 +558,16 @@ class LeaveAllocationRequestFilter(HorillaFilterSet):
     # Dedicated comma-separated "Name or Badge ID" search, alongside the
     # AJAX employee_id picker below rather than instead of it -- same
     # field/behavior as LeaveRequestFilter.name_or_badge; see
-    # horilla.filters.filter_name_or_badge_terms for the shared matching
+    # candour.filters.filter_name_or_badge_terms for the shared matching
     # logic.
     name_or_badge = django_filters.CharFilter(
         method="filter_name_or_badge", label=_("Name or Badge ID")
     )
-    # created_by is a FK to HorillaUser, not Employee -- rendering/
+    # created_by is a FK to CandourUser, not Employee -- rendering/
     # filtering on it directly (Meta.fields's own auto-generated
     # ModelChoiceFilter) surfaced raw usernames/emails ("admin",
-    # "michael.brown@horilla.com", ...) in the picker instead of the
-    # employee's name, since a HorillaUser has no display-friendly
+    # "michael.brown@candoursystems.com", ...) in the picker instead of the
+    # employee's name, since a CandourUser has no display-friendly
     # __str__ of its own. Overrides that auto field with one that goes
     # through the User -> Employee reverse OneToOne instead
     # (Employee.employee_user_id's related_name="employee_get", see
@@ -579,7 +579,7 @@ class LeaveAllocationRequestFilter(HorillaFilterSet):
         label=_("Created By"),
     )
 
-    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism,
+    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism,
     # see EmployeeFilter.ajax_fields for the full explanation).
     ajax_fields = {
         "employee_id": {
@@ -617,7 +617,7 @@ class LeaveAllocationRequestFilter(HorillaFilterSet):
     def filter_name_or_badge(self, queryset, name, value):
         """
         Filter panel's dedicated "Name or Badge ID" field (see
-        name_or_badge above) -- see horilla.filters.
+        name_or_badge above) -- see candour.filters.
         filter_name_or_badge_terms for the shared comma-separated
         matching logic (also used by EmployeeFilter/AttendanceFilters/
         LeaveRequestFilter).
@@ -633,7 +633,7 @@ class LeaveAllocationRequestFilter(HorillaFilterSet):
     def _build_custom_filter_fields(self):
         """
         Registry backing the Advanced section's "+ Add filter" builder
-        (see HorillaFilterSet._build_custom_filter_fields's docstring
+        (see CandourFilterSet._build_custom_filter_fields's docstring
         for the two supported entry shapes) -- same "choose field, then
         lookup, then value" pattern used by AttendanceFilters/
         EmployeeFilter/AssetFilter. Requested Date and Created At are
@@ -663,7 +663,7 @@ class LeaveAllocationRequestFilter(HorillaFilterSet):
 
     def filter_queryset(self, queryset):
         """
-        HorillaFilterSet._apply_custom_filters isn't wired into the base
+        CandourFilterSet._apply_custom_filters isn't wired into the base
         filter_queryset automatically -- this is the minimal "call it at
         the end" hookup, same as AttendanceFilters/FeedbackFilter/
         AssetFilter.
@@ -762,7 +762,7 @@ class LeaveAllocationRequestReGroup:
     ]
 
 
-class RestrictLeaveFilter(HorillaFilterSet):
+class RestrictLeaveFilter(CandourFilterSet):
     """
     Filter class for Restrict model.
 
@@ -781,7 +781,7 @@ class RestrictLeaveFilter(HorillaFilterSet):
         widget=forms.DateInput(attrs={"type": "date"}),
     )
 
-    # HorillaFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism,
+    # CandourFilterSet.ajax_fields (generic AJAX-loaded combobox mechanism,
     # see LeaveRequestFilter.ajax_fields for the full explanation). No
     # employee field exists on this model, so there's no "Name or Badge
     # ID" search here -- unlike the other modernized panels this session.
@@ -815,7 +815,7 @@ class RestrictLeaveFilter(HorillaFilterSet):
     def _build_custom_filter_fields(self):
         """
         Registry backing the Advanced section's "+ Add filter" builder
-        (see HorillaFilterSet._build_custom_filter_fields's docstring
+        (see CandourFilterSet._build_custom_filter_fields's docstring
         for the two supported entry shapes) -- same "choose field, then
         lookup, then value" pattern used by AttendanceFilters/
         EmployeeFilter/AssetFilter. Start Date/End Date used to each
@@ -852,7 +852,7 @@ class RestrictLeaveFilter(HorillaFilterSet):
 
     def filter_queryset(self, queryset):
         """
-        HorillaFilterSet._apply_custom_filters isn't wired into the base
+        CandourFilterSet._apply_custom_filters isn't wired into the base
         filter_queryset automatically -- this is the minimal "call it at
         the end" hookup, same as AttendanceFilters/FeedbackFilter/
         AssetFilter.

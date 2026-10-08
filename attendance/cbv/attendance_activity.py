@@ -12,11 +12,11 @@ from attendance.filters import AttendanceActivityFilter
 from attendance.forms import AttendanceActivityExportForm
 from attendance.models import AttendanceActivity
 from base.methods import filtersubordinates, has_export_access, is_reportingmanager
-from horilla_views.cbv_methods import hx_request_required, login_required
-from horilla_views.generic.cbv.views import (
-    HorillaDetailedView,
-    HorillaListView,
-    HorillaNavView,
+from candour_views.cbv_methods import hx_request_required, login_required
+from candour_views.generic.cbv.views import (
+    CandourDetailedView,
+    CandourListView,
+    CandourNavView,
     TemplateView,
 )
 
@@ -31,7 +31,7 @@ class AttendanceActivityView(TemplateView):
 
 
 @method_decorator(login_required, name="dispatch")
-class AttendanceActivityListView(HorillaListView):
+class AttendanceActivityListView(CandourListView):
     """
     list view of the page
     """
@@ -115,7 +115,7 @@ class AttendanceActivityListView(HorillaListView):
 
 
 @method_decorator(login_required, name="dispatch")
-class AttendanceActivityNavView(HorillaNavView):
+class AttendanceActivityNavView(CandourNavView):
     """
     nav bar
     """
@@ -176,7 +176,7 @@ class AttendanceActivityNavView(HorillaNavView):
     filter_instance = AttendanceActivityFilter()
     filter_form_context_name = "form"
     search_swap_target = "#listContainer"
-    # Modern slide-over filter panel (horilla_nav.html's .oh-filter-modern
+    # Modern slide-over filter panel (candour_nav.html's .oh-filter-modern
     # styles) -- AttendanceActivityFilter.ajax_fields carries the
     # AJAX-loaded comboboxes this needs, same as AttendancesNavView.
     modern_filter = True
@@ -227,7 +227,7 @@ class AttendanceActivityNavView(HorillaNavView):
 
 
 @method_decorator(login_required, name="dispatch")
-class AttendanceDetailView(HorillaDetailedView):
+class AttendanceDetailView(CandourDetailedView):
     """
     Detail view of page
     """

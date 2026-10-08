@@ -18,8 +18,8 @@ from datetime import date, timedelta
 from django.apps import apps
 from django.test import TestCase
 
-from horilla.testkit.company import clear_selected_company
-from horilla.testkit.factories import (
+from candour.testkit.company import clear_selected_company
+from candour.testkit.factories import (
     get_hired_stage,
     make_attendance,
     make_available_leave,
@@ -60,26 +60,26 @@ class StandardReportExecutionTests(TestCase):
         # invisible to them.
         cls.emp_a = make_employee(
             company=cls.company,
-            email="a@test.horilla",
+            email="a@test.candour",
             first_name="Ann",
             date_joining=cls.today - timedelta(days=400),
         )
         cls.emp_b = make_employee(
             company=cls.company,
-            email="b@test.horilla",
+            email="b@test.candour",
             first_name="Bob",
             date_joining=cls.today - timedelta(days=20),
         )
         cls.emp_left = make_employee(
             company=cls.company,
-            email="c@test.horilla",
+            email="c@test.candour",
             first_name="Cara",
             date_joining=cls.today - timedelta(days=40),
         )
         cls.emp_left.is_active = False
         cls.emp_left.save(update_fields=["is_active"])
         cls.emp_other = make_employee(
-            company=cls.other_company, email="d@test.horilla", first_name="Dan"
+            company=cls.other_company, email="d@test.candour", first_name="Dan"
         )
 
         cls._seed_exits()
@@ -168,7 +168,7 @@ class StandardReportExecutionTests(TestCase):
         make_candidate(
             recruitment=cls.recruitment,
             stage=cls.stage,
-            email="cand1@test.horilla",
+            email="cand1@test.candour",
         )
         # Candidate.save() derives `hired` from the stage's stage_type, so a
         # hired candidate has to sit on the real hired stage rather than
@@ -177,7 +177,7 @@ class StandardReportExecutionTests(TestCase):
         make_candidate(
             recruitment=cls.recruitment,
             stage=hired_stage,
-            email="cand2@test.horilla",
+            email="cand2@test.candour",
             name="Hired Candidate",
             hired=True,
         )
@@ -379,13 +379,13 @@ class ReportNumericAgreementTests(TestCase):
         cls.today = date.today()
         cls.company = make_company("Agreement Corp")
         cls.active_1 = make_employee(
-            company=cls.company, email="act1@test.horilla", first_name="Act1"
+            company=cls.company, email="act1@test.candour", first_name="Act1"
         )
         cls.active_2 = make_employee(
-            company=cls.company, email="act2@test.horilla", first_name="Act2"
+            company=cls.company, email="act2@test.candour", first_name="Act2"
         )
         cls.terminated = make_employee(
-            company=cls.company, email="term@test.horilla", first_name="Term"
+            company=cls.company, email="term@test.candour", first_name="Term"
         )
         cls.terminated.is_active = False
         cls.terminated.save(update_fields=["is_active"])
@@ -468,7 +468,7 @@ class ReportQueryBudgetTests(TestCase):
         cls.employees = [
             make_employee(
                 company=cls.company,
-                email=f"budget{i}@test.horilla",
+                email=f"budget{i}@test.candour",
                 first_name=f"Emp{i}",
             )
             for i in range(6)
@@ -517,7 +517,7 @@ class SubscriptionClaimTests(TestCase):
 
         cls.company = make_company("Claim Corp")
         cls.employee = make_employee(
-            company=cls.company, email="claim@test.horilla", first_name="Claim"
+            company=cls.company, email="claim@test.candour", first_name="Claim"
         )
         # The owner has to clear both the view and export permission gates,
         # or delivery exits before ever reaching the claim.
@@ -533,7 +533,7 @@ class SubscriptionClaimTests(TestCase):
 
         return patch(
             "report.delivery.ConfiguredEmailBackend.dynamic_from_email_with_display_name",
-            new_callable=lambda: property(lambda self: "reports@test.horilla"),
+            new_callable=lambda: property(lambda self: "reports@test.candour"),
             create=True,
         )
 
@@ -631,7 +631,7 @@ class AsyncExportScopingTests(TestCase):
             with self.assertRaises(async_export.ExportQueueFull):
                 async_export.queue_export_email(
                     user_id=1,
-                    to_email="x@test.horilla",
+                    to_email="x@test.candour",
                     slug="workforce-composition",
                     fmt="xlsx",
                     filters_dict={},
@@ -672,14 +672,14 @@ class PivotTruncationDisclosureTests(TestCase):
 
         rows = [{"n": i} for i in range(12)]
         response = pivot_json_with_meta(rows, limit=5)
-        self.assertEqual(response["X-Horilla-Pivot-Truncated"], "1")
-        self.assertEqual(response["X-Horilla-Pivot-Limit"], "5")
+        self.assertEqual(response["X-Candour-Pivot-Truncated"], "1")
+        self.assertEqual(response["X-Candour-Pivot-Limit"], "5")
 
     def test_untruncated_response_sets_no_flag(self):
         from report.pivot_limits import pivot_json_with_meta
 
         response = pivot_json_with_meta([{"n": 1}], limit=5)
-        self.assertIsNone(response.get("X-Horilla-Pivot-Truncated"))
+        self.assertIsNone(response.get("X-Candour-Pivot-Truncated"))
 
     def test_notice_script_is_loaded_for_pivot_pages(self):
         """The banner is installed once in the shared base template rather
@@ -706,8 +706,8 @@ class PivotTruncationDisclosureTests(TestCase):
             / "pivot_safety.js"
         )
         source = script.read_text(encoding="utf-8")
-        self.assertIn("X-Horilla-Pivot-Truncated", source)
-        self.assertIn("X-Horilla-Pivot-Limit", source)
+        self.assertIn("X-Candour-Pivot-Truncated", source)
+        self.assertIn("X-Candour-Pivot-Limit", source)
 
 
 class SharedFormulaGuardTests(TestCase):
@@ -717,7 +717,7 @@ class SharedFormulaGuardTests(TestCase):
     """
 
     def test_triggers_are_neutralized(self):
-        from horilla.export_safety import neutralize_formula
+        from candour.export_safety import neutralize_formula
 
         for payload in (
             '=HYPERLINK("http://evil.test","x")',
@@ -736,7 +736,7 @@ class SharedFormulaGuardTests(TestCase):
             self.assertTrue(guarded.startswith("'"), f"not neutralized: {payload!r}")
 
     def test_ordinary_text_and_numbers_pass_through(self):
-        from horilla.export_safety import neutralize_formula, safe_cell
+        from candour.export_safety import neutralize_formula, safe_cell
 
         self.assertEqual(neutralize_formula("Ann Smith"), "Ann Smith")
         self.assertEqual(neutralize_formula(""), "")
@@ -748,7 +748,7 @@ class SharedFormulaGuardTests(TestCase):
         self.assertEqual(safe_cell(None), "")
 
     def test_report_export_uses_the_shared_guard(self):
-        from horilla.export_safety import neutralize_formula
+        from candour.export_safety import neutralize_formula
         from report.export import _neutralize_formula
 
         self.assertEqual(_neutralize_formula("=cmd"), neutralize_formula("=cmd"))
@@ -758,8 +758,8 @@ class SharedFormulaGuardTests(TestCase):
         import inspect
 
         from base import methods as base_methods
-        from horilla_views import cbv_methods as hv_cbv
-        from horilla_views import views as hv_views
+        from candour_views import cbv_methods as hv_cbv
+        from candour_views import views as hv_views
 
         self.assertIn("safe_cell", inspect.getsource(base_methods.export_data))
         self.assertIn("safe_cell", inspect.getsource(hv_views))
@@ -770,7 +770,7 @@ class SharedFormulaGuardTests(TestCase):
         easiest way to reintroduce the sink."""
         import inspect
 
-        from horilla_views import cbv_methods as hv_cbv
+        from candour_views import cbv_methods as hv_cbv
 
         source = inspect.getsource(hv_cbv)
         # Header rows are literals built in-module, not user data; the two
@@ -788,7 +788,7 @@ class SharedFormulaGuardTests(TestCase):
         script = (
             base / "report" / "static" / "report" / "js" / "pivot_safety.js"
         ).read_text(encoding="utf-8")
-        self.assertIn("horillaSafeCell", script)
+        self.assertIn("candourSafeCell", script)
 
         for name in (
             "employee",
@@ -800,10 +800,10 @@ class SharedFormulaGuardTests(TestCase):
             "recruitment",
         ):
             markup = (
-                base / "horilla_theme" / "templates" / "report" / f"{name}_report.html"
+                base / "candour_theme" / "templates" / "report" / f"{name}_report.html"
             ).read_text(encoding="utf-8")
             self.assertIn(
-                "horillaSafeCell",
+                "candourSafeCell",
                 markup,
                 f"{name} pivot export writes cells unguarded",
             )
@@ -823,7 +823,7 @@ class PeriodNoteDisclosureTests(TestCase):
 
         cls.today = date.today()
         cls.company = make_company("Note Corp")
-        make_employee(company=cls.company, email="note@test.horilla", first_name="Note")
+        make_employee(company=cls.company, email="note@test.candour", first_name="Note")
 
     def setUp(self):
         clear_selected_company()
@@ -853,7 +853,7 @@ class PeriodNoteDisclosureTests(TestCase):
 
         markup = (
             Path(settings.BASE_DIR)
-            / "horilla_theme"
+            / "candour_theme"
             / "templates"
             / "report"
             / "standard_report.html"
@@ -872,7 +872,7 @@ class PeriodNoteDisclosureTests(TestCase):
 
         markup = (
             Path(settings.BASE_DIR)
-            / "horilla_theme"
+            / "candour_theme"
             / "templates"
             / "report"
             / "standard_report.html"
@@ -883,7 +883,7 @@ class PeriodNoteDisclosureTests(TestCase):
 class AuditActivityScopingTests(TestCase):
     """
     auditlog.LogEntry is third-party: no company column, no
-    HorillaCompanyManager. Unlike every other model the metrics layer
+    CandourCompanyManager. Unlike every other model the metrics layer
     touches, it returned every tenant's activity to any viewer.
     """
 
@@ -898,13 +898,13 @@ class AuditActivityScopingTests(TestCase):
         cls.user_b = make_user("audit-b")
         cls.emp_a = make_employee(
             company=cls.company_a,
-            email="aa@test.horilla",
+            email="aa@test.candour",
             first_name="AuditA",
             user=cls.user_a,
         )
         cls.emp_b = make_employee(
             company=cls.company_b,
-            email="bb@test.horilla",
+            email="bb@test.candour",
             first_name="AuditB",
             user=cls.user_b,
         )
@@ -1025,7 +1025,7 @@ class MetricTruncationDisclosureTests(TestCase):
         self.assertIn("(sample)", inspect.getsource(export._write_data_sheet))
         markup = (
             Path(settings.BASE_DIR)
-            / "horilla_theme"
+            / "candour_theme"
             / "templates"
             / "report"
             / "standard_report.html"
@@ -1078,13 +1078,13 @@ class CohortActiveFilterTests(TestCase):
         # inside the 90-day window.
         cls.early_leaver = make_employee(
             company=cls.company,
-            email="leaver@test.horilla",
+            email="leaver@test.candour",
             first_name="Early",
             date_joining=cls.today - timedelta(days=40),
         )
         cls.stayer = make_employee(
             company=cls.company,
-            email="stayer@test.horilla",
+            email="stayer@test.candour",
             first_name="Stayer",
             date_joining=cls.today - timedelta(days=40),
         )
@@ -1145,7 +1145,7 @@ class CohortActiveFilterTests(TestCase):
 
 class TemplateShadowingTests(TestCase):
     """
-    horilla/settings/base.py puts the theme filesystem loader ahead of
+    candour/settings/base.py puts the theme filesystem loader ahead of
     app_directories, so report/templates/report/*.html could never render --
     4,165 lines of it were being maintained alongside the live theme copies
     that actually shadow them.
@@ -1169,7 +1169,7 @@ class TemplateShadowingTests(TestCase):
             with self.subTest(explorer=name):
                 origin = get_template(f"report/{name}_report.html").origin.name or ""
                 self.assertIn(
-                    "horilla_theme",
+                    "candour_theme",
                     origin,
                     f"{name} no longer resolves to the theme copy: {origin}",
                 )
@@ -1184,7 +1184,7 @@ class TemplateShadowingTests(TestCase):
         self.assertFalse(
             shadowed.exists(),
             "report/templates/report/ is shadowed by the theme loader and can "
-            "never render; put explorer templates in horilla_theme instead.",
+            "never render; put explorer templates in candour_theme instead.",
         )
 
     def test_dead_export_helper_stays_deleted(self):
@@ -1198,7 +1198,7 @@ class TemplateShadowingTests(TestCase):
         self.assertFalse(
             (base / "report" / "static" / "report" / "js" / "report_export.js").exists()
         )
-        theme = base / "horilla_theme" / "templates" / "report"
+        theme = base / "candour_theme" / "templates" / "report"
         for path in theme.glob("*_report.html"):
             self.assertNotIn(
                 "report_export.js",
@@ -1224,7 +1224,7 @@ class ExplorerStylesheetTests(TestCase):
 
         return (
             Path(settings.BASE_DIR)
-            / "horilla_theme"
+            / "candour_theme"
             / "templates"
             / "report"
             / f"{name}_report.html"

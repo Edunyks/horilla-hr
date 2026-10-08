@@ -2,7 +2,7 @@
 
 from django.test import TestCase
 
-from horilla.testkit import make_company, make_employee, make_user
+from candour.testkit import make_company, make_employee, make_user
 
 
 class TestkitFactorySmokeTests(TestCase):
@@ -11,7 +11,7 @@ class TestkitFactorySmokeTests(TestCase):
         user = make_user("factory_user")
         emp = make_employee(
             company=company,
-            email="factory@test.horilla",
+            email="factory@test.candour",
             first_name="Fac",
             last_name="Tory",
         )

@@ -1,4 +1,4 @@
-# Code owners for horilla-hr.
+# Code owners for candour-hr.
 #
 # A path listed here gets its owner requested automatically as a reviewer on
 # any PR that touches it -- a routing hint, so changes to the files that
@@ -18,40 +18,40 @@
 # So treat a request generated from this file as a prompt, not a gate.
 
 # Default owner for anything not matched below.
-*                               @horilla-opensource
+*                               @candour-opensource
 
 # --- Deployment and runtime configuration ---
 # Settings decide DEBUG, ALLOWED_HOSTS, the security gate, storage backends
 # and the auth stack. A wrong edit here is a production incident, not a bug.
-/horilla/settings/              @horilla-opensource
-/horilla/observability.py       @horilla-opensource
-/horilla/scheduling.py          @horilla-opensource
+/candour/settings/              @candour-opensource
+/candour/observability.py       @candour-opensource
+/candour/scheduling.py          @candour-opensource
 
 # Container and process configuration: how many workers run, which process
 # owns the scheduled jobs, what the entrypoint does on boot.
-/Dockerfile                     @horilla-opensource
-/docker-compose.yml             @horilla-opensource
-/docker-compose.prod.yml        @horilla-opensource
-/docker/                        @horilla-opensource
+/Dockerfile                     @candour-opensource
+/docker-compose.yml             @candour-opensource
+/docker-compose.prod.yml        @candour-opensource
+/docker/                        @candour-opensource
 
 # --- CI and its own gates ---
 # A PR can otherwise edit the checks that are meant to be gating it.
-/.github/                       @horilla-opensource
+/.github/                       @candour-opensource
 
 # --- Dependencies ---
 # Pins carry CVE rationale inline; a bump can silently reintroduce an
 # advisory or break a transitive constraint.
-/requirements.txt               @horilla-opensource
+/requirements.txt               @candour-opensource
 
 # --- Multi-tenancy and authentication ---
 # Company scoping is enforced in a small number of places. Everything else
 # in the product inherits its correctness from these files.
-/base/horilla_company_manager.py  @horilla-opensource
-/base/middleware.py               @horilla-opensource
-/base/auth_backends.py            @horilla-opensource
-/horilla_api/authentication.py    @horilla-opensource
-/horilla/decorators.py            @horilla-opensource
+/base/candour_company_manager.py  @candour-opensource
+/base/middleware.py               @candour-opensource
+/base/auth_backends.py            @candour-opensource
+/candour_api/authentication.py    @candour-opensource
+/candour/decorators.py            @candour-opensource
 
 # --- Payroll ---
 # Money. Changes here have legal consequences for employees.
-/payroll/                       @horilla-opensource
+/payroll/                       @candour-opensource

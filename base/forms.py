@@ -51,7 +51,7 @@ from base.models import (
     EmployeeShiftSchedule,
     EmployeeType,
     Holidays,
-    HorillaMailTemplate,
+    CandourMailTemplate,
     JobPosition,
     JobRole,
     MultipleApprovalCondition,
@@ -72,13 +72,13 @@ from base.models import (
 from base.widgets import CustomModelChoiceWidget
 from employee.filters import EmployeeFilter
 from employee.models import Employee, EmployeeTag
-from horilla import horilla_middlewares
-from horilla.horilla_middlewares import _thread_locals
-from horilla.methods import get_horilla_model_class
-from horilla_audit.models import AuditTag
-from horilla_auth.models import HorillaUser
-from horilla_widgets.widgets.horilla_multi_select_field import HorillaMultiSelectField
-from horilla_widgets.widgets.select_widgets import HorillaMultiSelectWidget
+from candour import candour_middlewares
+from candour.candour_middlewares import _thread_locals
+from candour.methods import get_candour_model_class
+from candour_audit.models import AuditTag
+from candour_auth.models import CandourUser
+from candour_widgets.widgets.candour_multi_select_field import CandourMultiSelectField
+from candour_widgets.widgets.select_widgets import CandourMultiSelectWidget
 
 # your form here
 
@@ -191,7 +191,7 @@ class ModelForm(forms.ModelForm):
 
         reload_queryset(self.fields)
 
-        request = getattr(horilla_middlewares._thread_locals, "request", None)
+        request = getattr(candour_middlewares._thread_locals, "request", None)
 
         today = date.today()
         now = datetime.now()
@@ -433,11 +433,11 @@ class AssignUserGroup(Form):
     Form to assign employees to a group (searchable multi-select).
     """
 
-    employee = HorillaMultiSelectField(
+    employee = CandourMultiSelectField(
         queryset=Employee.objects.filter(
             is_active=True, employee_user_id__isnull=False
         ),
-        widget=HorillaMultiSelectWidget(
+        widget=CandourMultiSelectWidget(
             filter_route_name="employee-widget-filter",
             filter_class=EmployeeFilter,
             filter_instance_context_name="f",
@@ -474,7 +474,7 @@ class AssignUserGroup(Form):
             {"data-placeholder": _("Search employees...")}
         )
         from base.auth_backends import company_scoped_active, get_assigned_company_ids
-        from horilla.horilla_middlewares import _thread_locals
+        from candour.candour_middlewares import _thread_locals
 
         self._grantable_company_ids = None
         if not company_scoped_active():
@@ -654,9 +654,9 @@ class AssignPermission(Form):
     Forms to assign user permision
     """
 
-    employee = HorillaMultiSelectField(
+    employee = CandourMultiSelectField(
         queryset=Employee.objects.all(),
-        widget=HorillaMultiSelectWidget(
+        widget=CandourMultiSelectWidget(
             filter_route_name="employee-widget-filter",
             filter_class=EmployeeFilter,
             filter_instance_context_name="f",
@@ -703,7 +703,7 @@ class AssignPermission(Form):
         ).values_list("employee_user_id", flat=True)
         permissions = self.cleaned_data["permissions"]
         permissions = Permission.objects.filter(codename__in=permissions)
-        users = HorillaUser.objects.filter(id__in=user_ids)
+        users = CandourUser.objects.filter(id__in=user_ids)
         for user in users:
             user.user_permissions.add(*permissions)
 
@@ -915,7 +915,7 @@ class JobPositionMultiForm(ModelForm):
     JobPosition model's form
     """
 
-    department_id = HorillaMultiSelectField(
+    department_id = CandourMultiSelectField(
         queryset=Department.objects.all(),
         label=JobPosition._meta.get_field("department_id").verbose_name,
         widget=forms.SelectMultiple(
@@ -1252,9 +1252,9 @@ class RotatingWorkTypeAssignForm(ModelForm):
         "rotate_every": 12,
     }
 
-    # employee_id = HorillaMultiSelectField(
+    # employee_id = CandourMultiSelectField(
     #     queryset=Employee.objects.filter(employee_work_info__isnull=False),
-    #     widget=HorillaMultiSelectWidget(
+    #     widget=CandourMultiSelectWidget(
     #         filter_route_name="employee-widget-filter",
     #         filter_class=EmployeeFilter,
     #         filter_instance_context_name="f",
@@ -1298,11 +1298,11 @@ class RotatingWorkTypeAssignForm(ModelForm):
         request = getattr(_thread_locals, "request", None)
         self.fields["employee_id"].initial = request.GET.get("emp_id")
         if not self.instance.pk and not request.GET.get("emp_id"):
-            self.fields["employee_id"] = HorillaMultiSelectField(
+            self.fields["employee_id"] = CandourMultiSelectField(
                 queryset=Employee.objects.filter(
                     employee_work_info__isnull=False, is_active=True
                 ),
-                widget=HorillaMultiSelectWidget(
+                widget=CandourMultiSelectWidget(
                     filter_route_name="employee-widget-filter",
                     filter_class=EmployeeFilter,
                     filter_instance_context_name="f",
@@ -1638,7 +1638,7 @@ class EmployeeShiftScheduleUpdateForm(ModelForm):
         """
 
         context = {"form": self}
-        table_html = render_to_string("horilla_form.html", context)
+        table_html = render_to_string("candour_form.html", context)
         return table_html
 
     def clean(self):
@@ -1726,7 +1726,7 @@ class EmployeeShiftScheduleForm(ModelForm):
         """
 
         context = {"form": self}
-        table_html = render_to_string("horilla_form.html", context)
+        table_html = render_to_string("candour_form.html", context)
         return table_html
 
     def clean(self):
@@ -1925,9 +1925,9 @@ class RotatingShiftAssignForm(ModelForm):
         "rotate_every": 12,
     }
 
-    # employee_id = HorillaMultiSelectField(
+    # employee_id = CandourMultiSelectField(
     #     queryset=Employee.objects.filter(employee_work_info__isnull=False),
-    #     widget=HorillaMultiSelectWidget(
+    #     widget=CandourMultiSelectWidget(
     #         filter_route_name="employee-widget-filter",
     #         filter_class=EmployeeFilter,
     #         filter_instance_context_name="f",
@@ -1972,11 +1972,11 @@ class RotatingShiftAssignForm(ModelForm):
         request = getattr(_thread_locals, "request", None)
         self.fields["employee_id"].initial = request.GET.get("emp_id")
         if not self.instance.pk and not request.GET.get("emp_id"):
-            self.fields["employee_id"] = HorillaMultiSelectField(
+            self.fields["employee_id"] = CandourMultiSelectField(
                 queryset=Employee.objects.filter(
                     employee_work_info__isnull=False, is_active=True
                 ),
-                widget=HorillaMultiSelectWidget(
+                widget=CandourMultiSelectWidget(
                     filter_route_name="employee-widget-filter",
                     filter_class=EmployeeFilter,
                     filter_instance_context_name="f",
@@ -2249,7 +2249,7 @@ class ShiftRequestForm(ModelForm):
         Render the form fields as HTML table rows with Bootstrap styling.
         """
         context = {"form": self}
-        table_html = render_to_string("horilla_form.html", context)
+        table_html = render_to_string("candour_form.html", context)
         return table_html
 
     def save(self, commit: bool = ...):
@@ -2317,7 +2317,7 @@ class ShiftAllocationForm(ModelForm):
         Render the form fields as HTML table rows with Bootstrap styling.
         """
         context = {"form": self}
-        table_html = render_to_string("horilla_form.html", context)
+        table_html = render_to_string("candour_form.html", context)
         return table_html
 
     def save(self, commit: bool = ...):
@@ -2369,7 +2369,7 @@ class WorkTypeRequestForm(ModelForm):
         Render the form fields as HTML table rows with Bootstrap styling.
         """
         context = {"form": self}
-        table_html = render_to_string("horilla_form.html", context)
+        table_html = render_to_string("candour_form.html", context)
         return table_html
 
     def save(self, commit: bool = ...):
@@ -2493,7 +2493,7 @@ class ChangeUsernameForm(forms.Form):
 
     def clean_password(self):
         username = self.cleaned_data.get("username")
-        if HorillaUser.objects.filter(username=username).exists():
+        if CandourUser.objects.filter(username=username).exists():
             raise forms.ValidationError(_("Username already exists."))
         password = self.cleaned_data.get("password")
         if not self.user.check_password(password):
@@ -2569,7 +2569,7 @@ excluded_fields = [
     "created_by",
     "modified_by",
     "additional_data",
-    "horilla_history",
+    "candour_history",
     "additional_data",
 ]
 
@@ -2680,7 +2680,7 @@ class TagsForm(ModelForm):
         Render the form fields as HTML table rows with Bootstrap styling.
         """
         context = {"form": self}
-        table_html = render_to_string("horilla_form.html", context)
+        table_html = render_to_string("candour_form.html", context)
         return table_html
 
 
@@ -2764,7 +2764,7 @@ class DynamicMailConfForm(ModelForm):
         Render the form fields as HTML table rows with Bootstrap styling.
         """
         context = {"form": self}
-        table_html = render_to_string("horilla_form.html", context)
+        table_html = render_to_string("candour_form.html", context)
         return table_html
 
 
@@ -2784,7 +2784,7 @@ class MailTemplateForm(ModelForm):
     cols = {"title": 12, "body": 12, "company_id": 12}
 
     class Meta:
-        model = HorillaMailTemplate
+        model = CandourMailTemplate
         fields = "__all__"
         widgets = {
             "body": forms.Textarea(
@@ -2950,9 +2950,9 @@ class AnnouncementForm(ModelForm):
     Announcement Form
     """
 
-    employees = HorillaMultiSelectField(
+    employees = CandourMultiSelectField(
         queryset=Employee.objects.all(),
-        widget=HorillaMultiSelectWidget(
+        widget=CandourMultiSelectWidget(
             filter_route_name="employee-widget-filter",
             filter_class=EmployeeFilter,
             filter_instance_context_name="f",
@@ -3057,7 +3057,7 @@ class AnnouncementForm(ModelForm):
         cleaned_data = super().clean()
 
         # Remove 'employees' field error if it's handled manually
-        if isinstance(self.fields["employees"], HorillaMultiSelectField):
+        if isinstance(self.fields["employees"], CandourMultiSelectField):
             self.errors.pop("employees", None)
             employee_data = self.fields["employees"].queryset.filter(
                 id__in=self.data.getlist("employees")
@@ -3177,7 +3177,7 @@ class PassWordResetForm(forms.Form):
         user.
         """
         username = self.cleaned_data["email"]
-        user = HorillaUser.objects.get(username=username)
+        user = CandourUser.objects.get(username=username)
         employee = user.employee_get
         email = employee.email
         work_mail = None
@@ -3193,14 +3193,14 @@ class PassWordResetForm(forms.Form):
         elif request is not None:
             # get_current_site() resolves through django.contrib.sites, whose
             # only row on a normal install is the one its own migration
-            # creates -- domain "example.com". Nothing in Horilla ever updates
+            # creates -- domain "example.com". Nothing in Candour ever updates
             # it, so every reset link pointed at example.com while the rest of
             # the product was reachable on the real host. Leave-request mail
             # never had the problem because it takes the host straight off the
             # request (leave/threading.py), which is what this now does too.
             #
             # request.get_host() and not the X-Forwarded-Host reader in
-            # horilla_dbtemplate.utils.site: get_host() is validated against
+            # candour_dbtemplate.utils.site: get_host() is validated against
             # ALLOWED_HOSTS, and a reset link is exactly the wrong place to
             # trust an unvalidated header -- that is how reset-link poisoning
             # works. Deployments behind a proxy should set USE_X_FORWARDED_HOST,
@@ -3476,7 +3476,7 @@ class CompanyLeaveForm(ModelForm):
         choices = [("", "All")] + list(self.fields["based_on_week"].choices[1:])
         self.fields["based_on_week"].choices = choices
         self.fields["based_on_week"].widget.option_template_name = (
-            "horilla_widgets/select_option.html"
+            "candour_widgets/select_option.html"
         )
 
 
@@ -3494,7 +3494,7 @@ class PenaltyAccountForm(ModelForm):
         employee = kwargs.pop("employee", None)
         super().__init__(*args, **kwargs)
         if apps.is_installed("leave") and employee:
-            LeaveType = get_horilla_model_class(app_label="leave", model="leavetype")
+            LeaveType = get_candour_model_class(app_label="leave", model="leavetype")
             available_leaves = employee.available_leave.all()
             assigned_leave_types = LeaveType.objects.filter(
                 id__in=available_leaves.values_list("leave_type_id", flat=True)

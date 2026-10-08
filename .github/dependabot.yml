@@ -1,4 +1,4 @@
-# Keep Horilla HR dependencies and Actions current (open-source supply chain).
+# Keep Candour HR dependencies and Actions current (open-source supply chain).
 version: 2
 updates:
   - package-ecosystem: pip

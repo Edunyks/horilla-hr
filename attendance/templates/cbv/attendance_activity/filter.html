@@ -5,7 +5,7 @@
         Outside any accordion (always visible, not collapsible) -- same
         placement as Employee/Attendance's own panels. Dedicated
         comma-separated search (AttendanceActivityFilter.name_or_badge --
-        see horilla.filters.filter_name_or_badge_terms) -- e.g. "PEP01,
+        see candour.filters.filter_name_or_badge_terms) -- e.g. "PEP01,
         PEP02, jane" matches any log entry whose employee's name or badge
         matches ANY one of those terms.
     {% endcomment %}
@@ -178,8 +178,8 @@
                 AttendanceFilters did for attendance_clock_in/
                 attendance_clock_out. Registry: AttendanceActivityFilter.
                 _build_custom_filter_fields; applied server-side by
-                HorillaFilterSet._apply_custom_filters. Row markup/JS are
-                generic (initCustomFilterBuilder, horilla_nav.html) --
+                CandourFilterSet._apply_custom_filters. Row markup/JS are
+                generic (initCustomFilterBuilder, candour_nav.html) --
                 same builder Employee/Attendance use.
             {% endcomment %}
             <div class="row">

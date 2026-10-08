@@ -14,10 +14,10 @@ from base.methods import (
     sanitize_mail_template_body,
 )
 from employee.models import Employee
-from horilla import horilla_middlewares
-from horilla.decorators import login_required, owner_can_enter, permission_required
-from horilla.methods import handle_no_permission
-from horilla_views.generic.cbv import views
+from candour import candour_middlewares
+from candour.decorators import login_required, owner_can_enter, permission_required
+from candour.methods import handle_no_permission
+from candour_views.generic.cbv import views
 from pms import models
 from pms.filters import BonusPointSettingFilter, EmployeeBonusPointFilter
 from pms.forms import (
@@ -33,7 +33,7 @@ from pms.methods import check_duplication
 # ================Models for BonusPointSetting==============
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("pms.view_bonuspointsetting"), name="dispatch")
-class BonusPointSettingSectionView(views.HorillaSectionView):
+class BonusPointSettingSectionView(views.CandourSectionView):
     """
     BonusPointSetting SectionView
     """
@@ -51,7 +51,7 @@ class BonusPointSettingSectionView(views.HorillaSectionView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("pms.view_bonuspointsetting"), name="dispatch")
-class BonusPointSettingNavView(views.HorillaNavView):
+class BonusPointSettingNavView(views.CandourNavView):
     """
     BonusPointSetting nav view
     """
@@ -75,7 +75,7 @@ class BonusPointSettingNavView(views.HorillaNavView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("pms.add_bonuspointsetting"), name="dispatch")
-class BonusPointSettingFormView(views.HorillaFormView):
+class BonusPointSettingFormView(views.CandourFormView):
     """
     BonusPointSettingForm View
     """
@@ -119,7 +119,7 @@ class BonusPointSettingFormView(views.HorillaFormView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("pms.view_bonuspointsetting"), name="dispatch")
-class BonusPointSettingListView(views.HorillaListView):
+class BonusPointSettingListView(views.CandourListView):
     """
     BnusPointSetting list view
     """
@@ -152,7 +152,7 @@ class BonusPointSettingListView(views.HorillaListView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("pms.view_bonuspointsetting"), name="dispatch")
-class BonusPointSettingDetailView(views.HorillaDetailedView):
+class BonusPointSettingDetailView(views.CandourDetailedView):
     """
     BonusPointSetting detail view
     """
@@ -183,7 +183,7 @@ class BonusPointSettingDetailView(views.HorillaDetailedView):
 
 
 @method_decorator(login_required, name="dispatch")
-class EmployeeBonusPointSectionView(views.HorillaSectionView):
+class EmployeeBonusPointSectionView(views.CandourSectionView):
     """
     EmployeeBonusPoint SectionView
     """
@@ -200,7 +200,7 @@ class EmployeeBonusPointSectionView(views.HorillaSectionView):
 
 
 @method_decorator(login_required, name="dispatch")
-class EmployeeBonusPointNavView(views.HorillaNavView):
+class EmployeeBonusPointNavView(views.CandourNavView):
     """
     BonusPoint nav view
     """
@@ -241,7 +241,7 @@ class EmployeeBonusPointNavView(views.HorillaNavView):
 
 
 @method_decorator(login_required, name="dispatch")
-class EmployeeBonusPointFormView(views.HorillaFormView):
+class EmployeeBonusPointFormView(views.CandourFormView):
     """
     BonusPointForm View
     """
@@ -293,7 +293,7 @@ class EmployeeBonusPointFormView(views.HorillaFormView):
 
 
 @method_decorator(login_required, name="dispatch")
-class EmployeeBonusPointListView(views.HorillaListView):
+class EmployeeBonusPointListView(views.CandourListView):
     """
     BnusPoint list view
     """
@@ -328,7 +328,7 @@ class EmployeeBonusPointListView(views.HorillaListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        request = getattr(horilla_middlewares._thread_locals, "request", None)
+        request = getattr(candour_middlewares._thread_locals, "request", None)
         if is_reportingmanager(request) or request.user.has_perm(
             "pms.view_employeebonuspoint"
         ):
@@ -343,7 +343,7 @@ class EmployeeBonusPointListView(views.HorillaListView):
 
 
 @method_decorator(login_required, name="dispatch")
-class FeedbackEmployeeFormView(views.HorillaFormView):
+class FeedbackEmployeeFormView(views.CandourFormView):
     """
     Feedback other employee form View
     """
@@ -380,7 +380,7 @@ class FeedbackEmployeeFormView(views.HorillaFormView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(permission_required("pms.add_feedback"), name="dispatch")
-class BulkFeedbackFormView(views.HorillaFormView):
+class BulkFeedbackFormView(views.CandourFormView):
     """
     Feedback other employee form View
     """

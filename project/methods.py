@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 from base.methods import get_pagination, get_subordinates
 from employee.models import Employee
-from horilla.http import HorillaRedirect
+from candour.http import CandourRedirect
 from project.models import Project, Task, TimeSheet
 
 decorator_with_arguments = (
@@ -121,7 +121,7 @@ def is_projectmanager_or_member_or_perms(function, perm):
             or any_task_member(user)
         ):
             return function(request, *args, **kwargs)
-        return HorillaRedirect(request, message=_("You don't have permission."))
+        return CandourRedirect(request, message=_("You don't have permission."))
 
     return _function
 

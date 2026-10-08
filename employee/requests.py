@@ -7,7 +7,7 @@ Requests landing page with tabbed shift, inbox, work type, and document sections
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
-from horilla.decorators import hx_request_required
+from candour.decorators import hx_request_required
 
 
 @login_required

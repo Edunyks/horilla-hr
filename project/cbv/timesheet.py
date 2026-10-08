@@ -18,15 +18,15 @@ from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 
 from employee.models import Employee
-from horilla_views.cbv_methods import login_required
-from horilla_views.generic.cbv.views import (
-    HorillaCardView,
-    HorillaDetailedView,
-    HorillaFormView,
-    HorillaListView,
-    HorillaNavView,
-    HorillaTabContentShell,
-    HorillaTabView,
+from candour_views.cbv_methods import login_required
+from candour_views.generic.cbv.views import (
+    CandourCardView,
+    CandourDetailedView,
+    CandourFormView,
+    CandourListView,
+    CandourNavView,
+    CandourTabContentShell,
+    CandourTabView,
     TemplateView,
 )
 from project.cbv.cbv_decorators import is_projectmanager_or_member_or_perms
@@ -48,7 +48,7 @@ class TimeSheetView(TemplateView):
 
 
 @method_decorator(login_required, name="dispatch")
-class TimeSheetTabView(HorillaTabView):
+class TimeSheetTabView(CandourTabView):
     """My Timesheets / All Timesheets tabs."""
 
     def __init__(self, **kwargs: Any) -> None:
@@ -75,7 +75,7 @@ class TimeSheetTabView(HorillaTabView):
             )
 
 
-class TimeSheetTabShell(HorillaTabContentShell):
+class TimeSheetTabShell(CandourTabContentShell):
     """All Timesheets tab pane."""
 
     nav_url_name = "time-sheet-nav"
@@ -83,7 +83,7 @@ class TimeSheetTabShell(HorillaTabContentShell):
     tabs_root_id = "timesheetTabContainer"
 
 
-class MyTimeSheetTabShell(HorillaTabContentShell):
+class MyTimeSheetTabShell(CandourTabContentShell):
     """My Timesheets tab pane."""
 
     nav_url_name = "my-time-sheet-nav"
@@ -95,7 +95,7 @@ class MyTimeSheetTabShell(HorillaTabContentShell):
 @method_decorator(
     is_projectmanager_or_member_or_perms("project.view_timesheet"), name="dispatch"
 )
-class TimeSheetNavView(HorillaNavView):
+class TimeSheetNavView(CandourNavView):
     """
     Nav bar
     """
@@ -192,7 +192,7 @@ class TimeSheetNavView(HorillaNavView):
 
 
 @method_decorator(login_required, name="dispatch")
-class MyTimeSheetNavView(HorillaNavView):
+class MyTimeSheetNavView(CandourNavView):
     """Nav bar for the My Timesheets tab."""
 
     filter_form_context_name = "form"
@@ -257,7 +257,7 @@ class MyTimeSheetNavView(HorillaNavView):
 @method_decorator(
     is_projectmanager_or_member_or_perms("project.view_timesheet"), name="dispatch"
 )
-class TimeSheetList(HorillaListView):
+class TimeSheetList(CandourListView):
     """
     Time sheet list view
     """
@@ -416,7 +416,7 @@ class TimeSheetList(HorillaListView):
 
 
 @method_decorator(login_required, name="dispatch")
-class MyTimeSheetList(HorillaListView):
+class MyTimeSheetList(CandourListView):
     """List view for the My Timesheets tab -- own logged entries only."""
 
     model = TimeSheet
@@ -598,7 +598,7 @@ class TaskTimeSheet(TimeSheetList):
         return context
 
     def get_queryset(self):
-        queryset = HorillaListView.get_queryset(self)
+        queryset = CandourListView.get_queryset(self)
         task_id = self.kwargs.get("task_id")
         task = Task.objects.filter(id=task_id).first()
         queryset = TimeSheet.objects.filter(task_id=task_id)
@@ -624,7 +624,7 @@ class TaskTimeSheet(TimeSheetList):
 @method_decorator(
     is_projectmanager_or_member_or_perms("project.view_timesheet"), name="dispatch"
 )
-class TimeSheetFormView(HorillaFormView):
+class TimeSheetFormView(CandourFormView):
     """
     form view for create project
     """
@@ -755,7 +755,7 @@ class TimeSheetFormView(HorillaFormView):
 @method_decorator(
     is_projectmanager_or_member_or_perms("project.view_timesheet"), name="dispatch"
 )
-class TimeSheetCardView(HorillaCardView):
+class TimeSheetCardView(CandourCardView):
     """
     For card view
     """
@@ -920,7 +920,7 @@ class TimeSheetCardView(HorillaCardView):
 @method_decorator(
     is_projectmanager_or_member_or_perms("project.view_timesheet"), name="dispatch"
 )
-class TimeSheetDetailView(HorillaDetailedView):
+class TimeSheetDetailView(CandourDetailedView):
     """
     detail view of the page
     """

@@ -11,7 +11,7 @@ from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from horilla.testkit import make_company, make_employee
+from candour.testkit import make_company, make_employee
 from offboarding.dashboard import PIPELINE_STAGE_TYPES
 from offboarding.models import Offboarding, OffboardingEmployee, OffboardingStage
 
@@ -22,14 +22,14 @@ class OffboardingPipelineWidgetTests(TestCase):
         User = get_user_model()
         self.admin = User.objects.create_superuser(
             username="pipeline-admin",
-            email="pipeline-admin@test.horilla",
+            email="pipeline-admin@test.candour",
             password="pass",
         )
         # A superuser with no linked Employee gets redirected to the new-hire
         # onboarding flow before ever reaching the dashboard view.
         make_employee(
             company=self.company,
-            email="pipeline-admin-profile@test.horilla",
+            email="pipeline-admin-profile@test.candour",
             user=self.admin,
         )
         self.client = Client()
@@ -50,7 +50,7 @@ class OffboardingPipelineWidgetTests(TestCase):
             return OffboardingStage.objects.get(offboarding_id=process, type=stage_type)
 
         employees = [
-            make_employee(company=self.company, email=f"exit{i}@test.horilla")
+            make_employee(company=self.company, email=f"exit{i}@test.candour")
             for i in range(5)
         ]
 
