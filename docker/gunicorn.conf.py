@@ -10,10 +10,11 @@ host = "0.0.0.0"
 port = int(os.environ.get("PORT", "8000"))
 
 # Worker settings
+# `or`, not a get() default: Compose's ${GUNICORN_WORKERS:-} passes an empty
+# string when the variable is unset, and int("") crash-loops the container.
 workers = int(
-    os.environ.get(
-        "GUNICORN_WORKERS", max(2, min(multiprocessing.cpu_count() * 2 + 1, 8))
-    )
+    os.environ.get("GUNICORN_WORKERS")
+    or max(2, min(multiprocessing.cpu_count() * 2 + 1, 8))
 )
 worker_class = "gthread"
 threads = 4
