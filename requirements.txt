@@ -58,8 +58,10 @@ djangorestframework-simplejwt==5.5.1
 # by default carries a verifier-side algorithm allow-list bypass
 # (PYSEC-2026-176) and skips RFC 7515 crit-header validation
 # (PYSEC-2026-120). Both sit directly on the JWT verification path this
-# project authenticates API clients with. 2.13.0 clears all six.
-PyJWT==2.13.0
+# project authenticates API clients with. 2.13.0 cleared those six; 2.15.1
+# also clears the 2.13.0 advisories (PYSEC-2026-4140..4152, 4183,
+# CVE-2026-102268), two of which are only fixed from 2.15.0.
+PyJWT==2.15.1
 drf-yasg==1.21.15
 
 # Data processing

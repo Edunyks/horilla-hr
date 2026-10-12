@@ -185,7 +185,7 @@ function clearSelection(storeKey) {
 }
 
 /**
- * Clear list-row selections when switching Horilla tabs. Lists may use a
+ * Clear list-row selections when switching Candour tabs. Lists may use a
  * custom store (#selectedTickets, etc.) instead of #selectedInstances — the
  * generic tab onclick used to only clear selectedInstances, so selections
  * from one tab (e.g. My Tickets) leaked into another (Suggested Tickets).
