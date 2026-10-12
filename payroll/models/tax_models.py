@@ -14,6 +14,7 @@ from django.utils.translation import gettext_lazy as _
 
 from base.horilla_company_manager import HorillaCompanyManager
 from base.models import Company
+from horilla.horilla_middlewares import get_selected_company
 from horilla.models import HorillaModel
 from payroll.models.models import FilingStatus
 
@@ -42,6 +43,26 @@ class PayrollSettings(HorillaModel):
 
     def __str__(self):
         return f"Payroll Settings {self.currency_symbol}"
+
+    @classmethod
+    def for_current_company(cls):
+        """
+        Return the settings row for the selected company.
+
+        The settings page saves to the row whose company_id is the selected
+        company (None for "All Companies"), but the company-scoped manager
+        also matches company_id IS NULL rows. Taking `.objects.first()`
+        therefore usually returned the older shared row, so a saved currency
+        or position never showed up. Prefer the exact match, then the shared
+        row, then anything visible.
+        """
+        company = get_selected_company()
+        queryset = cls.objects.order_by("pk")
+        if company and company != "all":
+            row = queryset.filter(company_id=company).first()
+            if row:
+                return row
+        return queryset.filter(company_id__isnull=True).first() or queryset.first()
 
 
 class TaxBracket(HorillaModel):
