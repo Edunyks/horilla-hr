@@ -24,6 +24,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_GET, require_POST
 
 from horilla.decorators import permission_required
+from horilla.modules import disabled_url_names
 from horilla_tour.filters import TourFilter
 from horilla_tour.forms import TourForm, TourStepForm
 from horilla_tour.models import Tour, TourProgress, TourStep
@@ -119,8 +120,13 @@ def tour_active(request):
         p.tour_id: p for p in TourProgress.objects.filter(user=user, tour__in=tours)
     }
 
+    # Tours of a module switched off by ENABLED_MODULES (horilla/modules.py).
+    hidden_pages = disabled_url_names()
+
     payload = []
     for tour in tours:
+        if tour.match_type == "url_name" and tour.page_match in hidden_pages:
+            continue
         if not _tour_matches_page(tour, page, path):
             continue
         steps = _serialize_steps(tour, page)

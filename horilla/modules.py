@@ -146,3 +146,39 @@ def mount_disabled_urls(prefix, urlconf):
     urlpatterns.append(
         path(prefix, (_not_found_patterns(patterns), app_name, namespace))
     )
+
+
+def payroll_dashboard_is_home(user):
+    """
+    True when the payroll dashboard replaces the home dashboard for ``user``:
+    a payroll-only build and a user who may open the payroll dashboard. Every
+    one else keeps the role-based home (analytics dashboard or ESS).
+    """
+    return is_payroll_only() and user.has_perm("payroll.view_payslip")
+
+
+_DISABLED_URL_NAMES = None
+
+
+def disabled_url_names():
+    """
+    URL names that belong to switched-off modules (mounted as 404s by
+    ``mount_disabled_urls``). URLs are fixed at startup, so this is computed
+    once per process.
+    """
+    global _DISABLED_URL_NAMES
+    if _DISABLED_URL_NAMES is None:
+        from django.urls import get_resolver
+
+        names = set()
+
+        def walk(patterns):
+            for pattern in patterns:
+                if hasattr(pattern, "url_patterns"):
+                    walk(pattern.url_patterns)
+                elif pattern.callback is _module_disabled and pattern.name:
+                    names.add(pattern.name)
+
+        walk(get_resolver().url_patterns)
+        _DISABLED_URL_NAMES = frozenset(names)
+    return _DISABLED_URL_NAMES

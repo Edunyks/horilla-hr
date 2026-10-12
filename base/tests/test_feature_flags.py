@@ -16,7 +16,7 @@ from django.apps import apps
 from django.contrib.sessions.backends.db import SessionStore
 from django.http import Http404
 from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
-from django.urls import resolve
+from django.urls import resolve, reverse
 
 from horilla.config import sidebar
 from horilla.menu import get_settings_menu
@@ -27,7 +27,7 @@ from horilla.modules import (
     is_payroll_only,
 )
 from horilla.scheduling import ScheduledJob
-from horilla.testkit.factories import make_user
+from horilla.testkit.factories import make_company, make_employee, make_user
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -158,7 +158,7 @@ class MenuTests(TestCase):
         sidebar_apps = self._sidebar_apps()
         for name in ("recruitment", "onboarding", "pms", "helpdesk", "asset"):
             self.assertNotIn(name, sidebar_apps)
-        self.assertIn("payroll", sidebar_apps)
+        self.assertIn("payroll_sidebars_payslips", sidebar_apps)
         self.assertIn("employee", sidebar_apps)
 
     @override_settings(ENABLED_MODULES=PAYROLL_ONLY)
@@ -219,3 +219,177 @@ class UrlTests(SimpleTestCase):
         )
         self.assertEqual(result.returncode, 0, result.stderr[-3000:])
         self.assertIn("ok", result.stdout)
+
+
+class PayrollOnlySidebarTests(TestCase):
+    """The payroll-only build splits payroll into top-level sections."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.admin = make_user("po-admin", is_superuser=True)
+        cls.plain = make_user("po-plain")
+
+    def _menus(self, user):
+        request = RequestFactory().get("/")
+        request.user = user
+        request.session = SessionStore()
+        request.session.create()
+        sidebar(request)
+        return request.MENUS
+
+    def test_dotted_entries_resolve_to_their_owning_app(self):
+        from horilla.config import resolve_sidebar_entry
+
+        self.assertEqual(
+            resolve_sidebar_entry("payroll.sidebars.contracts"),
+            ("payroll", "payroll.sidebars.contracts"),
+        )
+        self.assertEqual(
+            resolve_sidebar_entry("payroll"), ("payroll", "payroll.sidebar")
+        )
+
+    @override_settings(ENABLED_MODULES=PAYROLL_ONLY)
+    def test_payroll_only_layout(self):
+        labels = [str(menu["menu"]) for menu in self._menus(self.admin)]
+        self.assertEqual(
+            labels,
+            [
+                "Employee",
+                "Attendance",
+                "Leave",
+                "Payslips",
+                "Contracts",
+                "Salary Structures",
+                "Pay Components",
+                "Loans",
+                "Reimbursements",
+                "Income Tax",
+                "Payroll Reports",
+                "Configuration",
+            ],
+        )
+        # Section ids stay unique, they key the open/closed state.
+        apps_ = [menu["app"] for menu in self._menus(self.admin)]
+        self.assertEqual(len(apps_), len(set(apps_)))
+
+    @override_settings(ENABLED_MODULES=None)
+    def test_default_layout_is_unchanged(self):
+        labels = [str(menu["menu"]) for menu in self._menus(self.admin)]
+        self.assertIn("Payroll", labels)
+        self.assertNotIn("Pay Components", labels)
+
+    @override_settings(ENABLED_MODULES=[])
+    def test_payroll_reports_needs_the_report_module(self):
+        labels = [str(menu["menu"]) for menu in self._menus(self.admin)]
+        self.assertIn("Contracts", labels)
+        self.assertNotIn("Payroll Reports", labels)
+
+    @override_settings(ENABLED_MODULES=PAYROLL_ONLY)
+    def test_sections_without_visible_entries_are_dropped(self):
+        labels = [str(menu["menu"]) for menu in self._menus(self.plain)]
+        for label in ("Contracts", "Salary Structures", "Income Tax"):
+            self.assertNotIn(label, labels)
+
+    @override_settings(ENABLED_MODULES=PAYROLL_ONLY)
+    def test_active_link_prefixes_survive_the_split(self):
+        prefixes = {
+            prefix
+            for menu in self._menus(self.admin)
+            for submenu in menu["submenu"]
+            for prefix in submenu.get("match_prefixes", [])
+        }
+        for prefix in (
+            "/payroll/contracts-detail-view/",
+            "/payroll/salary-structure-detail-view/",
+            "/payroll/allowance-detail-view/",
+            "/payroll/deduction-detail-view/",
+            "/payroll/loan-detail-view/",
+            "/payroll/filing-status-detail-view/",
+            "/payroll/detail-view-reimbursement/",
+        ):
+            self.assertIn(prefix, prefixes)
+
+
+class PayrollHomeTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        # Requests from a user without an employee record are logged out.
+        cls.admin = make_user("home-admin", is_superuser=True)
+        make_employee(
+            company=make_company("Home Co"), email="home@test.horilla", user=cls.admin
+        )
+
+    def setUp(self):
+        self.client.force_login(self.admin)
+
+    @override_settings(ENABLED_MODULES=PAYROLL_ONLY)
+    def test_payroll_dashboard_is_home_when_only_payroll_is_on(self):
+        response = self.client.get(reverse("home-page"))
+        self.assertRedirects(
+            response, reverse("view-payroll-dashboard"), fetch_redirect_response=False
+        )
+        response = self.client.get(reverse("dashboard"))
+        self.assertRedirects(
+            response, reverse("view-payroll-dashboard"), fetch_redirect_response=False
+        )
+
+    @override_settings(ENABLED_MODULES=None)
+    def test_home_is_unchanged_by_default(self):
+        response = self.client.get(reverse("home-page"))
+        self.assertRedirects(
+            response, reverse("dashboard"), fetch_redirect_response=False
+        )
+
+    @override_settings(ENABLED_MODULES=PAYROLL_ONLY)
+    def test_salary_structures_page(self):
+        response = self.client.get(reverse("view-salary-structure"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, reverse("salary-structure-nav-view"))
+
+
+class HiddenEntryPointTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.admin = make_user("hidden-admin", is_superuser=True)
+
+    def test_profile_tabs_of_disabled_modules_are_filtered(self):
+        from horilla_views.generic.cbv.views import _profile_tab_enabled
+
+        def recruitment_view(request):
+            return None
+
+        recruitment_view.__module__ = "recruitment.cbv.candidate_profile"
+
+        def payroll_view(request):
+            return None
+
+        payroll_view.__module__ = "payroll.cbv.payslip"
+
+        with override_settings(ENABLED_MODULES=PAYROLL_ONLY):
+            self.assertFalse(_profile_tab_enabled({"view": recruitment_view}))
+            self.assertTrue(_profile_tab_enabled({"view": payroll_view}))
+        with override_settings(ENABLED_MODULES=None):
+            self.assertTrue(_profile_tab_enabled({"view": recruitment_view}))
+
+    def test_settings_search_skips_disabled_modules(self):
+        import json
+
+        from django.template import Context
+
+        from base.templatetags.basefilters import settings_search_index
+
+        request = RequestFactory().get("/")
+        request.user = self.admin
+        request.session = SessionStore()
+        request.session.create()
+        sidebar(request)  # registers the settings sections
+
+        def sections():
+            entries = json.loads(settings_search_index(Context({"request": request})))
+            return {entry["section"] for entry in entries}
+
+        with override_settings(ENABLED_MODULES=None):
+            self.assertIn("Recruitment", sections())
+        with override_settings(ENABLED_MODULES=PAYROLL_ONLY):
+            self.assertNotIn("Recruitment", sections())
+            self.assertIn("Payroll", sections())

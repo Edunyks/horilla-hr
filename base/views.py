@@ -195,7 +195,7 @@ from horilla.group_by import group_by_queryset
 from horilla.http.response import HorillaRedirect
 from horilla.menu import get_settings_menu
 from horilla.methods import get_horilla_model_class, remove_dynamic_url
-from horilla.modules import is_enabled
+from horilla.modules import is_enabled, payroll_dashboard_is_home
 from horilla_audit.forms import HistoryTrackingFieldsForm
 from horilla_audit.models import AccountBlockUnblock, AuditTag, HistoryTrackingFields
 from horilla_auth.models import HorillaUser
@@ -1211,6 +1211,8 @@ def home(request):
     """
     from base.dashboard_roles import can_see_analytics_home, resolve_home_role
 
+    if payroll_dashboard_is_home(request.user):
+        return redirect("view-payroll-dashboard")
     if can_see_analytics_home(resolve_home_role(request)):
         return redirect("dashboard")
     return redirect("ess-dashboard")

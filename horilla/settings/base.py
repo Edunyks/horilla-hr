@@ -478,6 +478,10 @@ TWO_FACTORS_AUTHENTICATION = False
 # Off by default so Docker CI (web without the scheduler service) still passes.
 HORILLA_REQUIRE_SCHEDULER = env.bool("HORILLA_REQUIRE_SCHEDULER", default=False)
 
+# Sidebar sections, in order. An entry is an app label (renders
+# "<app>/sidebar.py") or the dotted path of a sidebar module
+# ("payroll.sidebars.contracts"); either way it is shown only while its owning
+# app -- the first component -- is enabled (see horilla/modules.py).
 SIDEBARS = [
     "employee",
     "attendance",
@@ -491,6 +495,25 @@ SIDEBARS = [
     "asset",
     "helpdesk",
     "report",
+]
+
+# Used instead of SIDEBARS when only payroll is on (horilla.modules.
+# is_payroll_only): payroll is split into top-level sections so the sidebar of
+# a payroll-only build is not three entries long. Dashboard is the fixed top
+# link above these and points at the payroll dashboard in this build.
+PAYROLL_ONLY_SIDEBARS = [
+    "employee",
+    "attendance",
+    "leave",
+    "payroll.sidebars.payslips",
+    "payroll.sidebars.contracts",
+    "payroll.sidebars.salary_structures",
+    "payroll.sidebars.allowances_deductions",
+    "payroll.sidebars.loans",
+    "payroll.sidebars.reimbursements",
+    "payroll.sidebars.income_tax",
+    "payroll.sidebars.reports",
+    "payroll.sidebars.configuration",
 ]
 
 # Audit logging is opt-in: the horilla_audit app registers models explicitly

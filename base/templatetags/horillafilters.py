@@ -264,6 +264,21 @@ def app_installed(app_name):
     return is_enabled(app_name)
 
 
+@register.simple_tag
+def home_dashboard_url(user):
+    """
+    URL of the sidebar's Dashboard link: the payroll dashboard when it is the
+    home page (payroll-only build), the main dashboard otherwise.
+    """
+    from django.urls import reverse
+
+    from horilla.modules import payroll_dashboard_is_home
+
+    if payroll_dashboard_is_home(user):
+        return reverse("view-payroll-dashboard")
+    return reverse("dashboard")
+
+
 @register.filter(name="integration_installed")
 def is_integration_installed(app_name):
     """

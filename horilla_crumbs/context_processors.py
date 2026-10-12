@@ -12,7 +12,7 @@ from django.utils.translation import gettext_lazy as _
 
 from base.context_processors import white_labelling_company
 from employee.models import Employee
-from horilla.modules import is_enabled
+from horilla.modules import is_enabled, payroll_dashboard_is_home
 from horilla.urls import urlpatterns
 
 logger = logging.getLogger(__name__)
@@ -95,6 +95,19 @@ def _resolve_menu_section(path, menus):
             if redirect_root and redirect_root == path_root:
                 return (str(menu.get("menu", "")), redirect)
     return None
+
+
+def _section_for(path, menus, request):
+    """
+    _resolve_menu_section, except that the payroll dashboard is "Dashboard"
+    when it serves as the home page (payroll-only build): it is reached from
+    the sidebar's Dashboard link, not from a payroll section.
+    """
+    if payroll_dashboard_is_home(request.user):
+        home = reverse("view-payroll-dashboard")
+        if path == home:
+            return (_trans("Dashboard"), home)
+    return _resolve_menu_section(path, menus)
 
 
 def sync_session_ids(request, key, queryset):
@@ -383,7 +396,7 @@ def breadcrumbs_legacy(request):
             except Exception:
                 menus = []
 
-        current_section = _resolve_menu_section(request.path, menus)
+        current_section = _section_for(request.path, menus, request)
 
         section_override = None
         try:
@@ -584,7 +597,7 @@ def build_breadcrumbs(request):
             logger.exception("Failed building sidebar menus for breadcrumbs")
             menus = []
 
-    current_section = _resolve_menu_section(request.path, menus)
+    current_section = _section_for(request.path, menus, request)
 
     section_override = None
     referer = request.META.get("HTTP_REFERER")
@@ -595,7 +608,7 @@ def build_breadcrumbs(request):
         except Resolver404:
             referer_url_name = ""
         if "dashboard" in referer_url_name:
-            referer_section = _resolve_menu_section(referer_path, menus)
+            referer_section = _section_for(referer_path, menus, request)
             if referer_section and referer_section != current_section:
                 section_override = {
                     "name": referer_section[0],

@@ -490,8 +490,8 @@ def settings_menu(context):
     return get_settings_menu(request)
 
 
-@register.simple_tag
-def settings_search_index():
+@register.simple_tag(takes_context=True)
+def settings_search_index(context):
     """
     Build the settings search index dynamically from the settings_registry.
 
@@ -511,8 +511,13 @@ def settings_search_index():
     entries = []
     seen = set()  # (text_lower, url) pairs — prevents exact duplicates
 
+    request = context.get("request")
     for cls in settings_registry._entries:
         obj = cls()
+        # Same section-level gate as the settings sidebar, so a module that is
+        # switched off (horilla/modules.py) is not searchable either.
+        if request is not None and not settings_registry._is_visible(obj, request):
+            continue
         section = str(getattr(obj, "title", ""))
         for item in getattr(obj, "items", []):
             page = str(item.get("label", ""))
