@@ -32,6 +32,7 @@ from horilla import horilla_middlewares
 from horilla.horilla_middlewares import _thread_locals
 from horilla.methods import get_horilla_model_class
 from horilla.models import HorillaModel, upload_path
+from horilla.modules import is_enabled
 from horilla_audit.methods import get_diff
 from horilla_audit.models import HorillaAuditInfo, HorillaAuditLog
 from horilla_views.cbv_methods import render_template
@@ -1312,7 +1313,7 @@ class LeaveRequest(HorillaModel):
         """
         leave_requests_with_interview = []
         context = {"instance": self}
-        if apps.is_installed("recruitment"):
+        if is_enabled("recruitment"):
             Schedule = get_horilla_model_class(
                 app_label="recruitment", model="interviewschedule"
             )
@@ -1515,7 +1516,7 @@ class LeaveRequest(HorillaModel):
         """
         leave_requests_with_interview = []
         context = {"instance": self}
-        if apps.is_installed("recruitment"):
+        if is_enabled("recruitment"):
             cache_key = (self.employee_id_id, self.start_date, self.end_date)
             request = getattr(_thread_locals, "request", None)
             cache = None

@@ -8,6 +8,7 @@ from django.apps import apps
 from django.db.models import Count, Q
 from django.utils.translation import gettext as _
 
+from horilla.modules import is_enabled
 from report.engine import ReportFilters, apply_org_filters, empty_report
 
 logger = logging.getLogger(__name__)
@@ -160,7 +161,7 @@ def document_expiry(filters: ReportFilters) -> dict:
             # smaller, apparently valid number. Log it.
             logger.exception("Report metric source unavailable")
 
-    if apps.is_installed("asset"):
+    if is_enabled("asset"):
         try:
             from asset.models import Asset
 
@@ -429,7 +430,7 @@ def asset_register(filters: ReportFilters) -> dict:
     """
     from datetime import date
 
-    if not apps.is_installed("asset"):
+    if not is_enabled("asset"):
         return empty_report(
             _("Asset Register"), filters, _("Asset app is not installed.")
         )

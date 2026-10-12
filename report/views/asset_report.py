@@ -6,7 +6,9 @@ from django.db.models.functions import Concat
 from django.http import JsonResponse
 from django.shortcuts import render
 
-if apps.is_installed("asset"):
+from horilla.modules import is_enabled
+
+if is_enabled("asset"):
     from asset.models import Asset
     from base.methods import has_export_access
     from base.models import Company

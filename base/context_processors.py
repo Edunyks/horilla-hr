@@ -23,6 +23,7 @@ from horilla.__version__ import __version__
 from horilla.decorators import hx_request_required, login_required
 from horilla.http.response import HorillaRedirect
 from horilla.methods import get_horilla_model_class
+from horilla.modules import is_enabled
 
 
 class AllCompany:
@@ -246,7 +247,7 @@ def resignation_request_enabled(request):
     selected_company = request.session.get("selected_company")
     enabled_resignation_request = False
     first = None
-    if apps.is_installed("offboarding"):
+    if is_enabled("offboarding"):
         OffboardingGeneralSetting = get_horilla_model_class(
             app_label="offboarding", model="offboardinggeneralsetting"
         )
@@ -358,7 +359,7 @@ def check_candidate_self_tracking(request):
     """
 
     def _resolve():
-        if not apps.is_installed("recruitment"):
+        if not is_enabled("recruitment"):
             return False
         first = check_candidate_recruitment_setting(request)
         return bool(first and first.candidate_self_tracking)
@@ -372,7 +373,7 @@ def check_candidate_self_tracking_rating(request):
     """
 
     def _resolve():
-        if not apps.is_installed("recruitment"):
+        if not is_enabled("recruitment"):
             return False
         first = check_candidate_recruitment_setting(request)
         return bool(first and first.show_overall_rating)

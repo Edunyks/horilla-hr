@@ -31,6 +31,7 @@ from horilla.decorators import (
 from horilla.group_by import group_by_queryset as group_by
 from horilla.http.response import HorillaRedirect
 from horilla.methods import get_horilla_model_class
+from horilla.modules import is_enabled
 from horilla_auth.models import HorillaUser
 from horilla_views.generic.cbv.views import HorillaFormView
 from notifications.signals import notify
@@ -1385,7 +1386,7 @@ def offboarding_dashboard(request):
     """
 
     onboarding_employees = []
-    if apps.is_installed("recruitment"):
+    if is_enabled("recruitment"):
         Candidate = get_horilla_model_class("recruitment", "candidate")
         onboarding_employees = Candidate.objects.filter(
             onboarding_stage__isnull=False, converted_employee_id__isnull=True
@@ -1432,7 +1433,7 @@ def dashboard_task_table(request):
     )
 
 
-if apps.is_installed("asset"):
+if is_enabled("asset"):
 
     @login_required
     @hx_request_required
@@ -1459,7 +1460,7 @@ if apps.is_installed("asset"):
         )
 
 
-if apps.is_installed("pms"):
+if is_enabled("pms"):
 
     @login_required
     @hx_request_required
@@ -1511,7 +1512,7 @@ def dashboard_join_chart(request):
         resigning_employees.count(),
         archived_employees.count(),
     ]
-    if apps.is_installed("recruitment"):
+    if is_enabled("recruitment"):
         Candidate = get_horilla_model_class(app_label="recruitment", model="candidate")
         onboarding_employees = Candidate.objects.filter(
             onboarding_stage__isnull=False, converted_employee_id__isnull=True

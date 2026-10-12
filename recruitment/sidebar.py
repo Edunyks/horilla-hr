@@ -10,6 +10,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 
 from horilla.menu import settings_menu
+from horilla.modules import is_enabled
 from recruitment.models import InterviewSchedule
 from recruitment.templatetags.recruitmentfilters import (
     is_recruitmentmangers,
@@ -171,7 +172,7 @@ def self_tracking_accessibility(request, submenu, user_perms, *args, **kwargs):
 class RecruitmentSettings:
     title = _("Recruitment")
     order = 4
-    condition = lambda self, request: apps.is_installed("recruitment")
+    condition = lambda self, request: is_enabled("recruitment")
     items = [
         {
             "label": _("Candidate Portal"),

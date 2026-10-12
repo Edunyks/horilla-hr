@@ -7,6 +7,7 @@ from django.contrib.auth.context_processors import PermWrapper
 
 from base.methods import check_manager
 from employee.models import Employee
+from horilla.modules import is_enabled
 from horilla_audit.models import AccountBlockUnblock
 
 
@@ -222,7 +223,7 @@ def allocation_accessibility(
 
     Candidate = (
         apps.get_model("recruitment", "Candidate")
-        if apps.is_installed("recruitment")
+        if is_enabled("recruitment")
         else None
     )
 
@@ -242,7 +243,7 @@ def allocation_accessibility(
     if recruitment and recruitment.recruitment_managers.filter(pk=employee.pk).exists():
         return True
 
-    if apps.is_installed("onboarding"):
+    if is_enabled("onboarding"):
         CandidateStage = apps.get_model("onboarding", "CandidateStage")
         stage_link = CandidateStage.objects.filter(candidate_id=candidate).first()
         if (

@@ -12,6 +12,7 @@ from django.utils.translation import gettext_lazy as _
 
 from base.context_processors import white_labelling_company
 from employee.models import Employee
+from horilla.modules import is_enabled
 from horilla.urls import urlpatterns
 
 logger = logging.getLogger(__name__)
@@ -398,7 +399,7 @@ def breadcrumbs_legacy(request):
 
         if len(parts) > 1:
 
-            if "recruitment" in parts and apps.is_installed("recruitment"):
+            if "recruitment" in parts and is_enabled("recruitment"):
                 if "search-candidate" in parts:
                     pass
                 elif "candidate-view" in parts:

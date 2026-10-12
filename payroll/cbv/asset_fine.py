@@ -12,6 +12,7 @@ from base.templatetags.horillafilters import is_asset_fine_enabled
 from employee.models import Employee
 from horilla.http.response import HorillaRedirect
 from horilla.methods import get_horilla_model_class
+from horilla.modules import is_enabled
 from horilla_views.cbv_methods import login_required
 from horilla_views.generic.cbv.views import HorillaFormView
 from payroll.forms.component_forms import AssetFineForm, LoanAccountForm
@@ -34,7 +35,7 @@ class AssetFineFormView(HorillaFormView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form: AssetFineForm) -> HttpResponse:
-        if apps.is_installed("asset"):
+        if is_enabled("asset"):
             Asset = get_horilla_model_class(app_label="asset", model="asset")
         asset_id = self.request.GET["asset_id"]
         employee_id = self.request.GET["employee_id"]

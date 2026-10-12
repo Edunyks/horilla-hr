@@ -4,6 +4,7 @@ from django.views.generic import RedirectView
 
 from base.cbv import company_leaves, holidays
 from employee.models import Employee
+from horilla.modules import is_enabled
 from leave import dashboard as leave_dashboard
 
 if apps.is_installed("attendance"):
@@ -802,7 +803,7 @@ urlpatterns = [
     ),
 ]
 
-if apps.is_installed("recruitment"):
+if is_enabled("recruitment"):
     urlpatterns.extend(
         [
             path(

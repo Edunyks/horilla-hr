@@ -54,6 +54,7 @@ from horilla.decorators import (
 from horilla.group_by import group_by_queryset
 from horilla.http.response import HorillaRedirect
 from horilla.methods import dynamic_attr, get_horilla_model_class, get_urlencode
+from horilla.modules import is_enabled
 
 # from leave.models import AvailableLeave
 from notifications.signals import notify
@@ -1966,7 +1967,7 @@ def asset_fine(request):
     """
     Add asset fine method
     """
-    if apps.is_installed("asset"):
+    if is_enabled("asset"):
         Asset = get_horilla_model_class(app_label="asset", model="asset")
     asset_id = request.GET["asset_id"]
     employee_id = request.GET["employee_id"]

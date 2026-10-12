@@ -128,6 +128,7 @@ from horilla.filters import HorillaPaginator
 from horilla.group_by import group_by_queryset
 from horilla.http.response import HorillaRedirect
 from horilla.methods import dynamic_attr, get_horilla_model_class
+from horilla.modules import is_enabled
 from horilla_audit.models import AccountBlockUnblock, HistoryTrackingFields
 from horilla_auth.methods import generate_random_password
 from horilla_auth.models import HorillaUser
@@ -2551,7 +2552,7 @@ def replace_employee(request, emp_id):
                         reporting_manager_id=emp_id
                     ).update(reporting_manager_id=replace_emp)
                 elif (
-                    apps.is_installed("recruitment")
+                    is_enabled("recruitment")
                     and field_name == "recruitment_managers"
                     and str(emp_id) != replace_emp_id
                 ):
@@ -2566,7 +2567,7 @@ def replace_employee(request, emp_id):
                             recruitment.recruitment_managers.remove(emp_id)
                             recruitment.recruitment_managers.add(replace_emp)
                 elif (
-                    apps.is_installed("recruitment")
+                    is_enabled("recruitment")
                     and field_name == "recruitment_stage_managers"
                     and str(emp_id) != replace_emp_id
                 ):
@@ -2581,7 +2582,7 @@ def replace_employee(request, emp_id):
                             stage.stage_managers.remove(emp_id)
                             stage.stage_managers.add(replace_emp)
                 elif (
-                    apps.is_installed("onboarding")
+                    is_enabled("onboarding")
                     and field_name == "onboarding_stage_manager"
                     and str(emp_id) != replace_emp_id
                 ):
@@ -2596,7 +2597,7 @@ def replace_employee(request, emp_id):
                             stage.employee_id.remove(emp_id)
                             stage.employee_id.add(replace_emp)
                 elif (
-                    apps.is_installed("onboarding")
+                    is_enabled("onboarding")
                     and field_name == "onboarding_task_manager"
                     and str(emp_id) != replace_emp_id
                 ):
@@ -3310,7 +3311,7 @@ def total_employees_count(request):
 @hx_request_required
 def joining_today_count(request):
     newbies_today = 0
-    if apps.is_installed("recruitment"):
+    if is_enabled("recruitment"):
         Candidate = get_horilla_model_class(app_label="recruitment", model="candidate")
         newbies_today = Candidate.objects.filter(
             joining_date__range=[date.today(), date.today() + timedelta(days=1)],
@@ -3323,7 +3324,7 @@ def joining_today_count(request):
 @hx_request_required
 def joining_week_count(request):
     newbies_week = 0
-    if apps.is_installed("recruitment"):
+    if is_enabled("recruitment"):
         Candidate = get_horilla_model_class(app_label="recruitment", model="candidate")
         newbies_week = Candidate.objects.filter(
             joining_date__range=[

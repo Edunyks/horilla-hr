@@ -7,9 +7,10 @@ Horilla app configurations
 import importlib
 import logging
 
-from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.context_processors import PermWrapper
+
+from horilla.modules import is_enabled
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +38,7 @@ def sidebar(request):
         MENUS = request.MENUS
 
         for app in base_dir_apps:
-            if apps.is_installed(app):
+            if is_enabled(app):
                 try:
                     sidebar = importlib.import_module(app + ".sidebar")
 

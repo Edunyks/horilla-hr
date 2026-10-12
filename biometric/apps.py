@@ -20,6 +20,13 @@ class BiometricConfig(AppConfig):
     name = "biometric"
 
     def ready(self):
+        from horilla.modules import is_enabled, mount_disabled_urls
+
+        if not is_enabled("biometric"):
+            # Switched off by ENABLED_MODULES: models stay, URLs only 404.
+            mount_disabled_urls("biometric/", "biometric.urls")
+            return super().ready()
+
         from django.urls import include, path
 
         from horilla.urls import urlpatterns

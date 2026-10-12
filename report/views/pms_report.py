@@ -6,7 +6,9 @@ from django.db.models.functions import Concat
 from django.http import JsonResponse
 from django.shortcuts import render
 
-if apps.is_installed("pms"):
+from horilla.modules import is_enabled
+
+if is_enabled("pms"):
 
     from base.methods import has_export_access
     from base.models import Company

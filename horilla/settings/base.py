@@ -103,6 +103,33 @@ INSTALLED_APPS = [
 ]
 
 # ========================================
+# OPTIONAL MODULES (feature flag)
+# ========================================
+# Comma-separated list of the optional modules to keep on; see
+# horilla/modules.py for which modules are optional. Switched-off modules stay
+# in INSTALLED_APPS (their tables and migrations are kept) but are hidden:
+# their pages 404 and they get no sidebar or settings entries, signals or
+# scheduled jobs.
+#
+#   ENABLED_MODULES unset / "all"  -> every module on (default)
+#   ENABLED_MODULES=payroll-only   -> payroll build (only "report" kept)
+#   ENABLED_MODULES=report,asset   -> exactly those optional modules
+#   ENABLED_MODULES=none           -> no optional modules
+_enabled_modules = [
+    name.strip().lower()
+    for name in env("ENABLED_MODULES", default="all").split(",")
+    if name.strip()
+]
+if not _enabled_modules or _enabled_modules == ["all"]:
+    ENABLED_MODULES = None
+elif _enabled_modules == ["payroll-only"]:
+    ENABLED_MODULES = ["report"]
+elif _enabled_modules == ["none"]:
+    ENABLED_MODULES = []
+else:
+    ENABLED_MODULES = _enabled_modules
+
+# ========================================
 # REST FRAMEWORK CONFIGURATION
 # ========================================
 

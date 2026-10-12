@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.utils.html import format_html, format_html_join
 from django.utils.translation import gettext_lazy as _
 
+from horilla.modules import is_enabled
 from horilla_views.cbv_methods import render_template
 
 
@@ -485,7 +486,7 @@ ShiftRequestToApprove.__init__ = _shift_request_to_approve_init
 DashboardWorkTypeRequest.__init__ = _work_type_request_to_approve_init
 
 
-if apps.is_installed("pms"):
+if is_enabled("pms"):
     from pms.cbv.meetings import MeetingsDetailedView
 
     _meeting_detailed_init_orig = MeetingsDetailedView.__init__
@@ -504,7 +505,7 @@ if apps.is_installed("pms"):
     MeetingsDetailedView.__init__ = _meeting_detailed_init
 
 
-if apps.is_installed("offboarding"):
+if is_enabled("offboarding"):
     from offboarding.cbv.resignation import ResignationLetterDetailView
 
     _resignation_detailed_init_orig = ResignationLetterDetailView.__init__
@@ -523,7 +524,7 @@ if apps.is_installed("offboarding"):
     ResignationLetterDetailView.__init__ = _resignation_detailed_init
 
 
-if apps.is_installed("project"):
+if is_enabled("project"):
     from project.cbv.timesheet import TimeSheetCardView, TimeSheetList
 
     _timesheet_list_init_orig = TimeSheetList.__init__

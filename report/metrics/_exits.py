@@ -8,6 +8,7 @@ from typing import Iterator
 from django.apps import apps
 from django.db.models import Q
 
+from horilla.modules import is_enabled
 from report.engine import ReportFilters, apply_org_filters
 
 
@@ -52,7 +53,7 @@ def exits_in_period(
 def _offboarding_archived_exits(
     filters: ReportFilters, start: date, end: date
 ) -> Iterator[dict]:
-    if not apps.is_installed("offboarding"):
+    if not is_enabled("offboarding"):
         return
     try:
         OffboardingEmployee = apps.get_model("offboarding", "OffboardingEmployee")
@@ -93,7 +94,7 @@ def _offboarding_archived_exits(
 def _resignation_exits(
     filters: ReportFilters, start: date, end: date
 ) -> Iterator[dict]:
-    if not apps.is_installed("offboarding"):
+    if not is_enabled("offboarding"):
         return
     try:
         ResignationLetter = apps.get_model("offboarding", "ResignationLetter")

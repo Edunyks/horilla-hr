@@ -9,6 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from base.context_processors import enable_late_come_early_out_tracking
 from base.templatetags.basefilters import is_reportingmanager
 from horilla.menu import settings_menu
+from horilla.modules import is_enabled
 
 MENU = _("Attendance")
 IMG_SRC = "images/ui/attendances.svg"
@@ -146,7 +147,7 @@ def validation_condition_accessibility(request, submenu, user_perms, *args, **kw
 
 
 def biometric_accessibility(request, submenu, user_perms, *args, **kwargs):
-    return apps.is_installed("biometric") and request.user.has_perm(
+    return is_enabled("biometric") and request.user.has_perm(
         "base.view_biometricattendance"
     )
 
@@ -161,27 +162,21 @@ def attendance_rule_accessibility(request, submenu, user_perms, *args, **kwargs)
         user.has_perm("base.view_tracklatecomeearlyout")
         or user.has_perm("attendance.change_attendancegeneralsetting")
         or user.has_perm("attendance.view_attendancegeneralsetting")
-        or (
-            apps.is_installed("biometric")
-            and user.has_perm("base.view_biometricattendance")
-        )
+        or (is_enabled("biometric") and user.has_perm("base.view_biometricattendance"))
         or user.has_perm("attendance.add_attendance")
+        or (is_enabled("geofencing") and user.has_perm("geofencing.add_geofencing"))
         or (
-            apps.is_installed("geofencing")
-            and user.has_perm("geofencing.add_geofencing")
-        )
-        or (
-            apps.is_installed("facedetection")
+            is_enabled("facedetection")
             and user.has_perm("facedetection.add_facedetection")
         )
     )
 
 
 def geo_face_accessibility(request, submenu, user_perms, *args, **kwargs):
-    has_geo = apps.is_installed("geofencing") and request.user.has_perm(
+    has_geo = is_enabled("geofencing") and request.user.has_perm(
         "geofencing.add_geofencing"
     )
-    has_face = apps.is_installed("facedetection") and request.user.has_perm(
+    has_face = is_enabled("facedetection") and request.user.has_perm(
         "facedetection.add_facedetection"
     )
     return has_geo or has_face

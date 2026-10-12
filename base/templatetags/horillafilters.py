@@ -19,6 +19,7 @@ from base.models import Company, EmployeeShiftSchedule, IntegrationApps
 from employee.methods.duration_methods import strtime_seconds
 from horilla.horilla_middlewares import _thread_locals
 from horilla.methods import get_horilla_model_class
+from horilla.modules import is_enabled
 from horilla_theme.models import CompanyTheme, HorillaColorTheme
 
 register = template.Library()
@@ -257,9 +258,10 @@ def get_item(list, i):
 @register.filter(name="app_installed")
 def app_installed(app_name):
     """
-    Returns True if the app with the given name is installed, otherwise False.
+    Returns True if the app with the given name is installed and not switched
+    off by ENABLED_MODULES (see horilla/modules.py), otherwise False.
     """
-    return apps.is_installed(app_name)
+    return is_enabled(app_name)
 
 
 @register.filter(name="integration_installed")
@@ -279,6 +281,8 @@ def is_integration_installed(app_name):
     if not IntegrationApps.objects.filter(
         app_label=app_name
     ).exists() and not apps.is_installed(app_name):
+        return False
+    if not is_enabled(app_name):
         return False
 
     return IntegrationApps.objects.filter(

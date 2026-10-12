@@ -18,6 +18,13 @@ class PmsConfig(AppConfig):
     verbose_name = _("Performance")
 
     def ready(self):
+        from horilla.modules import is_enabled, mount_disabled_urls
+
+        if not is_enabled("pms"):
+            # Switched off by ENABLED_MODULES: models stay, URLs only 404.
+            mount_disabled_urls("pms/", "pms.urls")
+            return super().ready()
+
         from django.urls import include, path
 
         from horilla.urls import urlpatterns

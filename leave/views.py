@@ -60,6 +60,7 @@ from horilla.methods import (
     handle_no_permission,
     remove_dynamic_url,
 )
+from horilla.modules import is_enabled
 from leave.decorators import *
 from leave.filters import *
 from leave.forms import *
@@ -599,7 +600,7 @@ def leave_request_view(request):
     leave_requests = queryset
 
     leave_requests_with_interview = []
-    if apps.is_installed("recruitment"):
+    if is_enabled("recruitment"):
         for leave_request in leave_requests:
 
             # Fetch interviews for the employee within the requested leave period
@@ -828,7 +829,7 @@ def leave_request_filter(request):
     leave_requests = queryset
 
     leave_requests_with_interview = []
-    if apps.is_installed("recruitment"):
+    if is_enabled("recruitment"):
         for leave_request in leave_requests:
 
             # Fetch interviews for the employee within the requested leave period
@@ -2724,7 +2725,7 @@ def user_request_view(request):
         leave_requests = queryset
 
         leave_requests_with_interview = []
-        if apps.is_installed("recruitment"):
+        if is_enabled("recruitment"):
             for leave_request in leave_requests:
 
                 # Fetch interviews for the employee within the requested leave period
@@ -2799,7 +2800,7 @@ def user_request_filter(request):
         leave_requests = queryset
 
         leave_requests_with_interview = []
-        if apps.is_installed("recruitment"):
+        if is_enabled("recruitment"):
 
             for leave_request in leave_requests:
 
@@ -5619,7 +5620,7 @@ if apps.is_installed("attendance"):
         )
 
 
-if apps.is_installed("recruitment"):
+if is_enabled("recruitment"):
 
     @login_required
     def check_interview_conflicts(request):

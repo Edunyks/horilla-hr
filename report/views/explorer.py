@@ -8,6 +8,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _lazy
 
 from horilla.decorators import login_required
+from horilla.modules import is_enabled
 
 _DOMAINS = (
     (
@@ -67,7 +68,7 @@ def explorer_domain_entries(request) -> list[dict]:
     user = request.user
     entries = []
     for app_label, url_name, name, description, permission in _DOMAINS:
-        if not apps.is_installed(app_label):
+        if not is_enabled(app_label):
             continue
         if not (user.is_superuser or user.has_perm(permission)):
             continue

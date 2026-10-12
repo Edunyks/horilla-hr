@@ -24,6 +24,7 @@ from django.apps import apps
 
 from base.methods import is_reportingmanager
 from horilla.__version__ import __version__
+from horilla.modules import is_enabled
 
 # Optional apps the mobile client hides features for when absent. Each maps to
 # the app label; ``apps.is_installed`` is the whole check. Note that geofencing
@@ -89,5 +90,5 @@ def build_capabilities(user):
             "view_payslip": user.has_perm("payroll.view_payslip"),
             "edit_own_profile": edit_own_profile,
         },
-        "features": {label: apps.is_installed(label) for label in OPTIONAL_APPS},
+        "features": {label: is_enabled(label) for label in OPTIONAL_APPS},
     }

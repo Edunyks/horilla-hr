@@ -12,6 +12,13 @@ class HelpdeskConfig(AppConfig):
     verbose_name = _("Ticket")
 
     def ready(self):
+        from horilla.modules import is_enabled, mount_disabled_urls
+
+        if not is_enabled("helpdesk"):
+            # Switched off by ENABLED_MODULES: models stay, URLs only 404.
+            mount_disabled_urls("helpdesk/", "helpdesk.urls")
+            return super().ready()
+
         from django.urls import include, path
 
         from horilla.urls import urlpatterns

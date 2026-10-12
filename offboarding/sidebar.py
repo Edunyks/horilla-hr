@@ -8,6 +8,7 @@ from django.utils.translation import gettext_lazy as _
 
 from base.context_processors import resignation_request_enabled
 from horilla.menu import settings_menu
+from horilla.modules import is_enabled
 from offboarding.templatetags.offboarding_filter import (
     any_manager,
     is_offboarding_employee,
@@ -102,7 +103,7 @@ def offboarding_rules_accessibility(request, submenu, user_perms, *args, **kwarg
 class OffboardingSettings:
     title = _("Offboarding")
     order = 8
-    condition = lambda self, request: apps.is_installed("offboarding")
+    condition = lambda self, request: is_enabled("offboarding")
     items = [
         {
             "label": _("Offboarding Rules"),
