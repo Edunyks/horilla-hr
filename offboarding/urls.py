@@ -8,6 +8,7 @@ from django.apps import apps
 from django.urls import path
 from django.views.generic import RedirectView
 
+from horilla.modules import is_enabled
 from horilla_views.cbv_methods import check_feature_enabled
 from offboarding import dashboard as ob_dashboard
 from offboarding import views
@@ -353,7 +354,7 @@ urlpatterns = [
     ),
 ]
 
-if apps.is_installed("asset"):
+if is_enabled("asset"):
     urlpatterns += [
         path(
             "dashboard-asset-table/",
@@ -367,7 +368,7 @@ if apps.is_installed("asset"):
         ),
     ]
 
-if apps.is_installed("pms"):
+if is_enabled("pms"):
     urlpatterns += [
         path(
             "dashboard-feedback-table/",

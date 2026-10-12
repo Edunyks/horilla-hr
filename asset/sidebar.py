@@ -7,6 +7,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 
 from horilla.menu import settings_menu
+from horilla.modules import is_enabled
 
 MENU = _("Assets")
 IMG_SRC = "images/ui/assets.svg"
@@ -99,7 +100,7 @@ def asset_rule_accessibility(request, submenu, user_perms, *args, **kwargs):
 class AssetSettings:
     title = _("Assets")
     order = 9
-    condition = lambda self, request: apps.is_installed("asset")
+    condition = lambda self, request: is_enabled("asset")
     items = [
         {
             "label": _("Asset Rule"),

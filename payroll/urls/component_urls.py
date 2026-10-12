@@ -165,6 +165,11 @@ urlpatterns = [
         name="allowances-deductions-tab",
     ),
     path(
+        "view-salary-structure/",
+        salary_structure.SalaryStructureViewPage.as_view(),
+        name="view-salary-structure",
+    ),
+    path(
         "salary-structure-list-view/",
         salary_structure.SalaryStructureListView.as_view(),
         name="salary-structure-list-view",

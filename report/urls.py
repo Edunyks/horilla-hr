@@ -1,6 +1,7 @@
 from django.apps import apps
 from django.urls import path
 
+from horilla.modules import is_enabled
 from report.cbv import audit as audit_cbv
 from report.cbv import subscriptions as subscriptions_cbv
 from report.views import (
@@ -244,7 +245,7 @@ urlpatterns = [
 ]
 
 
-if apps.is_installed("recruitment"):
+if is_enabled("recruitment"):
     urlpatterns.extend(
         [
             path(
@@ -314,7 +315,7 @@ if apps.is_installed("payroll"):
         ]
     )
 
-if apps.is_installed("asset"):
+if is_enabled("asset"):
     urlpatterns.extend(
         [
             path("asset-report/", asset_report.asset_report, name="asset-report"),
@@ -327,7 +328,7 @@ if apps.is_installed("asset"):
         ]
     )
 
-if apps.is_installed("pms"):
+if is_enabled("pms"):
     urlpatterns.extend(
         [
             path("pms-report/", pms_report.pms_report, name="pms-report"),

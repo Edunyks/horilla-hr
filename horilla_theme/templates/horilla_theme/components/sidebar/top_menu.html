@@ -1,14 +1,15 @@
-{% load i18n static %}
+{% load i18n static horillafilters %}
 {% comment %}
   Dashboard (top-level icon, no submenu panel). We attach the same
   htmx boost params used by submenu links so clicking Dashboard swaps
   only the main content region instead of doing a full page reload.
 {% endcomment %}
+{% home_dashboard_url request.user as dashboard_url %}
 <a
-    href="{% url 'dashboard' %}"
+    href="{{ dashboard_url }}"
     class="sideboxmain group flex items-center gap-3 px-3 py-2.5 rounded-lg w-full transition duration-300"
     data-menu="Dashboard"
-    hx-get="{% url 'dashboard' %}"
+    hx-get="{{ dashboard_url }}"
     hx-target="#ohMainContent"
     hx-select="#ohMainContent > *"
     hx-swap="innerHTML show:window:top"

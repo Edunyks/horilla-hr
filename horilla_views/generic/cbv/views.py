@@ -2607,6 +2607,20 @@ class HorillaNavView(TemplateView):
         return view
 
 
+def _profile_tab_enabled(tab) -> bool:
+    """
+    False for a tab contributed by a module switched off by ENABLED_MODULES.
+    Modules register their tabs on import, which still happens when they are
+    off (their URLs are mounted as 404s), so the tabs are filtered here.
+    """
+    from horilla.modules import OPTIONAL_MODULES, is_enabled
+
+    view = tab.get("view")
+    view = getattr(view, "view_class", view)
+    app = getattr(view, "__module__", "").split(".")[0]
+    return app not in OPTIONAL_MODULES or is_enabled(app)
+
+
 @method_decorator(hx_request_required, name="dispatch")
 class HorillaProfileView(DetailView):
     """
@@ -2698,7 +2712,8 @@ class HorillaProfileView(DetailView):
     def get_context_data(self, **kwargs: Any) -> dict:
         context = super().get_context_data(**kwargs)
         context["instance"] = context["object"]
-        context["tabs"] = self.tabs
+        tabs = [tab for tab in self.tabs if _profile_tab_enabled(tab)]
+        context["tabs"] = tabs
         context["view_id"] = self.view_id
         active_tab = models.ActiveTab.objects.filter(
             created_by=self.request.user, path=self.request.path
@@ -2735,7 +2750,7 @@ class HorillaProfileView(DetailView):
             user_id=self.request.user, path=self.request.path_info
         ).first()
 
-        self.visible_tabs = self.tabs.copy()
+        self.visible_tabs = tabs.copy()
 
         self.tabs_list = [(tab["title"], tab["title"]) for tab in self.visible_tabs]
 
@@ -2787,6 +2802,6 @@ def dispatch_profile_tab(request, tab_key: str, pk: int, *args, **kwargs):
     if not request.user.is_authenticated:
         return redirect(f"{reverse('login')}?next={request.path}")
     view_func = HorillaProfileView._tab_view_registry.get(tab_key)
-    if view_func is None:
+    if view_func is None or not _profile_tab_enabled({"view": view_func}):
         raise Http404(f"No profile tab registered for '{tab_key}'")
     return view_func(request, *args, pk=pk, **kwargs)

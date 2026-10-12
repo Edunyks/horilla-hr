@@ -14,6 +14,12 @@ class HorillaDBTemplateConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
 
     def ready(self):
+        from horilla.modules import is_enabled
+
+        if not is_enabled("horilla_dbtemplate"):
+            # Switched off by ENABLED_MODULES: models stay, signals do not run.
+            return super().ready()
+
         from . import signals
 
         return super().ready()

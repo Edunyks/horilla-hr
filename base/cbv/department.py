@@ -15,6 +15,7 @@ from django.utils.translation import gettext_lazy as _
 from base.filters import DepartmentViewFilter
 from base.forms import DepartmentForm
 from base.models import Department
+from horilla.modules import is_enabled
 from horilla_views.cbv_methods import login_required, permission_required
 from horilla_views.generic.cbv.views import (
     HorillaDetailedView,
@@ -32,7 +33,7 @@ def _attach_department_managers(departments):
     """
     departments = list(departments)
     manager_names_by_department = {}
-    if apps.is_installed("helpdesk") and departments:
+    if is_enabled("helpdesk") and departments:
         from helpdesk.models import DepartmentManager
 
         assignments = DepartmentManager.objects.filter(

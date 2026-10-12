@@ -10,6 +10,7 @@ from typing import Callable, Optional
 from django.apps import apps
 from django.utils.translation import gettext_lazy as _
 
+from horilla.modules import is_enabled
 from report.engine import ReportFilters
 
 QueryFn = Callable[[ReportFilters], dict]
@@ -40,7 +41,7 @@ class ReportDefinition:
     drilldown_fn: Optional[DrilldownFn] = None
 
     def is_available(self) -> bool:
-        return all(apps.is_installed(app) for app in self.required_apps)
+        return all(is_enabled(app) for app in self.required_apps)
 
     def user_has_permission(self, user) -> bool:
         if not user or not user.is_authenticated:

@@ -1,0 +1,14 @@
+{% extends "index.html" %}
+{% load static %}
+{% load i18n %}
+
+{% comment %}
+    Standalone Salary Structures page for the payroll-only sidebar. Same
+    content as the Salary Structures tab of Payroll Settings.
+{% endcomment %}
+{% block content %}
+    <meta name="csrf-token" content="{{ csrf_token }}">
+
+    {% include "generic/components.html" %}
+    {% include "cbv/payroll_settings/salary_structure_tab.html" %}
+{% endblock content %}

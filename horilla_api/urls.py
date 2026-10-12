@@ -4,6 +4,7 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
+from horilla.modules import is_enabled
 from horilla_api.schema import OrderedTagSchemaGenerator
 
 # Create schema view for Swagger and ReDoc
@@ -37,19 +38,28 @@ urlpatterns = [
     path("docs/", schema_view.with_ui("swagger", cache_timeout=0), name="schema-docs"),
     # API Endpoints (static configuration)
     path("auth/", include("horilla_api.api_urls.auth.urls")),
-    path("asset/", include("horilla_api.api_urls.asset.urls")),
     path("base/", include("horilla_api.api_urls.base.urls")),
     path("employee/", include("horilla_api.api_urls.employee.urls")),
     path("notifications/", include("horilla_api.api_urls.notifications.urls")),
     path("payroll/", include("horilla_api.api_urls.payroll.urls")),
     path("attendance/", include("horilla_api.api_urls.attendance.urls")),
     path("leave/", include("horilla_api.api_urls.leave.urls")),
-    path("helpdesk/", include("horilla_api.api_urls.helpdesk.urls")),
-    path("project/", include("horilla_api.api_urls.project.urls")),
-    path("onboarding/", include("horilla_api.api_urls.onboarding.urls")),
-    path("offboarding/", include("horilla_api.api_urls.offboarding.urls")),
-    path("recruitment/", include("horilla_api.api_urls.recruitment.urls")),
-    path("pms/", include("horilla_api.api_urls.pms.urls")),
     # Screen-shaped aggregates for the mobile client; see api_views/mobile.
     path("mobile/", include("horilla_api.api_urls.mobile.urls")),
 ]
+
+# Endpoints of optional modules, mounted only while the module is on (see
+# horilla/modules.py).
+for _module in (
+    "asset",
+    "helpdesk",
+    "project",
+    "onboarding",
+    "offboarding",
+    "recruitment",
+    "pms",
+):
+    if is_enabled(_module):
+        urlpatterns.append(
+            path(f"{_module}/", include(f"horilla_api.api_urls.{_module}.urls"))
+        )

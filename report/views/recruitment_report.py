@@ -6,7 +6,9 @@ from django.db.models.functions import Concat
 from django.http import JsonResponse
 from django.shortcuts import render
 
-if apps.is_installed("recruitment"):
+from horilla.modules import is_enabled
+
+if is_enabled("recruitment"):
 
     from base.methods import has_export_access
     from base.models import Company
@@ -342,7 +344,7 @@ if apps.is_installed("recruitment"):
             qs = Candidate.objects.all()
         elif model_type == "recruitment":
             qs = Recruitment.objects.all()
-        elif model_type == "onboarding" and apps.is_installed("onboarding"):
+        elif model_type == "onboarding" and is_enabled("onboarding"):
             OnboardingStage = apps.get_model("onboarding", "OnboardingStage")
             qs = OnboardingStage.objects.all()
         else:
@@ -382,7 +384,7 @@ if apps.is_installed("recruitment"):
         selected_company = request.session.get("selected_company")
         if selected_company != "all":
             company = Company.objects.filter(id=selected_company).first()
-        if apps.is_installed("onboarding"):
+        if is_enabled("onboarding"):
             OnboardingStage = apps.get_model("onboarding", "OnboardingStage")
             onboarding_export_access = has_export_access(request, OnboardingStage)
         else:
@@ -517,7 +519,7 @@ if apps.is_installed("recruitment"):
                 }
                 for item in data
             ]
-        elif model_type == "onboarding" and apps.is_installed("onboarding"):
+        elif model_type == "onboarding" and is_enabled("onboarding"):
             from onboarding.filters import OnboardingStageFilter
 
             OnboardingStage = apps.get_model("onboarding", "OnboardingStage")

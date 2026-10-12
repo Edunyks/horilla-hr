@@ -22,6 +22,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django_apscheduler.jobstores import DjangoJobStore
 
+from horilla.modules import OPTIONAL_MODULES, is_enabled
 from horilla.scheduling import get_registered_jobs
 
 logger = logging.getLogger(__name__)
@@ -43,7 +44,10 @@ class Command(BaseCommand):
         # process, which is the duplication this command exists to remove.
         self._load_job_modules()
 
-        jobs = get_registered_jobs()
+        # A module switched off by ENABLED_MODULES keeps its scheduler module
+        # importable (several apps import it from __init__), so its jobs are
+        # registered anyway; drop them here so they never run.
+        jobs = [job for job in get_registered_jobs() if self._job_enabled(job)]
         if not jobs:
             self.stderr.write(self.style.WARNING("No scheduled jobs registered."))
             return
@@ -118,6 +122,12 @@ class Command(BaseCommand):
             scheduler.start()
         except (KeyboardInterrupt, SystemExit):
             scheduler.shutdown(wait=True)
+
+    @staticmethod
+    def _job_enabled(job):
+        """False when the app that registered ``job`` is switched off."""
+        app = job.func.__module__.split(".")[0]
+        return app not in OPTIONAL_MODULES or is_enabled(app)
 
     def _load_job_modules(self):
         """Import every installed app's scheduler module to populate the registry."""

@@ -75,6 +75,7 @@ from employee.models import Employee, EmployeeTag
 from horilla import horilla_middlewares
 from horilla.horilla_middlewares import _thread_locals
 from horilla.methods import get_horilla_model_class
+from horilla.modules import is_enabled
 from horilla_audit.models import AuditTag
 from horilla_auth.models import HorillaUser
 from horilla_widgets.widgets.horilla_multi_select_field import HorillaMultiSelectField
@@ -790,7 +791,7 @@ class DepartmentForm(ModelForm):
         # Company" session context surface every employee in every company
         # instead of narrowing to whoever's already assigned to this
         # department.
-        if self.instance.pk and apps.is_installed("helpdesk"):
+        if self.instance.pk and is_enabled("helpdesk"):
             from helpdesk.models import DepartmentManager
 
             existing = DepartmentManager.objects.filter(
@@ -805,7 +806,7 @@ class DepartmentForm(ModelForm):
 
     def save(self, commit=True):
         department = super().save(commit=commit)
-        if commit and apps.is_installed("helpdesk"):
+        if commit and is_enabled("helpdesk"):
             from helpdesk.models import DepartmentManager
 
             manager = self.cleaned_data.get("manager")

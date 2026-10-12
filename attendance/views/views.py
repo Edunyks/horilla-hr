@@ -16,6 +16,7 @@ import uuid
 
 from horilla.http.response import HorillaRedirect
 from horilla.methods import remove_dynamic_url
+from horilla.modules import is_enabled
 
 logger = logging.getLogger(__name__)
 
@@ -3300,7 +3301,7 @@ def attendance_rule_settings_view(request):
     facedetection = None
     from django.apps import apps
 
-    if apps.is_installed("facedetection"):
+    if is_enabled("facedetection"):
         from facedetection.models import FaceDetection
 
         facedetection = FaceDetection.objects.filter(company_id=company).first()

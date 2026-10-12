@@ -6,6 +6,13 @@ class ReportConfig(AppConfig):
     name = "report"
 
     def ready(self) -> None:
+        from horilla.modules import is_enabled, mount_disabled_urls
+
+        if not is_enabled("report"):
+            # Switched off by ENABLED_MODULES: models stay, URLs only 404.
+            mount_disabled_urls("report/", "report.urls")
+            return super().ready()
+
         ready = super().ready()
         from django.urls import include, path
 

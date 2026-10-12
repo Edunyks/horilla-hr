@@ -383,6 +383,12 @@ def main_dashboard_view(request):
         resolve_home_role,
         role_default_prefs,
     )
+    from horilla.modules import payroll_dashboard_is_home
+
+    if payroll_dashboard_is_home(request.user) and request.GET.get("view") != (
+        "analytics"
+    ):
+        return redirect("view-payroll-dashboard")
 
     home_role = resolve_home_role(request)
     if not can_see_analytics_home(home_role) and request.GET.get("view") != "analytics":

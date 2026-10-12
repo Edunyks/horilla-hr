@@ -13,6 +13,7 @@ from typing import Any, Optional
 from django.apps import apps
 from django.utils.translation import gettext as _
 
+from horilla.modules import is_enabled
 from report.registry import ReportDefinition
 
 # Catalog of supported filter controls (id → metadata).
@@ -346,7 +347,7 @@ def build_filter_options(definition: ReportDefinition) -> dict[str, list]:
             {"id": "cancelled", "label": str(_("Cancelled"))},
         ]
 
-    if "recruitments" in needed and apps.is_installed("recruitment"):
+    if "recruitments" in needed and is_enabled("recruitment"):
         options["recruitments"] = _recruitments()
 
     if "sources" in needed:

@@ -1,5 +1,5 @@
 ﻿{% extends "index.html" %}
-{% load static i18n %}
+{% load static i18n horillafilters %}
 
 {% block content %}
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
@@ -1680,7 +1680,7 @@
                         <div class="md-chart-card__body"><div id="chart-leave-coverage"></div></div>
                     </div>
 
-                    {% if perms.recruitment.view_recruitment or request.user.is_superuser %}
+                    {% if "recruitment"|app_installed and perms.recruitment.view_recruitment or "recruitment"|app_installed and request.user.is_superuser %}
                         <!-- Recruitment Pipeline -->
                         <div
                             class="md-chart-card md-chart-card--wide"
@@ -1759,7 +1759,7 @@
                         </div>
                     {% endif %}
 
-                    {% if perms.recruitment.view_recruitment or request.user.is_superuser %}
+                    {% if "recruitment"|app_installed and perms.recruitment.view_recruitment or "recruitment"|app_installed and request.user.is_superuser %}
                         <!-- Recruitment Funnel (NEW) -->
                         <div
                             class="md-chart-card md-chart-card--wide"
@@ -1941,7 +1941,7 @@
                 attendance:  {% if perms.attendance.view_attendance or request.user.is_superuser %}true{% else %}false{% endif %},
                 leave:       {% if perms.leave.view_leaverequest   or request.user.is_superuser %}true{% else %}false{% endif %},
                 candidate:   {% if perms.recruitment.view_candidate or request.user.is_superuser %}true{% else %}false{% endif %},
-                recruitment: {% if perms.recruitment.view_recruitment or request.user.is_superuser %}true{% else %}false{% endif %},
+                recruitment: {% if "recruitment"|app_installed and perms.recruitment.view_recruitment or "recruitment"|app_installed and request.user.is_superuser %}true{% else %}false{% endif %},
             };
 
             const emptyHtml = (msg) => `<div class="md-empty"><img src="/static/images/ui/no_records.svg" alt="">${msg}</div>`;
@@ -2817,7 +2817,7 @@
             loadLeaveOverPeriod();
             {% endif %}
 
-            {% if perms.recruitment.view_recruitment or request.user.is_superuser %}
+            {% if "recruitment"|app_installed and perms.recruitment.view_recruitment or "recruitment"|app_installed and request.user.is_superuser %}
             // ─── RECRUITMENT PIPELINE ───
             function loadRecruitmentPipeline() {
                 fetch("{% url 'dashboard-recruitment-by-stage' %}?_t=" + Date.now())
@@ -3101,10 +3101,12 @@
                         <div class="md-pending-card__count">${p.attendance_requests}</div>
                         <div class="md-pending-card__label">{% trans "Attendance"|escapejs %}</div>
                     </a>
+                    {% if "asset"|app_installed %}
                     <a href="{% url 'asset-request-allocation-view' %}?open_tab=2&asset_request_status=Requested&filter_applied=1" class="md-pending-card md-pending-card--green">
                         <div class="md-pending-card__count">${p.asset_requests}</div>
                         <div class="md-pending-card__label">{% trans "Assets"|escapejs %}</div>
                     </a>
+                    {% endif %}
                     <a href="{% url 'shift-request-view' %}?open_tab=1&status=requested&filter_applied=1" class="md-pending-card" style="background:#f0fdfa;">
                         <div class="md-pending-card__count" style="color:#0d9488;">${p.shift_requests}</div>
                         <div class="md-pending-card__label">{% trans "Shift"|escapejs %}</div>
@@ -3137,7 +3139,7 @@
             }
             loadPendingApprovals();
 
-            {% if perms.recruitment.view_recruitment or request.user.is_superuser %}
+            {% if "recruitment"|app_installed and perms.recruitment.view_recruitment or "recruitment"|app_installed and request.user.is_superuser %}
             // ─── RECRUITMENT FUNNEL (HTML stage funnel — share of candidates) ───
             function loadRecruitmentFunnel() {
                 fetch("{% url 'dashboard-recruitment-pipeline' %}?_t=" + Date.now())

@@ -8,6 +8,13 @@ class HorillaLdapConfig(AppConfig):
     verbose_name = "LDAP"
 
     def ready(self):
+        from horilla.modules import is_enabled, mount_disabled_urls
+
+        if not is_enabled("horilla_ldap"):
+            # Switched off by ENABLED_MODULES: models stay, URLs only 404.
+            mount_disabled_urls("", "horilla_ldap.urls")
+            return super().ready()
+
         from django.urls import include, path
 
         from horilla import config

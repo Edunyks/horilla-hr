@@ -13,6 +13,7 @@ import uuid
 from django import template
 from django.apps import apps
 
+from horilla.modules import is_enabled
 from horilla_auth.models import HorillaUser
 from recruitment.models import CandidateRating
 
@@ -172,7 +173,7 @@ def is_in_task_managers(user):
     """
     This method is used to check the user in the task manager or not
     """
-    if apps.is_installed("onboarding"):
+    if is_enabled("onboarding"):
         from onboarding.models import OnboardingTask
 
         return OnboardingTask.objects.filter(

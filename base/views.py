@@ -195,6 +195,7 @@ from horilla.group_by import group_by_queryset
 from horilla.http.response import HorillaRedirect
 from horilla.menu import get_settings_menu
 from horilla.methods import get_horilla_model_class, remove_dynamic_url
+from horilla.modules import is_enabled, payroll_dashboard_is_home
 from horilla_audit.forms import HistoryTrackingFieldsForm
 from horilla_audit.models import AccountBlockUnblock, AuditTag, HistoryTrackingFields
 from horilla_auth.models import HorillaUser
@@ -1210,6 +1211,8 @@ def home(request):
     """
     from base.dashboard_roles import can_see_analytics_home, resolve_home_role
 
+    if payroll_dashboard_is_home(request.user):
+        return redirect("view-payroll-dashboard")
     if can_see_analytics_home(resolve_home_role(request)):
         return redirect("dashboard")
     return redirect("ess-dashboard")
@@ -1821,7 +1824,7 @@ def object_delete(request, obj_id, **kwargs):
             _("This {} is already in use for {}.").format(instance, model_names_str),
         ),
 
-    if apps.is_installed("pms") and redirect_path == "/pms/filter-key-result/":
+    if is_enabled("pms") and redirect_path == "/pms/filter-key-result/":
         KeyResult = get_horilla_model_class(app_label="pms", model="keyresult")
         key_results = KeyResult.objects.all()
         if key_results.exists():
@@ -6792,6 +6795,8 @@ def helpdesk_tag_view(request):
     """
     This method is used to show Help desk tags
     """
+    if not is_enabled("helpdesk"):
+        raise Http404()
     tags = Tags.objects.all()
     return render(
         request,

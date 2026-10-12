@@ -13,6 +13,7 @@ from django.shortcuts import render
 from django.utils.translation import gettext as _
 
 from horilla.decorators import login_required, permission_required
+from horilla.modules import is_enabled
 
 
 def _parse_period(request):
@@ -366,7 +367,7 @@ def offboarding_unreturned_assets(request):
     assets = []
 
     try:
-        if apps.is_installed("asset"):
+        if is_enabled("asset"):
             from asset.models import AssetAssignment
             from offboarding.models import OffboardingEmployee
 

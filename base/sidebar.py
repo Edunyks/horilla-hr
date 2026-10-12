@@ -15,6 +15,7 @@ from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 
 from horilla.menu import settings_menu
+from horilla.modules import is_enabled
 
 # ---------------------------------------------------------------------------
 # Accessibility functions
@@ -140,28 +141,32 @@ def color_theme_accessibility(request, submenu, user_perms, *args, **kwargs):
 
 
 def gdrive_accessibility(request, submenu, user_perms, *args, **kwargs):
-    return request.user.has_perm("horilla_backup.view_googledrivebackup")
+    return is_enabled("horilla_backup") and request.user.has_perm(
+        "horilla_backup.view_googledrivebackup"
+    )
 
 
 def linkedin_accessibility(request, submenu, user_perms, *args, **kwargs):
-    return request.user.has_perm("recruitment.view_linkedinaccount")
+    return is_enabled("recruitment") and request.user.has_perm(
+        "recruitment.view_linkedinaccount"
+    )
 
 
 def ldap_accessibility(request, submenu, user_perms, *args, **kwargs):
-    return apps.is_installed("horilla_ldap") and any(
+    return is_enabled("horilla_ldap") and any(
         request.user.has_perm(p)
         for p in ["horilla_ldap.add_ldapsettings", "horilla_ldap.update_ldapsettings"]
     )
 
 
 def google_meet_accessibility(request, submenu, user_perms, *args, **kwargs):
-    return apps.is_installed("horilla_meet") and request.user.has_perm(
+    return is_enabled("horilla_meet") and request.user.has_perm(
         "horilla_meet.view_googlecloudcredential"
     )
 
 
 def whatsapp_accessibility(request, submenu, user_perms, *args, **kwargs):
-    return apps.is_installed("whatsapp") and request.user.has_perm(
+    return is_enabled("whatsapp") and request.user.has_perm(
         "whatsapp.add_whatsappcredientials"
     )
 

@@ -24,6 +24,7 @@ from base.context_processors import intial_notice_period
 from base.methods import eval_validate
 from horilla.http.response import HorillaRedirect
 from horilla.methods import get_horilla_model_class
+from horilla.modules import is_enabled
 from horilla_views.cbv_methods import (
     hx_request_required,
     login_required,
@@ -1247,7 +1248,7 @@ class DashboardTaskListview(HorillaListView):
     ]
 
 
-if apps.is_installed("asset"):
+if is_enabled("asset"):
 
     @method_decorator(login_required, name="dispatch")
     @method_decorator(
@@ -1303,7 +1304,7 @@ if apps.is_installed("asset"):
                     """
 
 
-if apps.is_installed("pms"):
+if is_enabled("pms"):
 
     @method_decorator(login_required, name="dispatch")
     @method_decorator(

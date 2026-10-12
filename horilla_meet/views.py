@@ -15,6 +15,7 @@ from horilla.decorators import (
     permission_required,
 )
 from horilla.http.response import HorillaRedirect
+from horilla.modules import is_enabled
 from horilla_meet.methods import get_google_credentials
 from horilla_meet.models import *
 
@@ -153,7 +154,7 @@ def delete_google_meet(request, id):
         return HttpResponse("")
 
 
-if apps.is_installed("recruitment"):
+if is_enabled("recruitment"):
     from recruitment.models import InterviewSchedule
 
     @login_required
@@ -215,7 +216,7 @@ if apps.is_installed("recruitment"):
             return JsonResponse({"error": str(e)}, status=500)
 
 
-if apps.is_installed("pms"):
+if is_enabled("pms"):
     from pms.models import Meetings
 
     @login_required

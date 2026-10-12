@@ -20,6 +20,7 @@ from base.models import Announcement, IntegrationApps
 from employee.models import Employee
 from horilla.decorators import check_integration_enabled, login_required
 from horilla.horilla_middlewares import _thread_locals
+from horilla.modules import is_enabled
 from notifications.signals import notify
 from whatsapp.flows import (
     get_asset_category_flow_json,
@@ -553,7 +554,7 @@ def flow_conversion(number, flow_response_json):
     elif type == "work_type":
         message = work_type_create(employee, flow_response)
     elif type == "asset_request":
-        if apps.is_installed("asset"):
+        if is_enabled("asset"):
             message = asset_request_create(employee, flow_response)
         else:
             message = "Asset module is not installed."

@@ -7,14 +7,21 @@ Horilla app configurations
 import importlib
 import logging
 
-from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.context_processors import PermWrapper
+
+from horilla.modules import is_enabled, is_payroll_only
 
 logger = logging.getLogger(__name__)
 
 
 def get_apps_in_base_dir():
+    """
+    The sidebar sections to render, in order: PAYROLL_ONLY_SIDEBARS when only
+    payroll is on (see horilla.modules.is_payroll_only), SIDEBARS otherwise.
+    """
+    if is_payroll_only():
+        return getattr(settings, "PAYROLL_ONLY_SIDEBARS", settings.SIDEBARS)
     return settings.SIDEBARS
 
 
@@ -23,6 +30,19 @@ def import_method(accessibility):
     module = __import__(module_path, fromlist=[method_name])
     accessibility_method = getattr(module, method_name)
     return accessibility_method
+
+
+def resolve_sidebar_entry(entry):
+    """
+    Map a SIDEBARS entry to (owning app, sidebar module path).
+
+    An entry is either an app label ("payroll" -> "payroll.sidebar") or the
+    dotted path of a sidebar module ("payroll.sidebars.contracts"), whose
+    owning app is its first component.
+    """
+    if "." in entry:
+        return entry.split(".", 1)[0], entry
+    return entry, entry + ".sidebar"
 
 
 ALL_MENUS = {}
@@ -36,10 +56,11 @@ def sidebar(request):
         request.MENUS = []
         MENUS = request.MENUS
 
-        for app in base_dir_apps:
-            if apps.is_installed(app):
+        for entry in base_dir_apps:
+            app, module_path = resolve_sidebar_entry(entry)
+            if is_enabled(app):
                 try:
-                    sidebar = importlib.import_module(app + ".sidebar")
+                    sidebar = importlib.import_module(module_path)
 
                 except Exception as e:
                     logger.error(e)
@@ -60,7 +81,10 @@ def sidebar(request):
                     ):
                         MENU = {}
                         MENU["menu"] = sidebar.MENU
-                        MENU["app"] = app
+                        # Section id for the template's open/closed state, so
+                        # it must be unique: the dotted path for a section
+                        # module, the app label otherwise.
+                        MENU["app"] = entry.replace(".", "_")
                         MENU["img_src"] = sidebar.IMG_SRC
                         MENU["submenu"] = []
                         MENUS.append(MENU)
@@ -80,6 +104,10 @@ def sidebar(request):
                                 PermWrapper(request.user),
                             ):
                                 MENU["submenu"].append(submenu)
+                        if "." in entry and not MENU["submenu"]:
+                            # A single-purpose section with nothing the user
+                            # may open would render as an empty button.
+                            MENUS.remove(MENU)
         ALL_MENUS[request.session.session_key] = MENUS
 
 

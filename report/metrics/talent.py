@@ -7,6 +7,7 @@ import logging
 from django.db.models import Count, Q
 from django.utils.translation import gettext as _
 
+from horilla.modules import is_enabled
 from report.engine import ReportFilters, apply_org_filters, empty_report
 
 logger = logging.getLogger(__name__)
@@ -357,7 +358,7 @@ def offer_acceptance(filters: ReportFilters) -> dict:
 def onboarding_progress(filters: ReportFilters) -> dict:
     from django.apps import apps
 
-    if not apps.is_installed("onboarding"):
+    if not is_enabled("onboarding"):
         return {
             "title": _("Onboarding Progress"),
             "kpis": [],

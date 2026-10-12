@@ -28,6 +28,7 @@ from django.template.loader import render_to_string
 from django.utils.translation import gettext as _
 
 from horilla.models import has_xss
+from horilla.modules import is_enabled
 
 logger = logging.getLogger(__name__)
 
@@ -1210,7 +1211,7 @@ def reload_queryset(fields):
     request = getattr(_thread_locals, "request", None)
     selected_company = request.session.get("selected_company") if request else None
 
-    recruitment_installed = apps.is_installed("recruitment")
+    recruitment_installed = is_enabled("recruitment")
     model_filters = {
         "Employee": {"is_active": True},
         "Candidate": {"is_active": True} if recruitment_installed else None,
@@ -1684,7 +1685,7 @@ def check_chart_permission(request, charts):
     """
     from base.templatetags.basefilters import is_reportingmanager
 
-    if apps.is_installed("recruitment"):
+    if is_enabled("recruitment"):
         from recruitment.templatetags.recruitmentfilters import is_stagemanager
     else:
         is_stagemanager = lambda u: False  # fallback if recruitment not installed
@@ -1695,7 +1696,7 @@ def check_chart_permission(request, charts):
             return False
 
         # app must be installed
-        if not apps.is_installed(config["app"]):
+        if not is_enabled(config["app"]):
             return False
 
         # check permission

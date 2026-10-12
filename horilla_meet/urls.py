@@ -1,6 +1,7 @@
 from django.apps import apps
 from django.urls import path
 
+from horilla.modules import is_enabled
 from horilla_meet import cbv
 
 from . import views
@@ -93,7 +94,7 @@ urlpatterns = [
     ),
 ]
 
-if apps.is_installed("recruitment"):
+if is_enabled("recruitment"):
     urlpatterns += [
         path(
             "create-interview-google-meeting/",
@@ -102,7 +103,7 @@ if apps.is_installed("recruitment"):
         ),
     ]
 
-if apps.is_installed("pms"):
+if is_enabled("pms"):
     urlpatterns += [
         path(
             "create-pms-google-meeting/",

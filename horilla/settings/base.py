@@ -103,6 +103,33 @@ INSTALLED_APPS = [
 ]
 
 # ========================================
+# OPTIONAL MODULES (feature flag)
+# ========================================
+# Comma-separated list of the optional modules to keep on; see
+# horilla/modules.py for which modules are optional. Switched-off modules stay
+# in INSTALLED_APPS (their tables and migrations are kept) but are hidden:
+# their pages 404 and they get no sidebar or settings entries, signals or
+# scheduled jobs.
+#
+#   ENABLED_MODULES unset / "all"  -> every module on (default)
+#   ENABLED_MODULES=payroll-only   -> payroll build (only "report" kept)
+#   ENABLED_MODULES=report,asset   -> exactly those optional modules
+#   ENABLED_MODULES=none           -> no optional modules
+_enabled_modules = [
+    name.strip().lower()
+    for name in env("ENABLED_MODULES", default="all").split(",")
+    if name.strip()
+]
+if not _enabled_modules or _enabled_modules == ["all"]:
+    ENABLED_MODULES = None
+elif _enabled_modules == ["payroll-only"]:
+    ENABLED_MODULES = ["report"]
+elif _enabled_modules == ["none"]:
+    ENABLED_MODULES = []
+else:
+    ENABLED_MODULES = _enabled_modules
+
+# ========================================
 # REST FRAMEWORK CONFIGURATION
 # ========================================
 
@@ -451,6 +478,10 @@ TWO_FACTORS_AUTHENTICATION = False
 # Off by default so Docker CI (web without the scheduler service) still passes.
 HORILLA_REQUIRE_SCHEDULER = env.bool("HORILLA_REQUIRE_SCHEDULER", default=False)
 
+# Sidebar sections, in order. An entry is an app label (renders
+# "<app>/sidebar.py") or the dotted path of a sidebar module
+# ("payroll.sidebars.contracts"); either way it is shown only while its owning
+# app -- the first component -- is enabled (see horilla/modules.py).
 SIDEBARS = [
     "employee",
     "attendance",
@@ -464,6 +495,25 @@ SIDEBARS = [
     "asset",
     "helpdesk",
     "report",
+]
+
+# Used instead of SIDEBARS when only payroll is on (horilla.modules.
+# is_payroll_only): payroll is split into top-level sections so the sidebar of
+# a payroll-only build is not three entries long. Dashboard is the fixed top
+# link above these and points at the payroll dashboard in this build.
+PAYROLL_ONLY_SIDEBARS = [
+    "employee",
+    "attendance",
+    "leave",
+    "payroll.sidebars.payslips",
+    "payroll.sidebars.contracts",
+    "payroll.sidebars.salary_structures",
+    "payroll.sidebars.allowances_deductions",
+    "payroll.sidebars.loans",
+    "payroll.sidebars.reimbursements",
+    "payroll.sidebars.income_tax",
+    "payroll.sidebars.reports",
+    "payroll.sidebars.configuration",
 ]
 
 # Audit logging is opt-in: the horilla_audit app registers models explicitly

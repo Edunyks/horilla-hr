@@ -17,6 +17,7 @@ from horilla_views.generic.cbv.views import (
     HorillaFormView,
     HorillaListView,
     HorillaNavView,
+    TemplateView,
 )
 from payroll.filters import SalaryStructureFilter
 from payroll.forms.component_forms import (
@@ -41,6 +42,19 @@ def _reload_detail_view_script(structure_pk, request):
         return ""
     detail_url = reverse("salary-structure-detail-view", kwargs={"pk": structure_pk})
     return f"htmx.ajax('GET', '{detail_url}', {{target: '#genericModalBody'}});"
+
+
+@method_decorator(login_required, name="dispatch")
+@method_decorator(
+    permission_required(perm="payroll.view_salarystructure"), name="dispatch"
+)
+class SalaryStructureViewPage(TemplateView):
+    """
+    Standalone salary structures page (payroll-only sidebar); the same content
+    is also a tab of Payroll Settings.
+    """
+
+    template_name = "cbv/salary_structure/salary_structure_home.html"
 
 
 @method_decorator(login_required, name="dispatch")
