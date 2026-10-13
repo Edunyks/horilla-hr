@@ -339,11 +339,11 @@ def currency_symbol_position(amount):
         PayrollSettings = get_horilla_model_class(
             app_label="payroll", model="payrollsettings"
         )
-    symbol = PayrollSettings.objects.first()
+    symbol = PayrollSettings.for_current_company()
 
     currency = symbol.currency_symbol if symbol else "$"
 
-    if symbol.position == "postfix":
+    if symbol and symbol.position == "postfix":
         currency_symbol = f"{amount} {currency}"
     else:
         currency_symbol = f"{currency} {amount}"

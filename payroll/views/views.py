@@ -592,7 +592,7 @@ def view_payslip_pdf(request, payslip_id):
             data["json_data"]["employee"] = payslip.employee_id.id
             data["json_data"]["payslip"] = payslip.id
             data["instance"] = payslip
-            data["currency"] = PayrollSettings.objects.first().currency_symbol
+            data["currency"] = PayrollSettings.for_current_company().currency_symbol
             data["all_deductions"] = []
             for deduction_list in [
                 data["basic_pay_deductions"],
@@ -1580,7 +1580,7 @@ def payslip_pdf(request, id):
                     "employee": payslip.employee_id,
                     "payslip": payslip,
                     "json_data": data.copy(),
-                    "currency": PayrollSettings.objects.first().currency_symbol,
+                    "currency": PayrollSettings.for_current_company().currency_symbol,
                     "all_deductions": [],
                     "all_allowances": data["allowances"].copy(),
                     "host": request.get_host(),

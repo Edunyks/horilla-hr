@@ -84,6 +84,27 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
+# wkhtmltopdf: pdfkit shells out to it for every PDF (payslips, reports), so
+# without it each download fails with 'No wkhtmltopdf executable found'.
+# Debian trixie (this base) no longer ships it, and Debian's old build used
+# unpatched Qt, which rejects the --footer-center option the payslip PDF
+# passes. So use the upstream build, pinned by checksum per architecture.
+ARG WKHTMLTOX_VERSION=0.12.6.1-3
+RUN set -eux; \
+    arch="$(dpkg --print-architecture)"; \
+    case "$arch" in \
+        amd64) sha=98ba0d157b50d36f23bd0dedf4c0aa28c7b0c50fcdcdc54aa5b6bbba81a3941d ;; \
+        arm64) sha=b6606157b27c13e044d0abbe670301f88de4e1782afca4f9c06a5817f3e03a9c ;; \
+        *) echo "no wkhtmltox build for $arch"; exit 1 ;; \
+    esac; \
+    curl -fsSLo /tmp/wkhtmltox.deb \
+        "https://github.com/wkhtmltopdf/packaging/releases/download/${WKHTMLTOX_VERSION}/wkhtmltox_${WKHTMLTOX_VERSION}.bookworm_${arch}.deb"; \
+    echo "${sha}  /tmp/wkhtmltox.deb" | sha256sum -c -; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends /tmp/wkhtmltox.deb; \
+    rm -rf /tmp/wkhtmltox.deb /var/lib/apt/lists/*; \
+    wkhtmltopdf --version
+
 # The base image ships its own setuptools (and pip's vendored msgpack) in
 # /usr/local/lib/python3.12/site-packages, outside the /opt/venv this app
 # runs from. Pinning them in requirements.txt only fixes the venv copy, so
